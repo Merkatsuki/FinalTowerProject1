@@ -1,20 +1,15 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(PlayerController2D))]
 public class PlayerStateMachine : StateMachine<PlayerState>, IGameStateListener
 {
-    public float moveSpeed = 5f;
-    public float jumpForce = 7f;
+    private PlayerController2D controller;
 
-    private Rigidbody2D rb;
-    private Animator animator;
-    private bool isGrounded = true; // Simplified for now
-    private float horizontalInput;
+    public static event System.Action<PlayerState, PlayerState> OnPlayerStateChanged;
 
     protected override void Initialize()
     {
-        rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
+        controller = GetComponent<PlayerController2D>();
         GameStateManager.Instance?.RegisterListener(this);
         ChangeState(PlayerState.Idle);
     }
@@ -26,56 +21,64 @@ public class PlayerStateMachine : StateMachine<PlayerState>, IGameStateListener
 
     private void Update()
     {
-        if (GameStateManager.Instance == null || !GameStateManager.Instance.Is(GameState.Gameplay))
+        if (!GameStateManager.Instance.Is(GameState.Gameplay))
             return;
 
-        HandleInput();
-        UpdateState();
-    }
+        Vector2 moveInput = InputManager.Instance.GetMoveInput();
+        bool jumpPressed = InputManager.Instance.GetJumpPressed();
 
-    private void HandleInput()
-    {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            ChangeState(PlayerState.Jumping);
-        }
-        else if (Mathf.Abs(horizontalInput) > 0.1f)
-        {
-            ChangeState(PlayerState.Walking);
-        }
-        else
-        {
-            ChangeState(PlayerState.Idle);
-        }
-    }
-
-    private void UpdateState()
-    {
         switch (CurrentState)
         {
-            case PlayerState.Walking:
-                rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
-                break;
-            case PlayerState.Jumping:
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-                isGrounded = false; // You'd update this based on collision logic
-                ChangeState(PlayerState.Idle); // Simplified transition
-                break;
             case PlayerState.Idle:
-                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+                if (Mathf.Abs(moveInput.x) > 0.1f)
+                    ChangeState(PlayerState.Walking);
+                if (jumpPressed && controller.IsGrounded())
+                    ChangeState(PlayerState.Jumping);
                 break;
+
+            case PlayerState.Walking:
+                controller.Move(moveInput);
+                if (Mathf.Abs(moveInput.x) < 0.1f)
+                    ChangeState(PlayerState.Idle);
+                if (jumpPressed && controller.IsGrounded())
+                    ChangeState(PlayerState.Jumping);
+                break;
+
+            case PlayerState.Jumping:
+                controller.Jump();
+                ChangeState(PlayerState.Idle); // Simplified
+                break;
+
             case PlayerState.Interacting:
             case PlayerState.Frozen:
-                rb.linearVelocity = Vector2.zero;
+                controller.StopMovement();
                 break;
         }
+    }
 
-        if (animator != null)
+    public override bool CanEnterState(PlayerState newState)
+    {
+        switch (newState)
         {
-            animator.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
-            animator.SetBool("IsGrounded", isGrounded);
+            case PlayerState.Jumping:
+                return controller.IsGrounded();
+            case PlayerState.Walking:
+            case PlayerState.Idle:
+                return GameStateManager.Instance.Is(GameState.Gameplay);
+            default:
+                return true;
+        }
+    }
+
+    public override void ChangeState(PlayerState newState)
+    {
+        if (!Equals(CurrentState, newState) && CanEnterState(newState))
+        {
+            var previousState = CurrentState;
+            OnStateExit(CurrentState);
+            CurrentState = newState;
+            OnStateEnter(CurrentState);
+            OnPlayerStateChanged?.Invoke(previousState, CurrentState);
         }
     }
 

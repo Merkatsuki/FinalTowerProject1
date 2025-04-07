@@ -11,10 +11,13 @@ public abstract class StateMachine<T> : MonoBehaviour where T : System.Enum
 
     protected abstract void Initialize();
 
+    public virtual bool CanEnterState(T newState) => true;
+
     public virtual void ChangeState(T newState)
     {
-        if (!Equals(CurrentState, newState))
+        if (!Equals(CurrentState, newState) && CanEnterState(newState))
         {
+            var previousState = CurrentState;
             OnStateExit(CurrentState);
             CurrentState = newState;
             OnStateEnter(CurrentState);
