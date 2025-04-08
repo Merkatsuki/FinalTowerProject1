@@ -1,29 +1,28 @@
 using UnityEngine;
 
-public abstract class StateMachine<T> : MonoBehaviour where T : System.Enum
+public abstract class StateMachine : MonoBehaviour
 {
-    public T CurrentState { get; protected set; }
+    private State currentState;
 
-    protected virtual void Start()
+    public void SetState(State state)
     {
-        Initialize();
+        currentState?.Exit();
+        currentState = state;
+        currentState?.Enter();
     }
 
-    protected abstract void Initialize();
-
-    public virtual bool CanEnterState(T newState) => true;
-
-    public virtual void ChangeState(T newState)
+    private void Update()
     {
-        if (!Equals(CurrentState, newState) && CanEnterState(newState))
-        {
-            var previousState = CurrentState;
-            OnStateExit(CurrentState);
-            CurrentState = newState;
-            OnStateEnter(CurrentState);
-        }
+        currentState?.Tick();
     }
 
-    protected virtual void OnStateEnter(T state) { }
-    protected virtual void OnStateExit(T state) { }
+    private void FixedUpdate()
+    {
+        currentState?.FixedTick();
+    }
+
+    private void OnDrawGizmos()
+    {
+        currentState?.DebugGizmos();
+    }
 }

@@ -8,6 +8,18 @@ public class InputManager : MonoBehaviour
 
     private PlayerInputActions inputActions;
 
+    private Vector2 moveInput;
+    private bool isJumpPressed = false;
+    private bool wasJumpPressedThisFrame = false;
+
+    public Vector2 MoveInput => moveInput;
+    public bool IsJumpPressed => isJumpPressed;
+    public bool WasJumpPressedThisFrame => wasJumpPressedThisFrame;
+
+    public static event System.Action<Vector2> OnMove;
+    public static event System.Action OnJumpRequested;
+    public static event System.Action OnInteractPressed;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -18,11 +30,40 @@ public class InputManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
         inputActions = new PlayerInputActions();
         inputActions.Enable();
+
+        inputActions.Player.Move.performed += ctx => {
+            moveInput = ctx.ReadValue<Vector2>();
+            OnMove?.Invoke(moveInput);
+        };
+
+        inputActions.Player.Move.canceled += ctx => {
+            moveInput = Vector2.zero;
+            OnMove?.Invoke(moveInput);
+        };
+
+        inputActions.Player.Jump.started += ctx => {
+            isJumpPressed = true;
+            wasJumpPressedThisFrame = true;
+            OnJumpRequested?.Invoke(); // New!
+        };
+
+        inputActions.Player.Jump.canceled += ctx => {
+            isJumpPressed = false;
+        };
+
+        inputActions.Player.Interact.performed += ctx => OnInteractPressed?.Invoke();
     }
 
-    public Vector2 GetMoveInput() => inputActions.Player.Move.ReadValue<Vector2>();
-    public bool GetJumpPressed() => inputActions.Player.Jump.triggered;
-    public bool GetInteractPressed() => inputActions.Player.Interact.triggered;
+    private void Update()
+    {
+        wasJumpPressedThisFrame = false;
+    }
+
+    private void OnDisable()
+    {
+        inputActions.Disable();
+    }
 }
