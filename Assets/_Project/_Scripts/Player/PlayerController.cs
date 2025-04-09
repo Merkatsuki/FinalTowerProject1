@@ -3,30 +3,47 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 7f;
-    public float jumpForce = 11f;
-    public Vector2 wallJumpDirection = new Vector2(2f, 4f);
-    public float wallJumpMultiplier = 15f;
+    [Header("Movement")]
+    [Range(1f, 20f)] public float maxSpeed = 7f;
+    [Range(10f, 200f)] public float acceleration = 70f;
+    [Range(10f, 200f)] public float deceleration = 100f;
+    [Range(10f, 200f)] public float airAcceleration = 50f;
+    [Range(10f, 200f)] public float airDeceleration = 60f;
+
+    [Header("Jumping")]
+    [Range(5f, 45f)] public float jumpForce = 25f;
+    [Range(0f, 10f)] public float gravityScale = 5f;
+    [Range(0f, 100f)] public float maxFallSpeed = 20f;
+    [Range(1f, 5f)] public float jumpCutMultiplier = 2f;
+    [Range(1f, 5f)] public float fallMultiplier = 2.5f;
+    [Range(0f, 0.5f)] public float coyoteTime = 0.15f;
+    [Range(0f, 0.5f)] public float jumpBufferTime = 0.15f;
+
+    [Header("Grounding")]
+    [Range(0f, 1f)] public float groundCheckRadius = 0.2f;
     public Transform groundCheck;
-    public float groundCheckRadius = 0.1f;
     public Transform wallCheckFront;
     public Transform wallCheckBack;
-    public float wallCheckDistance = 0.1f;
     public LayerMask groundLayer;
-    public float coyoteTime = 0.15f;
-    public float jumpBufferTime = 0.15f;
+    [Range(-20f, 0f)] public float groundingForce = -5f;
+
+    [Header("Input")]
+    [Range(0f, 1f)] public float inputDeadzone = 0.2f;
+    public bool snapInput = true;
 
     public Rigidbody2D rb;
-    [SerializeField] public Animator animator;
+    public Animator animator;
 
+    private bool isJumpCut;
+    private bool preserveMomentum;
     private Vector3 originalScale;
-    private float coyoteTimer;
-    private float jumpBufferTimer;
-    private bool preserveMomentum = false;
 
+    public float lastGroundedTime { get; private set; }
+    public float lastJumpInputTime { get; private set; }
+    
     public bool IsFacingRight => transform.localScale.x > 0;
-    public bool JumpBuffered => jumpBufferTimer > 0;
-    public bool CanCoyoteJump => coyoteTimer > 0;
+    public Vector2 LastInput { get; private set; }
+    public bool WasJumpPressedThisFrame => InputManager.Instance.WasJumpPressedThisFrame;
 
     private void Awake()
     {
@@ -36,104 +53,121 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        lastGroundedTime -= Time.deltaTime;
+
         if (IsGrounded())
-            coyoteTimer = coyoteTime;
-        else
-            coyoteTimer -= Time.deltaTime;
+            lastGroundedTime = coyoteTime;
 
-        jumpBufferTimer -= Time.deltaTime;
+        if (Input.GetButtonUp("Jump") && rb.linearVelocity.y > 0)
+        {
+            isJumpCut = true;
+        }
 
-        //Debug.Log($"[PLAYER] CoyoteTimer: {coyoteTimer:F2} | JumpBuffer: {jumpBufferTimer:F2}");
+        animator?.SetBool("IsGrounded", IsGrounded());
+        animator?.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
     }
 
-    public void BufferJump()
+    private void FixedUpdate()
     {
-        jumpBufferTimer = jumpBufferTime;
+        HandleGravity();
+
+        if (IsGrounded() && rb.linearVelocity.y < 0)
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, groundingForce);
+    }
+
+    private void OnEnable()
+    {
+        InputManager.OnJumpRequested += BufferJump;
+    }
+
+    private void OnDisable()
+    {
+        InputManager.OnJumpRequested -= BufferJump;
     }
 
     public void Move(Vector2 input, bool applyMovement = true)
     {
-        if (!applyMovement)
-        {
-            return;
-        }
+        if (!applyMovement || preserveMomentum) return;
 
-        if (!preserveMomentum)
-        {
-            rb.linearVelocity = new Vector2(input.x * moveSpeed, rb.linearVelocity.y);
+        float targetSpeed = input.x * maxSpeed;
+        float accel = IsGrounded()
+            ? (Mathf.Abs(input.x) > 0.01f ? acceleration : deceleration)
+            : (Mathf.Abs(input.x) > 0.01f ? airAcceleration : airDeceleration);
 
-            if (input.x > 0 && !IsFacingRight)
-                Flip();
-            else if (input.x < 0 && IsFacingRight)
-                Flip();
-        }
+        float newX = Mathf.MoveTowards(rb.linearVelocity.x, targetSpeed, accel * Time.fixedDeltaTime);
+        rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
 
-        animator?.SetFloat("Speed", Mathf.Abs(input.x));
-        animator?.SetBool("IsGrounded", IsGrounded());
+        if (input.x > 0 && !IsFacingRight) Flip();
+        else if (input.x < 0 && IsFacingRight) Flip();
     }
 
     public void Jump()
     {
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        animator?.SetTrigger("Jump");
+
+        lastGroundedTime = 0f;
+        isJumpCut = !InputManager.Instance.IsJumpHeld;
+
         preserveMomentum = false;
-        Debug.Log("[PLAYER] Jump Force Applied");
+        animator?.SetTrigger("Jump");
+        ClearJumpBuffer();
     }
 
-    public void WallJump()
+    public void BufferJump() => lastJumpInputTime = Time.time;
+    public bool HasBufferedJump() => Time.time - lastJumpInputTime <= jumpBufferTime;
+    public void ClearJumpBuffer() => lastJumpInputTime = -Mathf.Infinity;
+    public bool IsGrounded() => Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+
+    public bool IsTouchingFrontWall()
     {
-        Vector2 dir = new Vector2(-Mathf.Sign(transform.localScale.x) * wallJumpDirection.x, wallJumpDirection.y).normalized;
-        rb.AddForce(dir * wallJumpMultiplier, ForceMode2D.Impulse);
-        preserveMomentum = true;
-        Flip();
-        animator?.SetTrigger("Jump");
-        Debug.Log($"[PLAYER] Wall Jump Force Applied: {dir * wallJumpMultiplier}");
+        return wallCheckFront && Physics2D.Raycast(wallCheckFront.position, IsFacingRight ? Vector2.right : Vector2.left, 0.1f, groundLayer);
+    }
+
+    public bool IsTouchingBackWall()
+    {
+        return wallCheckBack && Physics2D.Raycast(wallCheckBack.position, IsFacingRight ? Vector2.left : Vector2.right, 0.1f, groundLayer);
+    }
+
+    public void Flip()
+    {
+        transform.localScale = new Vector3(-transform.localScale.x, originalScale.y, originalScale.z);
+    }
+
+    private void HandleGravity()
+    {
+        float gravity = gravityScale;
+        if (rb.linearVelocity.y < 0)
+            gravity *= fallMultiplier;
+        else if (isJumpCut)
+            gravity *= jumpCutMultiplier;
+
+        rb.linearVelocity += Vector2.up * Physics2D.gravity.y * gravity * Time.fixedDeltaTime;
+
+        // Clamp max fall speed
+        if (rb.linearVelocity.y < -maxFallSpeed)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, -maxFallSpeed);
+        }
     }
 
     public void StopMovement()
     {
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-        animator?.SetFloat("Speed", 0);
+        StopMovementAnimation();
     }
 
-    public bool IsGrounded()
+    public void StopMovementAnimation()
     {
-        if (groundCheck == null) return true;
-        return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-    }
-
-    public bool IsTouchingFrontWall()
-    {
-        if (wallCheckFront == null) return false;
-        return Physics2D.Raycast(wallCheckFront.position, IsFacingRight ? Vector2.right : Vector2.left, wallCheckDistance, groundLayer);
-    }
-
-    public bool IsTouchingBackWall()
-    {
-        if (wallCheckBack == null) return false;
-        return Physics2D.Raycast(wallCheckBack.position, IsFacingRight ? Vector2.left : Vector2.right, wallCheckDistance, groundLayer);
-    }
-
-    public void Flip()
-    {
-        transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+        animator?.SetFloat("Speed", 0f);
     }
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.green;
         if (groundCheck != null)
+        {
+            Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-
-        Gizmos.color = Color.red;
-        if (wallCheckFront != null)
-            Gizmos.DrawLine(wallCheckFront.position, wallCheckFront.position + (IsFacingRight ? Vector3.right : Vector3.left) * wallCheckDistance);
-        if (wallCheckBack != null)
-            Gizmos.DrawLine(wallCheckBack.position, wallCheckBack.position + (IsFacingRight ? Vector3.left : Vector3.right) * wallCheckDistance);
-    }
-
-    public void ResetMomentumPreservation()
-    {
-        preserveMomentum = false;
+        }
     }
 }

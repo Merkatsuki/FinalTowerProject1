@@ -35,7 +35,8 @@ public class InputManager : MonoBehaviour
         inputActions.Enable();
 
         inputActions.Player.Move.performed += ctx => {
-            moveInput = ctx.ReadValue<Vector2>();
+            Vector2 rawInput = ctx.ReadValue<Vector2>();
+            moveInput = new Vector2(Mathf.Round(rawInput.x), Mathf.Round(rawInput.y));
             OnMove?.Invoke(moveInput);
         };
 
@@ -56,6 +57,8 @@ public class InputManager : MonoBehaviour
 
         inputActions.Player.Interact.performed += ctx => OnInteractPressed?.Invoke();
     }
+
+    public bool IsJumpHeld => inputActions.Player.Jump.IsPressed();
 
     private void Update()
     {

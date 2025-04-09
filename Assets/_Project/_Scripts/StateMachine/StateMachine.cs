@@ -2,27 +2,29 @@ using UnityEngine;
 
 public abstract class StateMachine : MonoBehaviour
 {
-    private State currentState;
+    public State CurrentState { get; private set; }
 
-    public void SetState(State state)
+    protected virtual void Start()
     {
-        currentState?.Exit();
-        currentState = state;
-        currentState?.Enter();
+        CurrentState?.Enter();
     }
 
-    private void Update()
+    protected virtual void Update()
     {
-        currentState?.Tick();
+        CurrentState?.LogicUpdate();
     }
 
-    private void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
-        currentState?.FixedTick();
+        CurrentState?.PhysicsUpdate();
     }
 
-    private void OnDrawGizmos()
+    public void SetState(State newState)
     {
-        currentState?.DebugGizmos();
+        if (CurrentState == newState) return;
+
+        CurrentState?.Exit();
+        CurrentState = newState;
+        CurrentState?.Enter();
     }
 }
