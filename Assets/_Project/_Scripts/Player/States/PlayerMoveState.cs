@@ -7,7 +7,6 @@ public class PlayerMoveState : PlayerGroundedState
     public override void Enter()
     {
         base.Enter();
-        controller.animator?.SetBool("IsMoving", true);
     }
 
     public override void LogicUpdate()
@@ -21,10 +20,5 @@ public class PlayerMoveState : PlayerGroundedState
         {
             stateMachine.SetState(((PlayerStateMachine)stateMachine).IdleState);
         }
-    }
-
-    public override void Exit()
-    {
-        controller.animator?.SetBool("IsMoving", false);
     }
 }

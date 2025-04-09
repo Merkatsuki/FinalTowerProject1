@@ -7,7 +7,7 @@ public class PlayerFallState : PlayerInAirState
     public override void Enter()
     {
         base.Enter();
-        controller.animator?.SetTrigger("Fall");
+        Anim.PlayFall();
     }
 
     public override void LogicUpdate()

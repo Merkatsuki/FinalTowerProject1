@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class PlayerLandState : PlayerGroundedState
+public class PlayerIdleState : PlayerGroundedState
 {
-    public PlayerLandState(StateMachine stateMachine, PlayerController controller) : base(stateMachine, controller) {}
+    public PlayerIdleState(StateMachine stateMachine, PlayerController controller) : base(stateMachine, controller) { }
 
     public override void Enter()
     {
         base.Enter();
-        controller.animator?.SetTrigger("Land");
+        controller.StopMovement();
     }
 
     public override void LogicUpdate()
@@ -17,9 +17,8 @@ public class PlayerLandState : PlayerGroundedState
         Vector2 input = InputManager.Instance.MoveInput;
 
         if (Mathf.Abs(input.x) > 0.1f)
+        {
             stateMachine.SetState(((PlayerStateMachine)stateMachine).MoveState);
-        else
-            stateMachine.SetState(((PlayerStateMachine)stateMachine).IdleState);
+        }
     }
-
 }

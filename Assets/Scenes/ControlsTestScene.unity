@@ -1673,7 +1673,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 16
-  acceleration: 60
+  acceleration: 100
   deceleration: 50
   airAcceleration: 45
   airDeceleration: 15
@@ -1696,6 +1696,7 @@ MonoBehaviour:
   snapInput: 1
   rb: {fileID: 0}
   animator: {fileID: 3392726270329464489}
+  preventCoyoteUntilAirborne: 0
 --- !u!50 &1838870550
 Rigidbody2D:
   serializedVersion: 5

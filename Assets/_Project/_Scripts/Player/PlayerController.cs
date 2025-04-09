@@ -33,14 +33,15 @@ public class PlayerController : MonoBehaviour
 
     public Rigidbody2D rb;
     public Animator animator;
+    public PlayerAnimator playerAnimator;
 
     private bool isJumpCut;
     private bool preserveMomentum;
     private Vector3 originalScale;
 
+    public bool preventCoyoteUntilAirborne = false;
     public float lastGroundedTime { get; private set; }
     public float lastJumpInputTime { get; private set; }
-    
     public bool IsFacingRight => transform.localScale.x > 0;
     public Vector2 LastInput { get; private set; }
     public bool WasJumpPressedThisFrame => InputManager.Instance.WasJumpPressedThisFrame;
@@ -49,6 +50,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         originalScale = transform.localScale;
+        playerAnimator = GetComponent<PlayerAnimator>();
     }
 
     private void Update()
@@ -56,15 +58,21 @@ public class PlayerController : MonoBehaviour
         lastGroundedTime -= Time.deltaTime;
 
         if (IsGrounded())
-            lastGroundedTime = coyoteTime;
+        {
+            if (!preventCoyoteUntilAirborne)
+                lastGroundedTime = coyoteTime;
+        }
+        else
+        {
+            preventCoyoteUntilAirborne = false; 
+        }
 
         if (Input.GetButtonUp("Jump") && rb.linearVelocity.y > 0)
         {
             isJumpCut = true;
         }
 
-        animator?.SetBool("IsGrounded", IsGrounded());
-        animator?.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
+        UpdateAnimator();
     }
 
     private void FixedUpdate()
@@ -105,13 +113,12 @@ public class PlayerController : MonoBehaviour
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-
-        lastGroundedTime = 0f;
         isJumpCut = !InputManager.Instance.IsJumpHeld;
-
         preserveMomentum = false;
-        animator?.SetTrigger("Jump");
+        playerAnimator.PlayJump();
         ClearJumpBuffer();
+        lastGroundedTime = 0f;
+        preventCoyoteUntilAirborne = true;
     }
 
     public void BufferJump() => lastJumpInputTime = Time.time;
@@ -160,6 +167,12 @@ public class PlayerController : MonoBehaviour
     public void StopMovementAnimation()
     {
         animator?.SetFloat("Speed", 0f);
+    }
+
+    private void UpdateAnimator()
+    {
+        playerAnimator.SetIsGrounded(IsGrounded());
+        playerAnimator.SetSpeed(Mathf.Abs(rb.linearVelocity.x));
     }
 
     private void OnDrawGizmosSelected()

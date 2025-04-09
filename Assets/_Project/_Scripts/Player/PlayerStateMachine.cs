@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerStateMachine : StateMachine
 {
     public PlayerController controller;
+    public PlayerAnimator playerAnimator;
 
     public PlayerGroundedState GroundedState;
     public PlayerInAirState InAirState;
@@ -15,6 +16,7 @@ public class PlayerStateMachine : StateMachine
     private void Awake()
     {
         controller = GetComponent<PlayerController>();
+        playerAnimator = GetComponent<PlayerAnimator>();
         GroundedState = new PlayerGroundedState(this, controller);
         InAirState = new PlayerInAirState(this, controller);
         IdleState = new PlayerIdleState(this, controller);
