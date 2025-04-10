@@ -20,7 +20,7 @@ MonoBehaviour:
   LedgeHang: 1
   LedgeClimb: 1
   WallGrab: 0
-  WallClimb: 1
+  WallClimb: 0
   WallSlide: 0
   WallJump: 0
   StateChangeDebug: 0

@@ -75,7 +75,7 @@
                 {
                     "name": "",
                     "id": "3ad1e31e-0635-4aba-9b07-14863c55ad31",
-                    "path": "<Keyboard>/shift",
+                    "path": "<Keyboard>/c",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
@@ -97,7 +97,7 @@
                 {
                     "name": "",
                     "id": "5474225b-b4ba-4da9-88c8-f315fcfc8c58",
-                    "path": "<Keyboard>/ctrl",
+                    "path": "<Keyboard>/leftShift",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
@@ -163,7 +163,7 @@
                 {
                     "name": "",
                     "id": "c0edfa34-ddc3-421f-a373-d93ec343eb15",
-                    "path": "<Keyboard>/f",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
