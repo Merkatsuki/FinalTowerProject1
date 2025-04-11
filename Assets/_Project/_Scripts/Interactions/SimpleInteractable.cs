@@ -2,18 +2,26 @@
 
 public class SimpleInteractable : InteractableBase
 {
-    public override void OnInteract()
-    {
-        Debug.Log("Interacted with: " + gameObject.name);
-    }
+    [SerializeField] private GameObject highlightVisual;
 
     public override void OnFocusEnter()
     {
-        Debug.Log("Focused: " + gameObject.name);
+        SetHighlighted(true);
     }
 
     public override void OnFocusExit()
     {
-        Debug.Log("Focus left: " + gameObject.name);
+        SetHighlighted(false);
+    }
+
+    public override void SetHighlighted(bool isHighlighted)
+    {
+        if (highlightVisual != null)
+            highlightVisual.SetActive(isHighlighted);
+    }
+
+    public override void OnInteract()
+    {
+        Debug.Log("Interacted with: " + gameObject.name);
     }
 }

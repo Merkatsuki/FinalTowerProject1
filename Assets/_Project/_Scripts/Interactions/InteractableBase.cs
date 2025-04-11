@@ -13,4 +13,6 @@ public abstract class InteractableBase : MonoBehaviour
 
     // Called when the player stops targeting this object
     public virtual void OnFocusExit() { }
+
+    public virtual void SetHighlighted(bool isHighlighted) { }
 }
