@@ -83,7 +83,7 @@ public class PlayerInteractor : MonoBehaviour
 
         foreach (var interactable in nearbyInteractables)
         {
-            if (interactable == null) continue;
+            if (interactable == null || !interactable.CanInteract) continue;
 
             Vector2 toTarget = (interactable.transform.position - facingDirection.position).normalized;
             float dot = Vector2.Dot(facingDirection.right, toTarget);

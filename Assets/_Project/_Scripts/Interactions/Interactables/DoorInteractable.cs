@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting.Antlr3.Runtime;
+using UnityEngine;
 
 public class DoorInteractable : InteractableBase
 {
@@ -11,7 +12,7 @@ public class DoorInteractable : InteractableBase
     [SerializeField] private float closeDistanceThreshold = 4f;
     [SerializeField] private float autoCloseDelay = 0.5f;
 
-    private bool isOpen = false;
+    protected bool isOpen = false;
     private bool isClosing = false;
     private Vector3 closedPosition;
     private Vector3 openPosition;

@@ -19,13 +19,13 @@ MonoBehaviour:
   Dash: 1
   LedgeHang: 1
   LedgeClimb: 1
-  WallGrab: 0
+  WallGrab: 1
   WallClimb: 0
   WallSlide: 0
   WallJump: 0
   StateChangeDebug: 0
-  GroundedCheckGizmo: 1
-  UncrouchCheckGizmo: 1
+  GroundedCheckGizmo: 0
+  UncrouchCheckGizmo: 0
   LedgeCheckGizmo: 0
   LedgeClimbCheckGizmo: 0
   LedgeHangCheckGizmo: 0
@@ -50,12 +50,12 @@ MonoBehaviour:
   WallBoxColliderSize: {x: 0.3941078, y: 1.196432}
   GroundedCheckBoxLength: 0.14
   GroundedCheckBoxShrinkX: 0.01
-  MoveSpeed: 9
-  SprintSpeed: 13
-  CrouchMoveSpeed: 2.5
-  Acceleration: 17
+  MoveSpeed: 10
+  SprintSpeed: 14
+  CrouchMoveSpeed: 3
+  Acceleration: 14.43
   VelocityPower: 1
-  GroundFrictionAmount: 0.9
+  GroundFrictionAmount: 2.02
   VariableJumpHeight: 1
   AmountOfJumps: 1
   JumpHeight: 0.86
