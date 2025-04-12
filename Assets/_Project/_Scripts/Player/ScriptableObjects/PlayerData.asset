@@ -55,7 +55,7 @@ MonoBehaviour:
   CrouchMoveSpeed: 3
   Acceleration: 14.43
   VelocityPower: 1
-  GroundFrictionAmount: 2.02
+  GroundFrictionAmount: 1.31
   VariableJumpHeight: 1
   AmountOfJumps: 1
   JumpHeight: 0.86
