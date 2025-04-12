@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/HubTestScene.unity
+    path: Assets/Scenes/Memories/HubTestScene.unity
     guid: 2dd1075981ec87d43acfdbc2e1e6d06f
   - enabled: 1
     path: Assets/Scenes/Memories/Memory1.unity
