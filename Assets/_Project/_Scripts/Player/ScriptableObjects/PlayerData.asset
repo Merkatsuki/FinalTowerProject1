@@ -58,7 +58,7 @@ MonoBehaviour:
   GroundFrictionAmount: 2.02
   VariableJumpHeight: 1
   AmountOfJumps: 1
-  JumpHeight: 1.19
+  JumpHeight: 0.86
   JumpDistance: 2.61
   JumpYThresh: 5
   JumpBuffer: 0.2

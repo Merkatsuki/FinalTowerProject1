@@ -127,7 +127,7 @@ public class PlayerInteractor : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         if (facingDirection == null) return;
 
