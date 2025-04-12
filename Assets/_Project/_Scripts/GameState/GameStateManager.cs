@@ -17,7 +17,6 @@ public class GameStateManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     public void RegisterListener(IGameStateListener listener)
