@@ -111,7 +111,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  DashStrength: 130
+  DashStrength: 55
   DashLength: 0.06
   DashHangTime: 0.01
   TimeBetweenDashes: 0.25

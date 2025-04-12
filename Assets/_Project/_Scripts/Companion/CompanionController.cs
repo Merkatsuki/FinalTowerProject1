@@ -8,6 +8,7 @@ public class CompanionController : MonoBehaviour
     public Transform player;
     public float followDistance = 2.5f;
 
+    private IPerceivable currentTarget;
     private CompanionFSM fsm;
 
     // State instances
@@ -23,7 +24,7 @@ public class CompanionController : MonoBehaviour
 
     void Start()
     {
-        fsm.Initialize(followState);
+        fsm.Initialize(idleState);
     }
 
     void Update()
@@ -41,6 +42,30 @@ public class CompanionController : MonoBehaviour
     {
         fsm.FixedTick();
     }
+
+    public void SetTargetToInvestigate(IPerceivable target)
+    {
+        if (currentTarget != target)
+        {
+            currentTarget = target;
+            fsm.ChangeState(GetInvestigateState(target));
+        }
+    }
+
+    public void ClearInvestigationTarget()
+    {
+        if (currentTarget != null)
+        {
+            currentTarget = null;
+            fsm.ChangeState(idleState);
+        }
+    }
+
+    public CompanionState GetInvestigateState(IPerceivable target)
+    {
+        return new CompanionInvestigateState(this, fsm, target);
+    }
+
 
 #if UNITY_EDITOR
     private void OnDrawGizmos()
