@@ -13,6 +13,17 @@ public class CompanionInvestigateState : CompanionState
         this.targetTransform = target.GetTransform();
     }
 
+    public override void OnEnter()
+    {
+        if (target == null || !target.IsAvailable())
+        {
+            fsm.ChangeState(companion.idleState);
+            return;
+        }
+
+        companion.flightController.SetTarget(targetTransform.position);
+    }
+
     public override void Tick()
     {
         if (target == null || !target.IsAvailable())
@@ -21,8 +32,7 @@ public class CompanionInvestigateState : CompanionState
             return;
         }
 
-        float dist = Vector2.Distance(companion.transform.position, targetTransform.position);
-        if (dist <= arrivalThreshold)
+        if (companion.flightController.ReachedTarget(arrivalThreshold))
         {
             if (targetTransform.TryGetComponent(out CompanionClueInteractable clue))
             {
@@ -34,9 +44,10 @@ public class CompanionInvestigateState : CompanionState
                 fsm.ChangeState(companion.idleState);
             }
         }
-        else
-        {
-            companion.MoveTo(targetTransform.position);
-        }
+    }
+
+    public override void OnExit()
+    {
+        companion.flightController.ClearTarget();
     }
 }

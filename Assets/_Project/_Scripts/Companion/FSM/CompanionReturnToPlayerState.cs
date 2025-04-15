@@ -15,7 +15,7 @@ public class CompanionReturnToPlayerState : CompanionState
         }
         else
         {
-            companion.MoveTo(target);
+            companion.flightController.SetTarget(target);
         }
     }
 }

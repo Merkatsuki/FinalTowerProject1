@@ -9,7 +9,7 @@ public class CompanionController : MonoBehaviour
     private CompanionFSM fsm;
     public CompanionFollowState followState;
     public CompanionIdleState idleState;
-
+    public RobotFlightController flightController { get; private set; }
     public CompanionPerception Perception { get; private set; }
 
     void Awake()
@@ -18,6 +18,8 @@ public class CompanionController : MonoBehaviour
         followState = new CompanionFollowState(this, fsm);
         idleState = new CompanionIdleState(this, fsm);
         Perception = GetComponent<CompanionPerception>();
+
+        flightController = GetComponent<RobotFlightController>();
     }
 
     void Start()
@@ -27,11 +29,6 @@ public class CompanionController : MonoBehaviour
 
     void Update() => fsm.Tick();
     void FixedUpdate() => fsm.FixedTick();
-
-    public void MoveTo(Vector2 target)
-    {
-        transform.position = Vector2.MoveTowards(transform.position, target, 3f * Time.deltaTime);
-    }
 
     public bool TryAutoInvestigate()
     {

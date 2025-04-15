@@ -4,6 +4,11 @@ public class CompanionIdleState : CompanionState
 {
     public CompanionIdleState(CompanionController companion, CompanionFSM fsm) : base(companion, fsm) { }
 
+    public override void OnEnter()
+    {
+        companion.flightController.ClearTarget();
+    }
+
     public override void Tick()
     {
         if (companion.TryAutoInvestigate()) return;

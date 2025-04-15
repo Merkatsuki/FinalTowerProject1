@@ -2124,7 +2124,7 @@ GameObject:
   m_Component:
   - component: {fileID: 690407113}
   - component: {fileID: 690407114}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5900,12 +5900,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1932641923}
+  - component: {fileID: 1932641927}
+  - component: {fileID: 1932641928}
+  - component: {fileID: 1932641929}
   - component: {fileID: 1932641926}
   - component: {fileID: 1932641924}
   - component: {fileID: 1932641925}
-  - component: {fileID: 1932641927}
-  - component: {fileID: 1932641928}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Companion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5986,7 +5987,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 500
+  m_Mass: 80
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 0
@@ -6054,6 +6055,30 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   checkInterval: 0.2
+--- !u!114 &1932641929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1932641922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce99718b96c00bd44a0fcdcea797fa59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 3
+  acceleration: 6
+  decelerationRadius: 1.5
+  minHeight: 1.5
+  bobFrequency: 2
+  bobAmplitude: 0.15
+  swayAmplitude: 0.1
+  obstacleCheckDistance: 0.75
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 8
+  idleThreshold: 0.05
 --- !u!1 &1936580802
 GameObject:
   m_ObjectHideFlags: 0

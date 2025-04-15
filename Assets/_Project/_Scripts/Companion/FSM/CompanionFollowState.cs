@@ -11,11 +11,16 @@ public class CompanionFollowState : CompanionState
         float dist = Vector2.Distance(companion.transform.position, companion.player.position);
         if (dist > companion.followDistance)
         {
-            companion.MoveTo(companion.player.position);
+            companion.flightController.SetTarget(companion.player.position);
         }
         else
         {
             fsm.ChangeState(companion.idleState);
         }
+    }
+
+    public override void OnExit()
+    {
+        companion.flightController.ClearTarget();
     }
 }
