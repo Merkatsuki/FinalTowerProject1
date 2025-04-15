@@ -19,9 +19,12 @@ public class RobotFlightController : MonoBehaviour
     [Header("Visual References")]
     public Transform visualRoot;
     public ParticleSystem thrustParticles;
+    public float tiltMultiplier = 10f;
+    public float tiltSpeed = 5f;
 
     private Rigidbody2D rb;
     private Vector2 velocity;
+    private Vector2 lastVelocity;
     private Vector2 targetPosition;
     private bool hasTarget = false;
 
@@ -36,7 +39,6 @@ public class RobotFlightController : MonoBehaviour
     {
         Vector2 position = rb.position;
 
-        // Default follow target when idle
         if (!hasTarget && defaultFollowTarget != null)
         {
             SetTarget(defaultFollowTarget.position);
@@ -44,13 +46,9 @@ public class RobotFlightController : MonoBehaviour
 
         Vector2 desiredDirection = (targetPosition - position);
         float distanceToTarget = desiredDirection.magnitude;
-
-        // Base direction
         desiredDirection = desiredDirection.normalized;
-
         Vector2 adjustedTarget = targetPosition;
 
-        // Adaptive obstacle avoidance
         Vector2 avoidance = Vector2.zero;
         Vector2[] directions = new Vector2[] { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
         foreach (var dir in directions)
@@ -58,7 +56,7 @@ public class RobotFlightController : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(position, dir, avoidanceRadius, obstacleMask);
             if (hit.collider != null)
             {
-                avoidance -= dir; // Steer away from obstacle
+                avoidance -= dir;
             }
         }
 
@@ -70,6 +68,7 @@ public class RobotFlightController : MonoBehaviour
         float speedFactor = Mathf.Clamp01(distanceToTarget / decelerationRadius);
         Vector2 desiredVelocity = desiredDirection * speed * speedFactor;
 
+        lastVelocity = velocity;
         velocity = Vector2.Lerp(velocity, desiredVelocity, acceleration * Time.fixedDeltaTime);
         rb.MovePosition(position + velocity * Time.fixedDeltaTime);
 
@@ -80,6 +79,7 @@ public class RobotFlightController : MonoBehaviour
     {
         if (visualRoot != null)
         {
+            // Flip
             if (currentVelocity.magnitude > 0.1f)
             {
                 visualRoot.localScale = new Vector3(
@@ -87,6 +87,12 @@ public class RobotFlightController : MonoBehaviour
                     visualRoot.localScale.y,
                     visualRoot.localScale.z);
             }
+
+            // Acceleration-based tilt
+            Vector2 accelerationVector = (velocity - lastVelocity) / Time.fixedDeltaTime;
+            float tiltZ = Mathf.Clamp(-accelerationVector.x * tiltMultiplier, -tiltMultiplier, tiltMultiplier);
+            Quaternion targetRotation = Quaternion.Euler(0f, 0f, tiltZ);
+            visualRoot.localRotation = Quaternion.Slerp(visualRoot.localRotation, targetRotation, tiltSpeed * Time.deltaTime);
         }
 
         if (thrustParticles != null)
