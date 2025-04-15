@@ -14,8 +14,5 @@ public class LevelEndTriggerInteractable : InteractableBase
             highlightVisual.SetActive(isHighlighted);
     }
 
-    public override void OnInteract()
-    {
-        MemoryProgressTracker.Instance?.MarkMemoryComplete(memoryTag);
-    }
+   
 }

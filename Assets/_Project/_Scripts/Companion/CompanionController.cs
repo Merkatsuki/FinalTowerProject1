@@ -1,5 +1,3 @@
-using Unity.IO.LowLevel.Unsafe;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CompanionController : MonoBehaviour
@@ -31,7 +29,7 @@ public class CompanionController : MonoBehaviour
     {
         fsm.Tick();
 
-        // TEMP: Example for triggering states
+        // TEMP: Manual triggers for testing
         if (Input.GetKeyDown(KeyCode.I))
             fsm.ChangeState(idleState);
         if (Input.GetKeyDown(KeyCode.F))
@@ -57,7 +55,7 @@ public class CompanionController : MonoBehaviour
         if (currentTarget != null)
         {
             currentTarget = null;
-            fsm.ChangeState(idleState);
+            fsm.ChangeState(followState);
         }
     }
 
@@ -66,27 +64,26 @@ public class CompanionController : MonoBehaviour
         return new CompanionInvestigateState(this, fsm, target);
     }
 
+    public void MoveTo(Vector2 target)
+    {
+        transform.position = Vector2.MoveTowards(transform.position, target, 3f * Time.deltaTime);
+    }
 
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         if (player != null)
         {
-            // Draw follow distance range
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(transform.position, followDistance);
-
-            // Draw line to player
             Gizmos.color = Color.yellow;
             Gizmos.DrawLine(transform.position, player.position);
         }
 
-        // Optional: draw current state name above the robot
         if (Application.isPlaying && fsm != null)
         {
             UnityEditor.Handles.Label(transform.position + Vector3.up * 1.5f, fsm.GetCurrentStateName());
         }
     }
 #endif
-
 }

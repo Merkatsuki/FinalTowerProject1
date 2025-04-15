@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class CompanionInvestigateState : CompanionState
+public partial class CompanionInvestigateState : CompanionState
 {
     private IPerceivable target;
     private Transform targetTransform;
@@ -34,6 +34,11 @@ public class CompanionInvestigateState : CompanionState
         if (dist <= arrivalThreshold)
         {
             Debug.Log("Reached target: " + targetTransform.name);
+
+            if (targetTransform.TryGetComponent(out CompanionClueInteractable clue))
+            {
+                clue.RobotInteract(companion);
+            }
             // You could transition to an Interact state here
             fsm.ChangeState(companion.idleState);
         }

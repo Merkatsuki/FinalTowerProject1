@@ -45,4 +45,5 @@ public class LightToggleInteractable : InteractableBase
             interactable.gameObject.SetActive(isVisible);
         }
     }
+
 }

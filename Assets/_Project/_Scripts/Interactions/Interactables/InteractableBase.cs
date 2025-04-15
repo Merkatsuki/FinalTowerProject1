@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using static CompanionInvestigateState;
 
 public abstract class InteractableBase : MonoBehaviour
 {

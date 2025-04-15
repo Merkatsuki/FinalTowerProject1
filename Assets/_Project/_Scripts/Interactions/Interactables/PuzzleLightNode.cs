@@ -41,4 +41,6 @@ public class PuzzleLightNode : InteractableBase
         if (highlightVisual != null)
             highlightVisual.SetActive(isHighlighted);
     }
+
+    
 }

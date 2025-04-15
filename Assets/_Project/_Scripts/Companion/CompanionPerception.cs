@@ -70,6 +70,13 @@ public class CompanionPerception : MonoBehaviour
         return best;
     }
 
+    private bool TryGetPerceivable(Collider2D hit, out IPerceivable result)
+    {
+        result = hit.GetComponent<IPerceivable>();
+        return result != null && result.IsAvailable();
+    }
+
+
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
