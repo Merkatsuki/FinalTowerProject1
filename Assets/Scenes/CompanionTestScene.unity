@@ -959,7 +959,7 @@ GameObject:
   - component: {fileID: 268597931}
   - component: {fileID: 268597933}
   - component: {fileID: 268597934}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Locked Door 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9430,7 +9430,7 @@ GameObject:
   - component: {fileID: 1420443764}
   - component: {fileID: 1420443766}
   - component: {fileID: 1420443768}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PuzzleDoor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10945,6 +10945,8 @@ MonoBehaviour:
   avoidanceRadius: 1
   visualRoot: {fileID: 690407113}
   thrustParticles: {fileID: 681195944}
+  tiltMultiplier: 10
+  tiltSpeed: 5
 --- !u!1 &1936580802
 GameObject:
   m_ObjectHideFlags: 0

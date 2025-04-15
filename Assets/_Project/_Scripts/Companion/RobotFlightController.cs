@@ -1,5 +1,4 @@
-﻿// RobotFlightController.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class RobotFlightController : MonoBehaviour
@@ -9,12 +8,15 @@ public class RobotFlightController : MonoBehaviour
     public float acceleration = 6f;
     public float decelerationRadius = 1.5f;
     public float minHeight = 1.5f;
-    public float obstacleCheckDistance = 1f;
     public LayerMask obstacleMask;
     public float idleThreshold = 0.05f;
     public Transform defaultFollowTarget;
+
+    [Header("Avoidance Settings")]
     public float avoidanceWeight = 0.5f;
-    public float avoidanceRadius = 1f;
+    public int rayCount = 9;
+    public float rayArcAngle = 90f;
+    public float rayLength = 1f;
 
     [Header("Visual References")]
     public Transform visualRoot;
@@ -47,16 +49,21 @@ public class RobotFlightController : MonoBehaviour
         Vector2 desiredDirection = (targetPosition - position);
         float distanceToTarget = desiredDirection.magnitude;
         desiredDirection = desiredDirection.normalized;
-        Vector2 adjustedTarget = targetPosition;
 
+        // Multi-ray arc obstacle avoidance
         Vector2 avoidance = Vector2.zero;
-        Vector2[] directions = new Vector2[] { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
-        foreach (var dir in directions)
+        float startAngle = -rayArcAngle * 0.5f;
+        float angleStep = rayArcAngle / (rayCount - 1);
+
+        for (int i = 0; i < rayCount; i++)
         {
-            RaycastHit2D hit = Physics2D.Raycast(position, dir, avoidanceRadius, obstacleMask);
+            float angle = startAngle + angleStep * i;
+            Vector2 rayDir = Quaternion.Euler(0, 0, angle) * desiredDirection;
+            RaycastHit2D hit = Physics2D.Raycast(position, rayDir, rayLength, obstacleMask);
             if (hit.collider != null)
             {
-                avoidance -= dir;
+                float distanceFactor = 1f - (hit.distance / rayLength);
+                avoidance -= rayDir.normalized * distanceFactor;
             }
         }
 
@@ -79,7 +86,6 @@ public class RobotFlightController : MonoBehaviour
     {
         if (visualRoot != null)
         {
-            // Flip
             if (currentVelocity.magnitude > 0.1f)
             {
                 visualRoot.localScale = new Vector3(
@@ -88,7 +94,6 @@ public class RobotFlightController : MonoBehaviour
                     visualRoot.localScale.z);
             }
 
-            // Acceleration-based tilt
             Vector2 accelerationVector = (velocity - lastVelocity) / Time.fixedDeltaTime;
             float tiltZ = Mathf.Clamp(-accelerationVector.x * tiltMultiplier, -tiltMultiplier, tiltMultiplier);
             Quaternion targetRotation = Quaternion.Euler(0f, 0f, tiltZ);
@@ -125,10 +130,20 @@ public class RobotFlightController : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(targetPosition, 0.1f);
 
-        if (rb != null)
+        if (rb != null && Application.isPlaying)
         {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(rb.position, avoidanceRadius);
+            Vector2 position = rb.position;
+            Vector2 forward = (targetPosition - position).normalized;
+            float startAngle = -rayArcAngle * 0.5f;
+            float angleStep = rayArcAngle / (rayCount - 1);
+
+            for (int i = 0; i < rayCount; i++)
+            {
+                float angle = startAngle + angleStep * i;
+                Vector2 rayDir = Quaternion.Euler(0, 0, angle) * forward;
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(position, rayDir * rayLength);
+            }
         }
     }
 #endif
