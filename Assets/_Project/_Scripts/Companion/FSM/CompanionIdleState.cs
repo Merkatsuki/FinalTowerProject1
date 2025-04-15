@@ -1,22 +1,17 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class CompanionIdleState : CompanionState
 {
     public CompanionIdleState(CompanionController companion, CompanionFSM fsm) : base(companion, fsm) { }
 
-    public override void OnEnter()
-    {
-        // Could trigger idle animation here
-        Debug.Log("Companion entered IDLE state.");
-    }
-
     public override void Tick()
     {
-        // Maybe look at nearby objects or play idle animation
-    }
+        if (companion.TryAutoInvestigate()) return;
 
-    public override void OnExit()
-    {
-        Debug.Log("Companion exited IDLE state.");
+        float distance = Vector2.Distance(companion.transform.position, companion.player.position);
+        if (distance > companion.followDistance)
+        {
+            fsm.ChangeState(companion.followState);
+        }
     }
 }

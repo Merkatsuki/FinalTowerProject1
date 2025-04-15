@@ -6,18 +6,18 @@ public class CompanionController : MonoBehaviour
     public Transform player;
     public float followDistance = 2.5f;
 
-    private IPerceivable currentTarget;
     private CompanionFSM fsm;
-
-    // State instances
     public CompanionFollowState followState;
     public CompanionIdleState idleState;
+
+    public CompanionPerception Perception { get; private set; }
 
     void Awake()
     {
         fsm = new CompanionFSM();
         followState = new CompanionFollowState(this, fsm);
         idleState = new CompanionIdleState(this, fsm);
+        Perception = GetComponent<CompanionPerception>();
     }
 
     void Start()
@@ -25,48 +25,23 @@ public class CompanionController : MonoBehaviour
         fsm.Initialize(idleState);
     }
 
-    void Update()
-    {
-        fsm.Tick();
-
-        // TEMP: Manual triggers for testing
-        if (Input.GetKeyDown(KeyCode.I))
-            fsm.ChangeState(idleState);
-        if (Input.GetKeyDown(KeyCode.F))
-            fsm.ChangeState(followState);
-    }
-
-    void FixedUpdate()
-    {
-        fsm.FixedTick();
-    }
-
-    public void SetTargetToInvestigate(IPerceivable target)
-    {
-        if (currentTarget != target)
-        {
-            currentTarget = target;
-            fsm.ChangeState(GetInvestigateState(target));
-        }
-    }
-
-    public void ClearInvestigationTarget()
-    {
-        if (currentTarget != null)
-        {
-            currentTarget = null;
-            fsm.ChangeState(followState);
-        }
-    }
-
-    public CompanionState GetInvestigateState(IPerceivable target)
-    {
-        return new CompanionInvestigateState(this, fsm, target);
-    }
+    void Update() => fsm.Tick();
+    void FixedUpdate() => fsm.FixedTick();
 
     public void MoveTo(Vector2 target)
     {
         transform.position = Vector2.MoveTowards(transform.position, target, 3f * Time.deltaTime);
+    }
+
+    public bool TryAutoInvestigate()
+    {
+        var target = Perception.GetCurrentTarget();
+        if (target != null)
+        {
+            fsm.ChangeState(new CompanionInvestigateState(this, fsm, target));
+            return true;
+        }
+        return false;
     }
 
 #if UNITY_EDITOR

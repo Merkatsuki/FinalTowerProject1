@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CompanionPerception : MonoBehaviour
@@ -8,7 +8,8 @@ public class CompanionPerception : MonoBehaviour
     public LayerMask detectionMask;
     public float checkInterval = 0.2f;
 
-    private List<IPerceivable> currentTargets = new List<IPerceivable>();
+    private SortedList<float, IPerceivable> currentTargets = new SortedList<float, IPerceivable>();
+    private HashSet<IPerceivable> handledTargets = new HashSet<IPerceivable>();
     private float checkTimer;
     private CompanionController controller;
 
@@ -34,48 +35,30 @@ public class CompanionPerception : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, perceptionRadius, detectionMask);
         foreach (var hit in hits)
         {
-            IPerceivable target = hit.GetComponent<IPerceivable>();
-            if (target != null && target.IsAvailable())
+            if (hit.TryGetComponent<IPerceivable>(out var target) && target.IsAvailable() && !HasBeenHandled(target))
             {
-                currentTargets.Add(target);
+                float score = target.GetPriority(); // Add distance penalty here if desired
+                while (currentTargets.ContainsKey(score)) score += 0.001f;
+                currentTargets.Add(score, target);
             }
         }
-
-        if (currentTargets.Count > 0)
-        {
-            IPerceivable highest = GetHighestPriorityTarget();
-            controller.SetTargetToInvestigate(highest);
-        }
-        else
-        {
-            controller.ClearInvestigationTarget();
-        }
     }
 
-    private IPerceivable GetHighestPriorityTarget()
+    public IPerceivable GetCurrentTarget()
     {
-        IPerceivable best = null;
-        float highest = float.MinValue;
-
-        foreach (var target in currentTargets)
-        {
-            float p = target.GetPriority();
-            if (p > highest)
-            {
-                highest = p;
-                best = target;
-            }
-        }
-
-        return best;
+        return currentTargets.Count > 0 ? currentTargets.Values[^1] : null;
     }
 
-    private bool TryGetPerceivable(Collider2D hit, out IPerceivable result)
+    public void MarkAsHandled(IPerceivable target)
     {
-        result = hit.GetComponent<IPerceivable>();
-        return result != null && result.IsAvailable();
+        if (target != null)
+            handledTargets.Add(target);
     }
 
+    public bool HasBeenHandled(IPerceivable target)
+    {
+        return handledTargets.Contains(target);
+    }
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()

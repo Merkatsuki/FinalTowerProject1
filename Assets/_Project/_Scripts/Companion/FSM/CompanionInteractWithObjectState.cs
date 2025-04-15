@@ -1,36 +1,44 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class CompanionInteractWithObjectState : CompanionState
 {
-    private InteractableBase target;
-    private float interactionDelay = 1.0f;
-    private float timer;
+    private CompanionClueInteractable target;
+    private IPerceivable perceivable;
+    private float delayTimer = 1.5f;
+    private bool hasExecuted = false;
 
-    public CompanionInteractWithObjectState(CompanionController companion, CompanionFSM fsm, InteractableBase target) : base(companion, fsm)
+    public CompanionInteractWithObjectState(CompanionController companion, CompanionFSM fsm, CompanionClueInteractable target, IPerceivable perceivable)
+        : base(companion, fsm)
     {
         this.target = target;
-    }
-
-    public override void OnEnter()
-    {
-        timer = interactionDelay;
-        Debug.Log("Starting interaction with: " + target.name);
+        this.perceivable = perceivable;
     }
 
     public override void Tick()
     {
-        timer -= Time.deltaTime;
-        if (timer <= 0f)
+        if (!hasExecuted)
         {
-            if (target is CompanionClueInteractable clue)
+            foreach (var interaction in target.robotInteractions)
             {
-                clue.RobotInteract(companion);
-            }
-            else
-            {
-                Debug.LogWarning($"Tried to interact with {target.name}, but it's not a CompanionClueInteractable.");
+                interaction.Execute(companion, target);
             }
 
+            bool keepAvailable = false;
+            foreach (var interaction in target.robotInteractions)
+            {
+                if (interaction.ShouldRemainAvailable())
+                    keepAvailable = true;
+            }
+
+            if (!keepAvailable)
+                companion.Perception.MarkAsHandled(perceivable);
+
+            hasExecuted = true;
+        }
+
+        delayTimer -= Time.deltaTime;
+        if (delayTimer <= 0f)
+        {
             fsm.ChangeState(companion.idleState);
         }
     }
