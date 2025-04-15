@@ -3,7 +3,6 @@ using UnityEngine;
 public class CompanionController : MonoBehaviour
 {
     [Header("References")]
-    public Transform player;
     public float followDistance = 2.5f;
 
     private CompanionFSM fsm;
@@ -44,12 +43,12 @@ public class CompanionController : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (player != null)
+        if (flightController != null && flightController.defaultFollowTarget != null)
         {
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(transform.position, followDistance);
             Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(transform.position, player.position);
+            Gizmos.DrawLine(transform.position, flightController.defaultFollowTarget.position);
         }
 
         if (Application.isPlaying && fsm != null)

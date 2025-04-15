@@ -52,7 +52,8 @@ namespace Momentum
 			StartFrameCache(); // Cache the Box Colliuder Info
 			
 			IsFacing = CheckFaceDirection(); // Set the Facing and Grounded bools using methods
-			IsGrounded = CheckIfGrounded();
+            UpdateVisualFacing();
+            IsGrounded = CheckIfGrounded();
 			IsTouchingLedge = CheckIfTouchingLedge();
 			
 			// Do some special code so that we can output 2 different values from just one method
@@ -62,7 +63,12 @@ namespace Momentum
 			IsTouchingAnyWall = anyWallTemp;
 		}
 
-		private void StartFrameCache() // Values we want to cache in this script. Its slightly more preformant and easier to read
+        private void FixedUpdate()
+        {
+            
+        }
+
+        private void StartFrameCache() // Values we want to cache in this script. Its slightly more preformant and easier to read
 		{
 			_bcPos = _playerReferences.PBC.bounds.center; // Get Center of BoxCollider
 			_bcExtents = _playerReferences.PBC.bounds.extents; // Get extents
@@ -80,7 +86,19 @@ namespace Momentum
 			IsFacing = facing;
 		}
 
-		private bool CheckIfGrounded()
+        private void UpdateVisualFacing()
+        {
+            if (IsFacing == Facing.Right)
+            {
+                transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            }
+            else if (IsFacing == Facing.Left)
+            {
+                transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+        }
+
+        private bool CheckIfGrounded()
 		{
 			GroundedCheckCtx = Physics2D.BoxCast(new Vector2(_bcPos.x, _bcPos.y - _bcExtents.y - (_playerReferences.PData.GroundedCheckBoxLength * 0.5f)), new Vector2((_bcExtents.x * 2) - _playerReferences.PData.GroundedCheckBoxShrinkX, _playerReferences.PData.GroundedCheckBoxLength), 0f, Vector2.down, 0, _playerReferences.PData.GroundLayerMask);
 

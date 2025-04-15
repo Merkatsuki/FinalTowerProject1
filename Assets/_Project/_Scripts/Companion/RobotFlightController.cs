@@ -9,61 +9,91 @@ public class RobotFlightController : MonoBehaviour
     public float acceleration = 6f;
     public float decelerationRadius = 1.5f;
     public float minHeight = 1.5f;
-    public float bobFrequency = 2f;
-    public float bobAmplitude = 0.15f;
-    public float swayAmplitude = 0.1f;
     public float obstacleCheckDistance = 1f;
     public LayerMask obstacleMask;
     public float idleThreshold = 0.05f;
+    public Transform defaultFollowTarget;
+    public float avoidanceWeight = 0.5f;
+    public float avoidanceRadius = 1f;
+
+    [Header("Visual References")]
+    public Transform visualRoot;
+    public ParticleSystem thrustParticles;
 
     private Rigidbody2D rb;
     private Vector2 velocity;
     private Vector2 targetPosition;
     private bool hasTarget = false;
 
-    private float bobOffset;
-    private float swayOffset;
-
     public bool IsHovering => velocity.magnitude < idleThreshold && !hasTarget;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        bobOffset = Random.Range(0f, 2f * Mathf.PI);
-        swayOffset = Random.Range(0f, 2f * Mathf.PI);
     }
 
     private void FixedUpdate()
     {
-        if (!hasTarget) return;
-
         Vector2 position = rb.position;
-        Vector2 desiredDirection = (targetPosition - position).normalized;
-        float distanceToTarget = Vector2.Distance(position, targetPosition);
 
-        Vector2 adjustedTarget = targetPosition;
-        if (adjustedTarget.y < minHeight)
-            adjustedTarget.y = minHeight;
-
-        RaycastHit2D hit = Physics2D.Raycast(position, desiredDirection, obstacleCheckDistance, obstacleMask);
-        if (hit.collider != null)
+        // Default follow target when idle
+        if (!hasTarget && defaultFollowTarget != null)
         {
-            Vector2 obstacleNormal = hit.normal;
-            desiredDirection = Vector2.Reflect(desiredDirection, obstacleNormal).normalized;
-            adjustedTarget = position + desiredDirection * 0.5f;
+            SetTarget(defaultFollowTarget.position);
         }
 
-        float bob = Mathf.Sin(Time.time * bobFrequency + bobOffset) * bobAmplitude;
-        float sway = Mathf.Cos(Time.time * bobFrequency + swayOffset) * swayAmplitude;
-        Vector2 motionOffset = new Vector2(sway, bob);
+        Vector2 desiredDirection = (targetPosition - position);
+        float distanceToTarget = desiredDirection.magnitude;
 
-        Vector2 finalTarget = adjustedTarget + motionOffset;
+        // Base direction
+        desiredDirection = desiredDirection.normalized;
+
+        Vector2 adjustedTarget = targetPosition;
+
+        // Adaptive obstacle avoidance
+        Vector2 avoidance = Vector2.zero;
+        Vector2[] directions = new Vector2[] { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+        foreach (var dir in directions)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(position, dir, avoidanceRadius, obstacleMask);
+            if (hit.collider != null)
+            {
+                avoidance -= dir; // Steer away from obstacle
+            }
+        }
+
+        if (avoidance != Vector2.zero)
+        {
+            desiredDirection = Vector2.Lerp(desiredDirection, desiredDirection + avoidance.normalized, avoidanceWeight).normalized;
+        }
 
         float speedFactor = Mathf.Clamp01(distanceToTarget / decelerationRadius);
-        Vector2 desiredVelocity = (finalTarget - position).normalized * speed * speedFactor;
+        Vector2 desiredVelocity = desiredDirection * speed * speedFactor;
 
         velocity = Vector2.Lerp(velocity, desiredVelocity, acceleration * Time.fixedDeltaTime);
         rb.MovePosition(position + velocity * Time.fixedDeltaTime);
+
+        UpdateVisuals(velocity);
+    }
+
+    private void UpdateVisuals(Vector2 currentVelocity)
+    {
+        if (visualRoot != null)
+        {
+            if (currentVelocity.magnitude > 0.1f)
+            {
+                visualRoot.localScale = new Vector3(
+                    Mathf.Sign(currentVelocity.x),
+                    visualRoot.localScale.y,
+                    visualRoot.localScale.z);
+            }
+        }
+
+        if (thrustParticles != null)
+        {
+            var emission = thrustParticles.emission;
+            emission.rateOverTime = Mathf.Lerp(2f, 30f, currentVelocity.magnitude / speed);
+        }
     }
 
     public void SetTarget(Vector2 position)
@@ -89,11 +119,10 @@ public class RobotFlightController : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(targetPosition, 0.1f);
 
-        if (rb != null && hasTarget)
+        if (rb != null)
         {
-            Gizmos.color = Color.red;
-            Vector2 direction = (targetPosition - rb.position).normalized;
-            Gizmos.DrawLine(rb.position, rb.position + direction * obstacleCheckDistance);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(rb.position, avoidanceRadius);
         }
     }
 #endif

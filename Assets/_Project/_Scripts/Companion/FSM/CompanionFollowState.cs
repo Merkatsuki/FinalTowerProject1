@@ -8,10 +8,20 @@ public class CompanionFollowState : CompanionState
     {
         if (companion.TryAutoInvestigate()) return;
 
-        float dist = Vector2.Distance(companion.transform.position, companion.player.position);
+        if (companion.flightController.defaultFollowTarget == null)
+        {
+            Debug.LogWarning("No defaultFollowTarget set.");
+            return;
+        }
+
+        float dist = Vector2.Distance(
+            companion.transform.position,
+            companion.flightController.defaultFollowTarget.position
+        );
+
         if (dist > companion.followDistance)
         {
-            companion.flightController.SetTarget(companion.player.position);
+            companion.flightController.SetTarget(companion.flightController.defaultFollowTarget.position);
         }
         else
         {
@@ -23,4 +33,6 @@ public class CompanionFollowState : CompanionState
     {
         companion.flightController.ClearTarget();
     }
+
+
 }
