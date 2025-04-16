@@ -15,39 +15,49 @@ public class CompanionInvestigateState : CompanionState
 
     public override void OnEnter()
     {
-        if (target == null || !target.IsAvailable())
-        {
-            fsm.ChangeState(companion.idleState);
-            return;
-        }
+        if (!IsValidTarget()) return;
 
-        companion.flightController.SetTarget(targetTransform.position);
+        companion.flightController.SetTargetWithHoverProfile(
+            targetTransform.position,
+            companion.investigateHoverProfile
+        );
     }
 
     public override void Tick()
     {
-        if (target == null || !target.IsAvailable())
-        {
-            fsm.ChangeState(companion.idleState);
-            return;
-        }
+        if (!IsValidTarget()) return;
 
         if (companion.flightController.ReachedTarget(arrivalThreshold))
         {
-            if (targetTransform.TryGetComponent(out CompanionClueInteractable clue))
-            {
-                fsm.ChangeState(new CompanionInteractWithObjectState(companion, fsm, clue, target));
-            }
-            else
-            {
-                companion.Perception.MarkAsHandled(target);
-                fsm.ChangeState(companion.idleState);
-            }
+            TransitionToInteractionOrIdle();
         }
     }
 
     public override void OnExit()
     {
         companion.flightController.ClearTarget();
+    }
+
+    private bool IsValidTarget()
+    {
+        if (target == null || !target.IsAvailable())
+        {
+            fsm.ChangeState(companion.idleState);
+            return false;
+        }
+        return true;
+    }
+
+    private void TransitionToInteractionOrIdle()
+    {
+        if (targetTransform.TryGetComponent(out CompanionClueInteractable clue))
+        {
+            fsm.ChangeState(new CompanionInteractWithObjectState(companion, fsm, clue, target));
+        }
+        else
+        {
+            companion.Perception.MarkAsHandled(target);
+            fsm.ChangeState(companion.idleState);
+        }
     }
 }
