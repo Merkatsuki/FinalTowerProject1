@@ -1,44 +1,57 @@
+// CompanionInteractWithObjectState.cs
 using UnityEngine;
+using System.Collections.Generic;
 
 public class CompanionInteractWithObjectState : CompanionState
 {
-    private CompanionClueInteractable target;
-    private IPerceivable perceivable;
-    private float delayTimer = 1.5f;
-    private bool hasExecuted = false;
+    private InteractableBase target;
+    private IRobotPerceivable perceivable;
+    private List<RobotInteractionSO> interactions;
+    private bool hasExecuted;
 
-    public CompanionInteractWithObjectState(CompanionController companion, CompanionFSM fsm, CompanionClueInteractable target, IPerceivable perceivable)
+    public CompanionInteractWithObjectState(CompanionController companion, CompanionFSM fsm, InteractableBase target, IRobotPerceivable perceivable)
         : base(companion, fsm)
     {
         this.target = target;
         this.perceivable = perceivable;
+        this.interactions = perceivable.GetRobotInteractions();
+    }
+
+    public override void OnEnter()
+    {
+        companion.LockInteraction();
+        hasExecuted = true;
+
+        foreach (var interaction in interactions)
+        {
+            interaction.OnEnter(companion, target);
+            interaction.Execute(companion, target);
+        }
     }
 
     public override void Tick()
     {
-        if (!hasExecuted)
+        if (!hasExecuted) return;
+
+        bool allReady = true;
+        foreach (var interaction in interactions)
         {
-            foreach (var interaction in target.robotInteractions)
+            if (!interaction.ShouldExit(companion, target))
             {
-                interaction.Execute(companion, target);
+                allReady = false;
+                break;
             }
-
-            bool keepAvailable = false;
-            foreach (var interaction in target.robotInteractions)
-            {
-                if (interaction.ShouldRemainAvailable())
-                    keepAvailable = true;
-            }
-
-            if (!keepAvailable)
-                companion.Perception.MarkAsHandled(perceivable);
-
-            hasExecuted = true;
         }
 
-        delayTimer -= Time.deltaTime;
-        if (delayTimer <= 0f)
+        if (allReady)
         {
+            companion.UnlockInteraction();
+            if (perceivable is CompanionClueInteractable clue)
+            {
+                clue.MarkHandled();
+            }
+
+            companion.Perception.MarkAsHandled(perceivable);
             fsm.ChangeState(companion.idleState);
         }
     }

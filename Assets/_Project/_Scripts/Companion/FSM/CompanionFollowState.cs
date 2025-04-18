@@ -6,7 +6,7 @@ public class CompanionFollowState : CompanionState
 
     public override void Tick()
     {
-        if (companion.TryAutoInvestigate()) return;
+        if (!companion.IsInteractionLocked && companion.TryAutoInvestigate()) return;
 
         if (companion.flightController.defaultFollowTarget == null)
         {

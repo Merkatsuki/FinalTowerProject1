@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class CompanionInvestigateState : CompanionState
 {
-    private IPerceivable target;
+    private IRobotPerceivable target;
     private Transform targetTransform;
     private float arrivalThreshold = 0.5f;
 
-    public CompanionInvestigateState(CompanionController companion, CompanionFSM fsm, IPerceivable target)
+    public CompanionInvestigateState(CompanionController companion, CompanionFSM fsm, IRobotPerceivable target)
         : base(companion, fsm)
     {
         this.target = target;
@@ -17,11 +17,24 @@ public class CompanionInvestigateState : CompanionState
     {
         if (!IsValidTarget()) return;
 
-        companion.flightController.SetTargetWithHoverProfile(
-            targetTransform.position,
-            companion.investigateHoverProfile
-        );
+        if (!targetTransform.TryGetComponent<IHoverProfileProvider>(out var provider))
+        {
+            Debug.LogWarning($"InvestigateState: Target '{targetTransform.name}' does not implement IHoverProfileProvider.");
+            fsm.ChangeState(companion.idleState);
+            return;
+        }
+
+        HoverStagingProfileSO profile = provider.GetHoverProfile();
+        if (profile == null)
+        {
+            Debug.LogWarning($"InvestigateState: Target '{targetTransform.name}' did not provide a HoverStagingProfileSO.");
+            fsm.ChangeState(companion.idleState);
+            return;
+        }
+
+        companion.flightController.SetTargetWithHoverProfile(targetTransform.position, profile);
     }
+
 
     public override void Tick()
     {
@@ -31,11 +44,6 @@ public class CompanionInvestigateState : CompanionState
         {
             TransitionToInteractionOrIdle();
         }
-    }
-
-    public override void OnExit()
-    {
-        companion.flightController.ClearTarget();
     }
 
     private bool IsValidTarget()

@@ -117,6 +117,12 @@ public class RobotFlightController : MonoBehaviour
         SetTarget(targetPos + offset);
     }
 
+    public void ClearTarget()
+    {
+        hasTarget = false;
+        velocity = Vector2.zero;
+    }
+
     private Vector2 SampleSmartHoverOffset(Vector2 targetPos, HoverStagingProfileSO profile, out bool usedFallback)
     {
         usedFallback = false;
@@ -189,12 +195,6 @@ public class RobotFlightController : MonoBehaviour
                 visualRoot.localScale.y,
                 visualRoot.localScale.z);
         }
-    }
-
-    public void ClearTarget()
-    {
-        hasTarget = false;
-        velocity = Vector2.zero;
     }
 
     public bool ReachedTarget(float threshold = 0.1f)

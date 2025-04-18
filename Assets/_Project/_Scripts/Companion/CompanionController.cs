@@ -1,16 +1,20 @@
+// CompanionController.cs
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class CompanionController : MonoBehaviour
 {
-    [Header("References")]
     public float followDistance = 2.5f;
-    public HoverStagingProfileSO investigateHoverProfile;
+    [SerializeField] private EnergyType currentEnergy = EnergyType.None;
+    [SerializeField] private Light2D robotGlowLight;
 
-    private CompanionFSM fsm;
-    public CompanionFollowState followState;
-    public CompanionIdleState idleState;
+    public CompanionFSM fsm { get; private set; }
     public RobotFlightController flightController { get; private set; }
     public CompanionPerception Perception { get; private set; }
+    public bool IsInteractionLocked { get; private set; } = false;
+
+    public CompanionFollowState followState;
+    public CompanionIdleState idleState;
 
     private void Awake()
     {
@@ -22,16 +26,23 @@ public class CompanionController : MonoBehaviour
         fsm.Initialize(idleState);
     }
 
-    private void Update() => fsm.Tick();
-    private void FixedUpdate() => fsm.FixedTick();
+    private void Update()
+    {
+        fsm.Tick();
+    }
+
+    private void FixedUpdate()
+    {
+        fsm.FixedTick();
+    }
 
     private void InitializeComponents()
     {
         fsm = new CompanionFSM();
+        flightController = GetComponent<RobotFlightController>();
+        Perception = GetComponent<CompanionPerception>();
         followState = new CompanionFollowState(this, fsm);
         idleState = new CompanionIdleState(this, fsm);
-        Perception = GetComponent<CompanionPerception>();
-        flightController = GetComponent<RobotFlightController>();
     }
 
     public bool TryAutoInvestigate()
@@ -44,6 +55,14 @@ public class CompanionController : MonoBehaviour
         }
         return false;
     }
+
+    public void LockInteraction() => IsInteractionLocked = true;
+    public void UnlockInteraction() => IsInteractionLocked = false;
+
+    public void SetEnergyType(EnergyType type) => currentEnergy = type;
+    public EnergyType GetEnergyType() => currentEnergy;
+
+    public Light2D GetRobotLight() => robotGlowLight;
 
 #if UNITY_EDITOR
     private void OnDrawGizmos()

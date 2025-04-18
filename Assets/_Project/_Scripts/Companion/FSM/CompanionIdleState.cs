@@ -11,7 +11,7 @@ public class CompanionIdleState : CompanionState
 
     public override void Tick()
     {
-        if (companion.TryAutoInvestigate()) return;
+        if (!companion.IsInteractionLocked && companion.TryAutoInvestigate()) return;
 
         float distance = Vector2.Distance(
         companion.transform.position,

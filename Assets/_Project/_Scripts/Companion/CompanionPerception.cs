@@ -8,8 +8,8 @@ public class CompanionPerception : MonoBehaviour
     public LayerMask detectionMask;
     public float checkInterval = 0.2f;
 
-    private SortedList<float, IPerceivable> currentTargets = new SortedList<float, IPerceivable>();
-    private HashSet<IPerceivable> handledTargets = new HashSet<IPerceivable>();
+    private SortedList<float, IRobotPerceivable> currentTargets = new SortedList<float, IRobotPerceivable>();
+    private HashSet<IRobotPerceivable> handledTargets = new HashSet<IRobotPerceivable>();
     private float checkTimer;
     private CompanionController controller;
 
@@ -35,7 +35,7 @@ public class CompanionPerception : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, perceptionRadius, detectionMask);
         foreach (var hit in hits)
         {
-            if (hit.TryGetComponent<IPerceivable>(out var target) && target.IsAvailable() && !HasBeenHandled(target))
+            if (hit.TryGetComponent<IRobotPerceivable>(out var target) && target.IsAvailable() && !HasBeenHandled(target))
             {
                 float score = target.GetPriority(); // Add distance penalty here if desired
                 while (currentTargets.ContainsKey(score)) score += 0.001f;
@@ -44,18 +44,18 @@ public class CompanionPerception : MonoBehaviour
         }
     }
 
-    public IPerceivable GetCurrentTarget()
+    public IRobotPerceivable GetCurrentTarget()
     {
         return currentTargets.Count > 0 ? currentTargets.Values[^1] : null;
     }
 
-    public void MarkAsHandled(IPerceivable target)
+    public void MarkAsHandled(IRobotPerceivable target)
     {
         if (target != null)
             handledTargets.Add(target);
     }
 
-    public bool HasBeenHandled(IPerceivable target)
+    public bool HasBeenHandled(IRobotPerceivable target)
     {
         return handledTargets.Contains(target);
     }
