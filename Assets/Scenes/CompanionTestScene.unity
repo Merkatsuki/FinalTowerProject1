@@ -7632,7 +7632,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa5112f4931d42545ad5549a18784f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  promptMessage: Press [E] to interact
   priority: 5
   hoverProfile: {fileID: 0}
   debugInfo: 
@@ -7894,7 +7893,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa5112f4931d42545ad5549a18784f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  promptMessage: Press [E] to interact
   priority: 5
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   debugInfo: 
@@ -9036,7 +9034,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa5112f4931d42545ad5549a18784f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  promptMessage: Press [E] to interact
   priority: 5
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   debugInfo: 
@@ -11566,6 +11563,7 @@ MonoBehaviour:
   followDistance: 0.5
   currentEnergy: 0
   robotGlowLight: {fileID: 1832866498}
+  chargedGlowIntensity: 50
 --- !u!114 &1932641928
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12877,7 +12875,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa5112f4931d42545ad5549a18784f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  promptMessage: Press [E] to interact
   priority: 5
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   debugInfo: 

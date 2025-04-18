@@ -1,4 +1,3 @@
-// SequentialExitStrategySO.cs
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +8,7 @@ public class SequentialExitStrategySO : ExitStrategySO
 
     private int currentStepIndex = 0;
 
-    public override void OnEnter(CompanionController companion, InteractableBase target)
+    public override void OnEnter(CompanionController companion, CompanionClueInteractable target)
     {
         currentStepIndex = 0;
         if (steps.Count > 0)
@@ -18,7 +17,7 @@ public class SequentialExitStrategySO : ExitStrategySO
         }
     }
 
-    public override bool ShouldExit(CompanionController companion, InteractableBase target)
+    public override bool ShouldExit(CompanionController companion, CompanionClueInteractable target)
     {
         if (steps.Count == 0) return true;
 

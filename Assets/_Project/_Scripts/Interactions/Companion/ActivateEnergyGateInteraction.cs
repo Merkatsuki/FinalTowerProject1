@@ -3,7 +3,7 @@
 [CreateAssetMenu(menuName = "RobotInteraction/Activate Energy Gate")]
 public class ActivateEnergyGateInteraction : RobotInteractionSO
 {
-    public override void Execute(CompanionController companion, InteractableBase target)
+    public override void Execute(CompanionController companion, CompanionClueInteractable target)
     {
         if (target.TryGetComponent<EnergyPuzzleGate>(out var gate))
         {

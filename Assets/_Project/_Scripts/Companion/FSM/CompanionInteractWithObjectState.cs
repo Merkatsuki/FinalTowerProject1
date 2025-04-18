@@ -1,15 +1,14 @@
-// CompanionInteractWithObjectState.cs
 using UnityEngine;
 using System.Collections.Generic;
 
 public class CompanionInteractWithObjectState : CompanionState
 {
-    private InteractableBase target;
+    private CompanionClueInteractable target;
     private IRobotPerceivable perceivable;
     private List<RobotInteractionSO> interactions;
     private bool hasExecuted;
 
-    public CompanionInteractWithObjectState(CompanionController companion, CompanionFSM fsm, InteractableBase target, IRobotPerceivable perceivable)
+    public CompanionInteractWithObjectState(CompanionController companion, CompanionFSM fsm, CompanionClueInteractable target, IRobotPerceivable perceivable)
         : base(companion, fsm)
     {
         this.target = target;
@@ -45,13 +44,9 @@ public class CompanionInteractWithObjectState : CompanionState
 
         if (allReady)
         {
+            target.MarkHandled();
+            companion.Perception.MarkAsHandled(target);
             companion.UnlockInteraction();
-            if (perceivable is CompanionClueInteractable clue)
-            {
-                clue.MarkHandled();
-            }
-
-            companion.Perception.MarkAsHandled(perceivable);
             fsm.ChangeState(companion.idleState);
         }
     }

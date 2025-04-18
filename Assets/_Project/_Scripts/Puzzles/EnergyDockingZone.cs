@@ -7,7 +7,6 @@ public class EnergyDockingZone : MonoBehaviour
 {
     [SerializeField] private Light2D energyLight;
     [SerializeField] private float chargeTime = 3f;
-    [SerializeField] private float lightIntensity = 20f;
 
     [Tooltip("Optional point where the robot should position itself.")]
     public Transform dockingPoint;
@@ -24,34 +23,25 @@ public class EnergyDockingZone : MonoBehaviour
 
     private IEnumerator ChargeSequence(CompanionController companion)
     {
-        isCharging = true;
+        Color energyColor = EnergyColorMap.GetColor(zoneType);
 
-        Light2D companionLight = companion.GetRobotLight();
-        Color energyColor = EnergyColorMap.GetColor(zoneType); // a helper script you define
-
-        float elapsed = 0f;
-        while (elapsed < chargeTime)
+        if (energyLight != null)
         {
-            float t = elapsed / chargeTime;
-            if (energyLight != null)
-                energyLight.intensity = Mathf.Lerp(lightIntensity, 0f, t);
+            float initialIntensity = energyLight.intensity;
 
-            if (companionLight != null)
+            float elapsed = 0f;
+            while (elapsed < chargeTime)
             {
-                companionLight.intensity = Mathf.Lerp(0f, 50f, t);
-                companionLight.color = energyColor;
+                float t = elapsed / chargeTime;
+                energyLight.intensity = Mathf.Lerp(initialIntensity, 0f, t);
+                elapsed += Time.deltaTime;
+                yield return null;
             }
 
-            elapsed += Time.deltaTime;
-            yield return null;
+            energyLight.intensity = 0f;
         }
 
-        if (energyLight != null) energyLight.intensity = 0f;
-        if (companionLight != null)
-        {
-            companionLight.intensity = 50f;
-            companionLight.color = energyColor;
-        }
+        StartCoroutine(companion.ChargeGlow(energyColor, chargeTime));
 
         companion.SetEnergyType(zoneType);
         isCharging = false;

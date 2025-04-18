@@ -7,7 +7,7 @@ public class AllMustPassStrategySO : ExitStrategySO
 {
     public List<ExitStrategySO> strategies;
 
-    public override void OnEnter(CompanionController companion, InteractableBase target)
+    public override void OnEnter(CompanionController companion, CompanionClueInteractable target)
     {
         foreach (var strategy in strategies)
         {
@@ -15,7 +15,7 @@ public class AllMustPassStrategySO : ExitStrategySO
         }
     }
 
-    public override bool ShouldExit(CompanionController companion, InteractableBase target)
+    public override bool ShouldExit(CompanionController companion, CompanionClueInteractable target)
     {
         foreach (var strategy in strategies)
         {

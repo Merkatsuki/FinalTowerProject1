@@ -5,7 +5,7 @@ public class EmotionPulseInteraction : RobotInteractionSO
 {
     public Color pulseColor = Color.cyan;
 
-    public override void Execute(CompanionController companion, InteractableBase target)
+    public override void Execute(CompanionController companion, CompanionClueInteractable target)
     {
         Debug.Log($"[Robot Emotion Pulse]: {target.name} emits color {pulseColor}");
         // TODO: change companion's color, animate, or trigger emotion systems

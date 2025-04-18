@@ -6,7 +6,7 @@ public class ScanClueInteraction : RobotInteractionSO
     [TextArea]
     public string scanMessage = "Analyzing memory fragment...";
 
-    public override void Execute(CompanionController companion, InteractableBase target)
+    public override void Execute(CompanionController companion, CompanionClueInteractable target)
     {
         if (DialogueManager.Instance != null)
         {

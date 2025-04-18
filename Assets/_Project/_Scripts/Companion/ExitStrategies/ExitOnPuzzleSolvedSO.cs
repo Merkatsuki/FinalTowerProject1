@@ -6,7 +6,7 @@ public class ExitOnPuzzleSolvedSO : ExitStrategySO
 {
     public string puzzleKey;
 
-    public override bool ShouldExit(CompanionController companion, InteractableBase target)
+    public override bool ShouldExit(CompanionController companion, CompanionClueInteractable target)
     {
         return PuzzleManager.Instance.IsPuzzleSolved(puzzleKey);
     }
