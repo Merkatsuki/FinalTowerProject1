@@ -10,7 +10,7 @@ public class DockAtZoneInteraction : RobotInteractionSO
             zone.Dock(companion);
             var energy = companion.GetEnergyType();
 
-            DialogueManager.Instance?.ShowMessage($"Docked at {zone.name}. Charged with {energy} energy.");
+            DialogueManager.Instance?.ShowMessage($"Docked at {zone.name}....");
         }
         else
         {

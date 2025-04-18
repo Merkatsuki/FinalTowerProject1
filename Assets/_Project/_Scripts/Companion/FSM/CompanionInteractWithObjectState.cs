@@ -4,22 +4,20 @@ using System.Collections.Generic;
 public class CompanionInteractWithObjectState : CompanionState
 {
     private CompanionClueInteractable target;
-    private IRobotPerceivable perceivable;
     private List<RobotInteractionSO> interactions;
     private bool hasExecuted;
 
-    public CompanionInteractWithObjectState(CompanionController companion, CompanionFSM fsm, CompanionClueInteractable target, IRobotPerceivable perceivable)
+    public CompanionInteractWithObjectState(CompanionController companion, CompanionFSM fsm, CompanionClueInteractable target)
         : base(companion, fsm)
     {
         this.target = target;
-        this.perceivable = perceivable;
-        this.interactions = perceivable.GetRobotInteractions();
+        this.interactions = target.GetRobotInteractions();
     }
 
     public override void OnEnter()
     {
-        companion.LockInteraction();
         hasExecuted = true;
+        companion.LockInteraction();
 
         foreach (var interaction in interactions)
         {
@@ -46,6 +44,8 @@ public class CompanionInteractWithObjectState : CompanionState
         {
             target.MarkHandled();
             companion.Perception.MarkAsHandled(target);
+            companion.ClearCurrentTarget();
+            companion.StartRetargetCooldown();
             companion.UnlockInteraction();
             fsm.ChangeState(companion.idleState);
         }

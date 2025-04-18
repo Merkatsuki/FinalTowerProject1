@@ -15,6 +15,8 @@ public class CompanionInvestigateState : CompanionState
 
     public override void OnEnter()
     {
+        Debug.Log($"Investigating: {target}");
+
         if (!IsValidTarget()) return;
 
         if (!targetTransform.TryGetComponent<IHoverProfileProvider>(out var provider))
@@ -33,8 +35,8 @@ public class CompanionInvestigateState : CompanionState
         }
 
         companion.flightController.SetTargetWithHoverProfile(targetTransform.position, profile);
+        // track active target during flight
     }
-
 
     public override void Tick()
     {
@@ -60,11 +62,12 @@ public class CompanionInvestigateState : CompanionState
     {
         if (targetTransform.TryGetComponent(out CompanionClueInteractable clue))
         {
-            fsm.ChangeState(new CompanionInteractWithObjectState(companion, fsm, clue, target));
+            fsm.ChangeState(new CompanionInteractWithObjectState(companion, fsm, clue));
         }
         else
         {
             companion.Perception.MarkAsHandled(target);
+            companion.ClearCurrentTarget();
             fsm.ChangeState(companion.idleState);
         }
     }

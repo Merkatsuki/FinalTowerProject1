@@ -4,14 +4,16 @@ using UnityEngine;
 public class CompanionPerception : MonoBehaviour
 {
     [Header("Detection Settings")]
-    public float perceptionRadius = 5f;
-    public LayerMask detectionMask;
-    public float checkInterval = 0.2f;
+    [SerializeField] private float perceptionRadius = 5f;
+    [SerializeField] private LayerMask detectionMask;
+    [SerializeField] private float checkInterval = 0.2f;
 
-    private SortedList<float, IRobotPerceivable> currentTargets = new SortedList<float, IRobotPerceivable>();
-    private HashSet<IRobotPerceivable> handledTargets = new HashSet<IRobotPerceivable>();
-    private float checkTimer;
+
+    private readonly SortedList<float, IRobotPerceivable> currentTargets = new();
+    private readonly HashSet<IRobotPerceivable> handledTargets = new();
+
     private CompanionController controller;
+    private float checkTimer;
 
     private void Awake()
     {
@@ -30,14 +32,30 @@ public class CompanionPerception : MonoBehaviour
 
     private void ScanForTargets()
     {
+        if (controller.IsInteractionLocked) return;
+
         currentTargets.Clear();
 
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, perceptionRadius, detectionMask);
         foreach (var hit in hits)
         {
-            if (hit.TryGetComponent<IRobotPerceivable>(out var target) && target.IsAvailable() && !HasBeenHandled(target))
+            if (
+                hit.TryGetComponent<IRobotPerceivable>(out var target)
+                && !HasBeenHandled(target)
+                && target.IsAvailable()
+                            )
             {
-                float score = target.GetPriority(); // Add distance penalty here if desired
+                // Skip clue-wrapped docking zones if already charged
+                if (controller.GetEnergyType() != EnergyType.None)
+                {
+                    if (target is CompanionClueInteractable clue && clue.TryGetComponent<EnergyDockingZone>(out _))
+                    {
+                        //Debug.Log($"Skipping energy dock {clue.name} because companion is already charged.");
+                        continue;
+                    }
+                }
+
+                float score = target.GetPriority();
                 while (currentTargets.ContainsKey(score)) score += 0.001f;
                 currentTargets.Add(score, target);
             }
@@ -51,14 +69,20 @@ public class CompanionPerception : MonoBehaviour
 
     public void MarkAsHandled(IRobotPerceivable target)
     {
-        if (target != null)
+        if (target is CompanionClueInteractable clue && clue.TryGetComponent<EnergyDockingZone>(out _))
+        {
+            // Don't mark docking zones as handled so they can be reused
+            return;
+        }
+
+        if (!handledTargets.Contains(target))
+        {
             handledTargets.Add(target);
+        }
     }
 
-    public bool HasBeenHandled(IRobotPerceivable target)
-    {
-        return handledTargets.Contains(target);
-    }
+    public bool HasBeenHandled(IRobotPerceivable target) => handledTargets.Contains(target);
+
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()

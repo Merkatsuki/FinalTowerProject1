@@ -1,4 +1,3 @@
-// CompanionController.cs
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -9,6 +8,10 @@ public class CompanionController : MonoBehaviour
     [SerializeField] private EnergyType currentEnergy = EnergyType.None;
     [SerializeField] private Light2D robotGlowLight;
     [SerializeField] private float chargedGlowIntensity = 1.2f;
+    [SerializeField] private float energyDuration = 10f;
+
+    [SerializeField] private float retargetCooldown = 2.1f;  //Right now set to just longer than charge on EnergyDockingZone to avoid retargetting while charging.  Might make this more reaonable later.
+    private float retargetCooldownTimer = 0f;
 
     public CompanionFSM fsm { get; private set; }
     public RobotFlightController flightController { get; private set; }
@@ -17,6 +20,17 @@ public class CompanionController : MonoBehaviour
 
     public CompanionFollowState followState;
     public CompanionIdleState idleState;
+
+    private Coroutine energyTimerCoroutine;
+
+    private IRobotPerceivable currentTarget;
+    public void SetCurrentTarget(IRobotPerceivable target) => currentTarget = target;
+    public void ClearCurrentTarget() => currentTarget = null;
+    public IRobotPerceivable GetCurrentTrackedTarget() => currentTarget;
+
+    public bool IsBusy => currentTarget != null || IsInteractionLocked;
+    public bool CanInvestigate() => !IsBusy && retargetCooldownTimer <= 0f;
+    public void StartRetargetCooldown() => retargetCooldownTimer = retargetCooldown;
 
     private void Awake()
     {
@@ -31,6 +45,9 @@ public class CompanionController : MonoBehaviour
     private void Update()
     {
         fsm.Tick();
+
+        if (retargetCooldownTimer > 0f)
+            retargetCooldownTimer -= Time.deltaTime;
     }
 
     private void FixedUpdate()
@@ -49,9 +66,12 @@ public class CompanionController : MonoBehaviour
 
     public bool TryAutoInvestigate()
     {
+        if (!CanInvestigate()) return false;
+
         var target = Perception.GetCurrentTarget();
         if (target != null)
         {
+            currentTarget = target;
             fsm.ChangeState(new CompanionInvestigateState(this, fsm, target));
             return true;
         }
@@ -61,7 +81,39 @@ public class CompanionController : MonoBehaviour
     public void LockInteraction() => IsInteractionLocked = true;
     public void UnlockInteraction() => IsInteractionLocked = false;
 
-    public void SetEnergyType(EnergyType type) => currentEnergy = type;
+    public void SetEnergyType(EnergyType type)
+    {
+        currentEnergy = type;
+        if (energyTimerCoroutine != null)
+            StopCoroutine(energyTimerCoroutine);
+
+        if (type != EnergyType.None)
+            energyTimerCoroutine = StartCoroutine(EnergyDecay());
+    }
+
+    private IEnumerator EnergyDecay()
+    {
+        float from = robotGlowLight.intensity;
+        float elapsed = 0f;
+
+        while (elapsed < energyDuration)
+        {
+            robotGlowLight.intensity = Mathf.Lerp(from, 0f, elapsed / energyDuration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        ClearEnergy(true);
+    }
+
+    public void ClearEnergy(bool skipFade = false)
+    {
+        currentEnergy = EnergyType.None;
+
+        if (robotGlowLight != null && skipFade)
+            robotGlowLight.intensity = 0f;
+    }
+
     public EnergyType GetEnergyType() => currentEnergy;
 
     public Light2D GetRobotLight() => robotGlowLight;
@@ -87,7 +139,6 @@ public class CompanionController : MonoBehaviour
         robotGlowLight.intensity = chargedGlowIntensity;
         robotGlowLight.color = color;
     }
-
 
 #if UNITY_EDITOR
     private void OnDrawGizmos()

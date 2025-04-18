@@ -1,4 +1,3 @@
-// CompanionClueInteractable.cs
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,6 +19,10 @@ public class CompanionClueInteractable : MonoBehaviour, IRobotPerceivable, IHove
     public Transform GetTransform() => transform;
 
     public void MarkHandled() => isHandled = true;
+    public void ResetHandled()
+    {
+        isHandled = false;
+    }
 
     public void RobotInteract(CompanionController companion)
     {
