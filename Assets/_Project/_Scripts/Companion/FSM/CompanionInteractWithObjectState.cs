@@ -50,4 +50,6 @@ public class CompanionInteractWithObjectState : CompanionState
             fsm.ChangeState(companion.idleState);
         }
     }
+
+    public override CompanionStateType StateType => CompanionStateType.InteractWithObject;
 }

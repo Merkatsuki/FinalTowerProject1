@@ -7,7 +7,7 @@ public enum HoverMode
     SmartSampled           // Arc-sampled to avoid nearby obstacles and find free space
 }
 
-[CreateAssetMenu(menuName = "AI/Hover Staging Profile")]
+[CreateAssetMenu(menuName = "Companion/Hover/Hover Staging Profile")]
 public class HoverStagingProfileSO : ScriptableObject
 {
     [Header("Hover Logic")]

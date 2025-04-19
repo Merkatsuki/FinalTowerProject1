@@ -23,4 +23,6 @@ public class CompanionIdleState : CompanionState
             fsm.ChangeState(companion.followState);
         }
     }
+
+    public override CompanionStateType StateType => CompanionStateType.Idle;
 }

@@ -34,5 +34,5 @@ public class CompanionFollowState : CompanionState
         companion.flightController.ClearTarget();
     }
 
-
+    public override CompanionStateType StateType => CompanionStateType.Follow;
 }

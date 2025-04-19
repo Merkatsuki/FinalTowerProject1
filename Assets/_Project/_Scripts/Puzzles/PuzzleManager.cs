@@ -6,6 +6,7 @@ public class PuzzleManager : MonoBehaviour
     public static PuzzleManager Instance { get; private set; }
 
     private HashSet<string> solvedPuzzles = new HashSet<string>();
+    private readonly HashSet<string> activeFlags = new();
 
     private void Awake()
     {
@@ -48,5 +49,20 @@ public class PuzzleManager : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public void SetFlag(string flagKey)
+    {
+        activeFlags.Add(flagKey);
+    }
+
+    public void ClearFlag(string flagKey)
+    {
+        activeFlags.Remove(flagKey);
+    }
+
+    public bool IsFlagSet(string flagKey)
+    {
+        return activeFlags.Contains(flagKey);
     }
 }

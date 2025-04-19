@@ -1,3 +1,4 @@
+// CompanionInvestigateState.cs
 using UnityEngine;
 
 public class CompanionInvestigateState : CompanionState
@@ -35,7 +36,6 @@ public class CompanionInvestigateState : CompanionState
         }
 
         companion.flightController.SetTargetWithHoverProfile(targetTransform.position, profile);
-        // track active target during flight
     }
 
     public override void Tick()
@@ -50,11 +50,13 @@ public class CompanionInvestigateState : CompanionState
 
     private bool IsValidTarget()
     {
-        if (target == null || !target.IsAvailable())
+        if (target == null) return false;
+
+        if (target is CompanionClueInteractable clue)
         {
-            fsm.ChangeState(companion.idleState);
-            return false;
+            return clue.HasValidInteractions(companion);
         }
+
         return true;
     }
 
@@ -66,9 +68,10 @@ public class CompanionInvestigateState : CompanionState
         }
         else
         {
-            companion.Perception.MarkAsHandled(target);
             companion.ClearCurrentTarget();
             fsm.ChangeState(companion.idleState);
         }
     }
+
+    public override CompanionStateType StateType => CompanionStateType.Investigate;
 }

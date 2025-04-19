@@ -1,20 +1,35 @@
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Rendering.Universal;
 
 public class EnergyPuzzleGate : MonoBehaviour
 {
-    public EnergyType requiredEnergy;
-    public GameObject gateObject;
+    [SerializeField] private EnergyType requiredEnergy;
+    [SerializeField] private UnityEvent onGateActivated;
+    [SerializeField] private Light2D gateLight;
+    [SerializeField] private float gateGlowIntensity = 20f;
 
-    public void TryActivate(CompanionController companion)
+    private bool isActivated = false;
+
+    public void AcceptEnergyFrom(CompanionController companion)
     {
-        if (companion.GetEnergyType() == requiredEnergy)
+        EnergyType energy = companion.GetEnergyType();
+
+        if (energy != requiredEnergy || isActivated) return;
+
+        if (gateLight != null)
         {
-            Debug.Log("Gate unlocked!");
-            gateObject.SetActive(false);
+            gateLight.color = EnergyColorMap.GetColor(energy);
+            gateLight.intensity = gateGlowIntensity;
         }
-        else
-        {
-            Debug.Log("Incorrect energy. Gate remains locked.");
-        }
+
+        // Keep companion's energy — allow multiple activations
+        isActivated = true;
+        onGateActivated?.Invoke();
+        Debug.Log($"Gate activated with energy: {energy}");
     }
+
+    public EnergyType GetRequiredEnergy() => requiredEnergy;
+    public bool IsActivated() => isActivated;
 }
+

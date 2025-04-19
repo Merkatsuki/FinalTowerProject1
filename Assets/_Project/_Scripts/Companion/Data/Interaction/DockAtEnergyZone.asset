@@ -9,8 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 952c77781e415e94c9aff642646aa0b8, type: 3}
+  m_Script: {fileID: 11500000, guid: b8a3cd2be8d348641a5c537f165f0e80, type: 3}
   m_Name: DockAtEnergyZone
   m_EditorClassIdentifier: 
+  entryStrategies:
+  - {fileID: 11400000, guid: 2ac0e24843e87df45a6de6cd1757e2a8, type: 2}
   exitStrategies:
   - {fileID: 11400000, guid: adfff014d1b512a4c8a7b5f3188a9a95, type: 2}

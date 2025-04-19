@@ -1,7 +1,8 @@
-using System.Collections;
-using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine;
+using System.Collections;
 
+#region Core Declaration
 public class CompanionController : MonoBehaviour
 {
     public float followDistance = 2.5f;
@@ -12,6 +13,9 @@ public class CompanionController : MonoBehaviour
 
     [SerializeField] private float retargetCooldown = 2.1f;  //Right now set to just longer than charge on EnergyDockingZone to avoid retargetting while charging.  Might make this more reaonable later.
     private float retargetCooldownTimer = 0f;
+
+    [SerializeField] private CompanionStatusUI statusUI;
+
 
     public CompanionFSM fsm { get; private set; }
     public RobotFlightController flightController { get; private set; }
@@ -32,14 +36,12 @@ public class CompanionController : MonoBehaviour
     public bool CanInvestigate() => !IsBusy && retargetCooldownTimer <= 0f;
     public void StartRetargetCooldown() => retargetCooldownTimer = retargetCooldown;
 
+    #endregion
+
+    #region Unity Lifecycle
     private void Awake()
     {
         InitializeComponents();
-    }
-
-    private void Start()
-    {
-        fsm.Initialize(idleState);
     }
 
     private void Update()
@@ -55,6 +57,9 @@ public class CompanionController : MonoBehaviour
         fsm.FixedTick();
     }
 
+    #endregion
+
+    #region Initialization
     private void InitializeComponents()
     {
         fsm = new CompanionFSM();
@@ -62,8 +67,14 @@ public class CompanionController : MonoBehaviour
         Perception = GetComponent<CompanionPerception>();
         followState = new CompanionFollowState(this, fsm);
         idleState = new CompanionIdleState(this, fsm);
+
+        // Inject the FSM and the status UI reference
+        fsm.Initialize(idleState, statusUI);
     }
 
+    #endregion
+
+    #region Investigation Logic
     public bool TryAutoInvestigate()
     {
         if (!CanInvestigate()) return false;
@@ -78,9 +89,15 @@ public class CompanionController : MonoBehaviour
         return false;
     }
 
+    #endregion
+
+    #region Interaction Locking
     public void LockInteraction() => IsInteractionLocked = true;
     public void UnlockInteraction() => IsInteractionLocked = false;
 
+    #endregion
+
+    #region Energy System
     public void SetEnergyType(EnergyType type)
     {
         currentEnergy = type;
@@ -140,6 +157,9 @@ public class CompanionController : MonoBehaviour
         robotGlowLight.color = color;
     }
 
+    #endregion
+
+    #region Gizmos & Editor Debug
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
@@ -167,3 +187,5 @@ public class CompanionController : MonoBehaviour
     }
 #endif
 }
+
+#endregion

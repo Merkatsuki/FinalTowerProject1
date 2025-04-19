@@ -23,4 +23,6 @@ public class CompanionGlitchState : CompanionState
         }
         // Optional: erratic movement here
     }
+
+    public override CompanionStateType StateType => CompanionStateType.Glitch;
 }

@@ -91,5 +91,12 @@ public class EnergyDockingZone : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(dockingPoint ? dockingPoint.position : transform.position, 0.3f);
+
+        float radius = 0.25f;
+        Color dockColor = isCharging ? Color.red : Color.cyan;
+        Gizmos.color = dockColor;
+        Gizmos.DrawSphere(transform.position, radius);
+
+        UnityEditor.Handles.Label(transform.position + Vector3.up * 0.5f, zoneType.ToString());
     }
 }

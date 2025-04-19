@@ -9,10 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df856e0e271183a4bb7babd89dc93a0e, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f86df00c5c5e5043b94b7d6d9c32333, type: 3}
   m_Name: ScanPuzzleButtonnteraction
   m_EditorClassIdentifier: 
+  entryStrategies: []
   exitStrategies:
-  - {fileID: 11400000, guid: 92008cb849aab8440bcf1069980207b1, type: 2}
-  scanMessage: Analyzing...  This button seems to be pressable, but it might need
-    power.
+  - {fileID: 11400000, guid: 4cf731c55917e9f4eac2df5f482297b8, type: 2}
+  IsRepeatable: 0
+  scanMessage: Analyzing puzzle button...
