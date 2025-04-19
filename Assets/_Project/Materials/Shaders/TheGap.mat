@@ -12,8 +12,10 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - _ENABLEINKSPREAD_ON
   - _ENABLEOUTEROUTLINE_ON
   - _ENABLESMOOTHPIXELART_ON
+  - _INNEROUTLINEOUTLINEONLYTOGGLE_ON
   - _OUTEROUTLINEDISTORTIONTOGGLE_ON
   - _SHADERFADING_NONE
   - _SHADERSPACE_UV
@@ -221,7 +223,7 @@ Material:
     - _EnableHalftone: 0
     - _EnableHologram: 0
     - _EnableHue: 0
-    - _EnableInkSpread: 0
+    - _EnableInkSpread: 1
     - _EnableInnerOutline: 0
     - _EnableMetal: 0
     - _EnableNegative: 0
@@ -311,14 +313,14 @@ Material:
     - _HologramLineSpeed: 0.1
     - _HologramMinAlpha: 0.63
     - _Hue: 0
-    - _InkSpreadContrast: 2
-    - _InkSpreadDistance: 3
+    - _InkSpreadContrast: 2.21
+    - _InkSpreadDistance: 4.03
     - _InkSpreadFade: 1
-    - _InkSpreadNoiseFactor: 0.5
-    - _InkSpreadWidth: 0.2
+    - _InkSpreadNoiseFactor: 1.32
+    - _InkSpreadWidth: 0.05
     - _InnerOutlineDistortionToggle: 0
     - _InnerOutlineFade: 0.52
-    - _InnerOutlineOutlineOnlyToggle: 0
+    - _InnerOutlineOutlineOnlyToggle: 1
     - _InnerOutlineTextureToggle: 0
     - _InnerOutlineWidth: 0.01
     - _IsText: 0
@@ -563,7 +565,7 @@ Material:
     - _GlitchNoiseSpeed: {r: 0, g: 1, b: 0, a: 0}
     - _HalftonePosition: {r: 0, g: 0, b: 0, a: 0}
     - _HologramTint: {r: 0.3137255, g: 1.662745, b: 2.996078, a: 1}
-    - _InkSpreadColor: {r: 1.1740642, g: 1.1740642, b: 1.1740642, a: 0}
+    - _InkSpreadColor: {r: 1.1534197, g: 1.1534197, b: 1.1534197, a: 0}
     - _InkSpreadNoiseScale: {r: 0.4, g: 0.4, b: 0, a: 0}
     - _InkSpreadPosition: {r: 0.5, g: -1, b: 0, a: 0}
     - _InnerOutlineColor: {r: 0, g: 0, b: 0, a: 1}
@@ -580,8 +582,8 @@ Material:
     - _MetalNoiseSpeed: {r: 0.05, g: 0.05, b: 0, a: 0}
     - _OuterOutlineColor: {r: 0.018867925, g: 0.018867925, b: 0.018867925, a: 1}
     - _OuterOutlineDistortionIntensity: {r: 0.16, g: 0, b: 0, a: 0}
-    - _OuterOutlineNoiseScale: {r: 16.8, g: 11.4, b: 0, a: 0}
-    - _OuterOutlineNoiseSpeed: {r: 0.04, g: 0.04, b: 0, a: 0}
+    - _OuterOutlineNoiseScale: {r: 16.8, g: 7.1, b: 0, a: 0}
+    - _OuterOutlineNoiseSpeed: {r: 0, g: -0.05, b: 0, a: 0}
     - _OuterOutlineTextureSpeed: {r: 0.99, g: 3.6, b: 0, a: 0}
     - _PingPongGlowFrom: {r: 5.992157, g: 0.1882353, b: 0.1882353, a: 0}
     - _PingPongGlowTo: {r: 0.1882353, g: 0.1882353, b: 5.992157, a: 0}
