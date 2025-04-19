@@ -16620,8 +16620,16 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2206134201140125084, guid: 522ec864bf4a19844ac006a41d26aeca, type: 3}
+      propertyPath: m_DrawMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2206134201140125084, guid: 522ec864bf4a19844ac006a41d26aeca, type: 3}
       propertyPath: m_MaskInteraction
-      value: 2
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2206134201140125084, guid: 522ec864bf4a19844ac006a41d26aeca, type: 3}
+      propertyPath: m_SpriteSortPoint
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2206134201140125084, guid: 522ec864bf4a19844ac006a41d26aeca, type: 3}
       propertyPath: m_RenderingLayerMask
@@ -16643,6 +16651,18 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 2df9cfb6684c8e9469dc85518c06b823, type: 2}
+    - target: {fileID: 4283339434507965798, guid: 522ec864bf4a19844ac006a41d26aeca, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.63888896
+      objectReference: {fileID: 0}
+    - target: {fileID: 4283339434507965798, guid: 522ec864bf4a19844ac006a41d26aeca, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.9682539
+      objectReference: {fileID: 0}
+    - target: {fileID: 4283339434507965798, guid: 522ec864bf4a19844ac006a41d26aeca, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4283339434507965798, guid: 522ec864bf4a19844ac006a41d26aeca, type: 3}
       propertyPath: m_LocalPosition.x
       value: -11.251

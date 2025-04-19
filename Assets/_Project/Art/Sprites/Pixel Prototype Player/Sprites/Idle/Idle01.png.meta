@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -108,7 +108,7 @@ TextureImporter:
         width: 46
         height: 61
       alignment: 9
-      pivot: {x: 0.50227976, y: 0.35215205}
+      pivot: {x: 0.5217391, y: 0.34426227}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []

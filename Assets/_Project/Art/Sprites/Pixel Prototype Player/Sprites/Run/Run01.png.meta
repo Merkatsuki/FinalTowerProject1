@@ -103,12 +103,12 @@ TextureImporter:
       name: Run01_0
       rect:
         serializedVersion: 2
-        x: 33
+        x: 25
         y: 0
-        width: 24
-        height: 38
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 46
+        height: 61
+      alignment: 9
+      pivot: {x: 0.5217391, y: 0.34426227}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 39d114e6c1a76e94fa846529038dd199
     internalID: 0
     vertices: []
     indices: 
