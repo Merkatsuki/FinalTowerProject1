@@ -1,6 +1,7 @@
-using UnityEngine.Rendering.Universal;
+﻿using UnityEngine.Rendering.Universal;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 #region Core Declaration
 public class CompanionController : MonoBehaviour
@@ -15,6 +16,7 @@ public class CompanionController : MonoBehaviour
     private float retargetCooldownTimer = 0f;
 
     [SerializeField] private CompanionStatusUI statusUI;
+    [SerializeField] private EmotionType currentEmotion = EmotionType.Neutral;
 
 
     public CompanionFSM fsm { get; private set; }
@@ -36,6 +38,25 @@ public class CompanionController : MonoBehaviour
     public bool CanInvestigate() => !IsBusy && retargetCooldownTimer <= 0f;
     public void StartRetargetCooldown() => retargetCooldownTimer = retargetCooldown;
 
+
+    // 🧩 Required by Entry/Exit Strategies & Debug
+
+    private CompanionClueInteractable playerCommandTarget;
+    private Dictionary<CompanionClueInteractable, float> lastSeenTimes = new();
+
+    public CompanionFSM GetFSM() => fsm;
+    public CompanionPerception GetPerception() => Perception;
+
+    public EmotionType GetEmotion() => currentEmotion;
+    public void SetEmotion(EmotionType emotion) => currentEmotion = emotion;
+
+    public void IssuePlayerCommand(CompanionClueInteractable target) => playerCommandTarget = target;
+    public bool WasCommanded(CompanionClueInteractable target) => playerCommandTarget == target;
+    public bool HasPendingPlayerCommand() => playerCommandTarget != null;
+    public void ClearPlayerCommand() => playerCommandTarget = null;
+
+    public void RecordPerceptionTime(CompanionClueInteractable clue) => lastSeenTimes[clue] = Time.time;
+    public float GetLastSeenTime(CompanionClueInteractable clue) => lastSeenTimes.TryGetValue(clue, out var time) ? time : float.MinValue;
     #endregion
 
     #region Unity Lifecycle

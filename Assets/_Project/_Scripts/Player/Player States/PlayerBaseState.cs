@@ -40,14 +40,21 @@ namespace Momentum.States
 
 		public virtual void LogicUpdate() // Gets called in Update()
 		{
-			_playerReferences.PAnimator.Play(_animationName);
-			
-			// Flip the player sprite according to direction we're facing
-			if (_playerChecks.IsFacing == PlayerChecks.Facing.Left) { _playerReferences.PSprite.flipX = true; }
-			else if (_playerChecks.IsFacing == PlayerChecks.Facing.Right) { _playerReferences.PSprite.flipX = false; }
-		}
+            //_playerReferences.PAnimator.Play(_animationName);  // ORIGINAL CALLS  replaced with below for custom animation control
 
-		public virtual void PhysicsUpdate() // Gets called in FixedUpdate()
+            UpdateAnimationParameters();
+
+            // Flip the player sprite according to direction we're facing  !!!!! COMMENTING OUT SINCE I AM FACING THE ENTIRE OBJECT ELSEWHERE FOR NOW
+            //if (_playerChecks.IsFacing == PlayerChecks.Facing.Left) { _playerReferences.PSprite.flipX = true; }
+			//else if (_playerChecks.IsFacing == PlayerChecks.Facing.Right) { _playerReferences.PSprite.flipX = false; }
+		}
+        protected virtual void UpdateAnimationParameters()
+        {
+            float speed = Mathf.Abs(_playerReferences.PRB.linearVelocity.x);
+            _playerReferences.PAnimator.SetFloat("Speed", speed);
+            _playerReferences.PAnimator.SetBool("IsGrounded", _playerChecks.IsGrounded);
+        }
+        public virtual void PhysicsUpdate() // Gets called in FixedUpdate()
 		{
 			
 		}

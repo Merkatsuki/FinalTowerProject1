@@ -17,8 +17,8 @@ MonoBehaviour:
   Crouch: 1
   Jump: 1
   Dash: 1
-  LedgeHang: 1
-  LedgeClimb: 1
+  LedgeHang: 0
+  LedgeClimb: 0
   WallGrab: 0
   WallClimb: 0
   WallSlide: 0
@@ -58,7 +58,7 @@ MonoBehaviour:
   GroundFrictionAmount: 1.31
   VariableJumpHeight: 1
   AmountOfJumps: 1
-  JumpHeight: 0.86
+  JumpHeight: 1.03
   JumpDistance: 2.61
   JumpYThresh: 5
   JumpBuffer: 0.2
@@ -77,7 +77,7 @@ MonoBehaviour:
   LedgeClimbOffset: {x: -0.19, y: -1.23}
   LedgeHangOffset: {x: -0.19, y: -1.23}
   CanMoveInAir: 1
-  FallGravityMultiplier: 15
+  FallGravityMultiplier: 12
   MaxFallForce: -19.2
   AddForceParallelToSlope: 1
   PreventBouncingOnSlope: 1
@@ -111,9 +111,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  DashStrength: 55
-  DashLength: 0.06
-  DashHangTime: 0.01
+  DashStrength: 30
+  DashLength: 0.1
+  DashHangTime: 0.1
   TimeBetweenDashes: 0.25
   DashRegenerationCooldown: 0.35
   WallGrabCheckShrink: {x: 0.05, y: 0.05}
