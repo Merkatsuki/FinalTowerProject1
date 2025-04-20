@@ -14,7 +14,6 @@ Material:
   m_ValidKeywords:
   - _ENABLEINKSPREAD_ON
   - _ENABLEOUTEROUTLINE_ON
-  - _ENABLESMOOTHPIXELART_ON
   - _INNEROUTLINEOUTLINEONLYTOGGLE_ON
   - _OUTEROUTLINEDISTORTIONTOGGLE_ON
   - _SHADERFADING_NONE
@@ -181,11 +180,11 @@ Material:
     - _CustomFadeAlpha: 1
     - _CustomFadeNoiseFactor: 0
     - _CustomFadeSmoothness: 24.77
-    - _DirectionalAlphaFadeFade: 0
+    - _DirectionalAlphaFadeFade: -1.48
     - _DirectionalAlphaFadeInvert: 0
     - _DirectionalAlphaFadeNoiseFactor: 0.2
-    - _DirectionalAlphaFadeRotation: 0
-    - _DirectionalAlphaFadeWidth: 0.2
+    - _DirectionalAlphaFadeRotation: 177
+    - _DirectionalAlphaFadeWidth: 2.16
     - _DirectionalDistortionFade: 0
     - _DirectionalDistortionInvert: 0
     - _DirectionalDistortionNoiseFactor: 0.2
@@ -247,7 +246,7 @@ Material:
     - _EnableSineRotate: 0
     - _EnableSineScale: 0
     - _EnableSmoke: 0
-    - _EnableSmoothPixelArt: 1
+    - _EnableSmoothPixelArt: 0
     - _EnableSourceAlphaDissolve: 0
     - _EnableSourceGlowDissolve: 0
     - _EnableSplitToning: 0
@@ -290,8 +289,8 @@ Material:
     - _FullAlphaDissolveFade: 0.5
     - _FullAlphaDissolveWidth: 0.5
     - _FullDistortionFade: 1
-    - _FullGlowDissolveFade: 0.5
-    - _FullGlowDissolveWidth: 0.5
+    - _FullGlowDissolveFade: 0.84
+    - _FullGlowDissolveWidth: 1.11
     - _GaussianBlurFade: 1
     - _GaussianBlurOffset: 0.5
     - _GlitchBrightness: 4
@@ -313,7 +312,7 @@ Material:
     - _HologramLineSpeed: 0.1
     - _HologramMinAlpha: 0.63
     - _Hue: 0
-    - _InkSpreadContrast: 2.21
+    - _InkSpreadContrast: 2.19
     - _InkSpreadDistance: 4.03
     - _InkSpreadFade: 1
     - _InkSpreadNoiseFactor: 1.32
@@ -396,12 +395,12 @@ Material:
     - _ShineSmooth: 1
     - _ShineSpeed: 5
     - _ShineWidth: 0.1
-    - _SineGlowContrast: 1
+    - _SineGlowContrast: 12.69
     - _SineGlowFade: 1
-    - _SineGlowFrequency: 4
+    - _SineGlowFrequency: 6.98
     - _SineGlowMaskToggle: 0
-    - _SineGlowMax: 1
-    - _SineGlowMin: 0
+    - _SineGlowMax: 13.62
+    - _SineGlowMin: 16.73
     - _SineMoveFade: 1
     - _SineRotateAngle: 15
     - _SineRotateFade: 1
@@ -413,14 +412,14 @@ Material:
     - _SmokeNoiseScale: 0.5
     - _SmokeSmoothness: 1
     - _SmokeVertexSeed: 0
-    - _SourceAlphaDissolveFade: 1
+    - _SourceAlphaDissolveFade: 0.47
     - _SourceAlphaDissolveInvert: 0
-    - _SourceAlphaDissolveNoiseFactor: 0.2
-    - _SourceAlphaDissolveWidth: 0.2
-    - _SourceGlowDissolveFade: 1
+    - _SourceAlphaDissolveNoiseFactor: 0.08
+    - _SourceAlphaDissolveWidth: 0.83
+    - _SourceGlowDissolveFade: 1.32
     - _SourceGlowDissolveInvert: 0
-    - _SourceGlowDissolveNoiseFactor: 0.2
-    - _SourceGlowDissolveWidth: 0.1
+    - _SourceGlowDissolveNoiseFactor: 0.39
+    - _SourceGlowDissolveWidth: 0.13
     - _SplitToningBalance: 1
     - _SplitToningContrast: 1
     - _SplitToningFade: 1
@@ -554,8 +553,8 @@ Material:
     - _FullAlphaDissolveNoiseScale: {r: 0.1, g: 0.1, b: 0, a: 0}
     - _FullDistortionDistortion: {r: 0.2, g: 0.2, b: 0, a: 0}
     - _FullDistortionNoiseScale: {r: 0.5, g: 0.5, b: 0, a: 0}
-    - _FullGlowDissolveEdgeColor: {r: 11.98431, g: 0.627451, b: 0.627451, a: 0}
-    - _FullGlowDissolveNoiseScale: {r: 0.1, g: 0.1, b: 0, a: 0}
+    - _FullGlowDissolveEdgeColor: {r: 0, g: 0, b: 0, a: 0}
+    - _FullGlowDissolveNoiseScale: {r: 1.02, g: 19.57, b: 0, a: 0}
     - _GlitchDistortion: {r: 0.1, g: 0, b: 0, a: 0}
     - _GlitchDistortionScale: {r: 0, g: 3, b: 0, a: 0}
     - _GlitchDistortionSpeed: {r: 0, g: 1, b: 0, a: 0}
@@ -565,7 +564,7 @@ Material:
     - _GlitchNoiseSpeed: {r: 0, g: 1, b: 0, a: 0}
     - _HalftonePosition: {r: 0, g: 0, b: 0, a: 0}
     - _HologramTint: {r: 0.3137255, g: 1.662745, b: 2.996078, a: 1}
-    - _InkSpreadColor: {r: 1.1534197, g: 1.1534197, b: 1.1534197, a: 0}
+    - _InkSpreadColor: {r: 1, g: 1, b: 1, a: 0}
     - _InkSpreadNoiseScale: {r: 0.4, g: 0.4, b: 0, a: 0}
     - _InkSpreadPosition: {r: 0.5, g: -1, b: 0, a: 0}
     - _InnerOutlineColor: {r: 0, g: 0, b: 0, a: 1}
@@ -582,8 +581,8 @@ Material:
     - _MetalNoiseSpeed: {r: 0.05, g: 0.05, b: 0, a: 0}
     - _OuterOutlineColor: {r: 0.018867925, g: 0.018867925, b: 0.018867925, a: 1}
     - _OuterOutlineDistortionIntensity: {r: 0.16, g: 0, b: 0, a: 0}
-    - _OuterOutlineNoiseScale: {r: 16.8, g: 7.1, b: 0, a: 0}
-    - _OuterOutlineNoiseSpeed: {r: 0, g: -0.05, b: 0, a: 0}
+    - _OuterOutlineNoiseScale: {r: 29.5, g: 7.57, b: 0, a: 0}
+    - _OuterOutlineNoiseSpeed: {r: 0, g: 0, b: 0, a: 0}
     - _OuterOutlineTextureSpeed: {r: 0.99, g: 3.6, b: 0, a: 0}
     - _PingPongGlowFrom: {r: 5.992157, g: 0.1882353, b: 0.1882353, a: 0}
     - _PingPongGlowTo: {r: 0.1882353, g: 0.1882353, b: 5.992157, a: 0}
@@ -611,16 +610,16 @@ Material:
     - _ShiftingColorA: {r: 1.498039, g: 0, b: 0, a: 0}
     - _ShiftingColorB: {r: 1.498039, g: 0.7490196, b: 0, a: 0}
     - _ShineColor: {r: 11.98431, g: 11.98431, b: 11.98431, a: 0}
-    - _SineGlowColor: {r: 0, g: 2.007843, b: 2.996078, a: 0}
+    - _SineGlowColor: {r: 1, g: 0, b: 0, a: 0}
     - _SineMoveFrequency: {r: 1, g: 1, b: 0, a: 0}
     - _SineMoveOffset: {r: 0, g: 0.5, b: 0, a: 0}
     - _SineRotatePivot: {r: 0.5, g: 0.5, b: 0, a: 0}
     - _SineScaleFactor: {r: 0.2, g: 0.2, b: 0, a: 0}
     - _SourceAlphaDissolveNoiseScale: {r: 0.3, g: 0.3, b: 0, a: 0}
-    - _SourceAlphaDissolvePosition: {r: 0, g: 0, b: 0, a: 0}
-    - _SourceGlowDissolveEdgeColor: {r: 11.98431, g: 0.627451, b: 0.627451, a: 0}
-    - _SourceGlowDissolveNoiseScale: {r: 0.3, g: 0.3, b: 0, a: 0}
-    - _SourceGlowDissolvePosition: {r: 0, g: 0, b: 0, a: 0}
+    - _SourceAlphaDissolvePosition: {r: 0.78, g: 0.91, b: 0, a: 0}
+    - _SourceGlowDissolveEdgeColor: {r: 0.603773, g: 0.603773, b: 0.603773, a: 0}
+    - _SourceGlowDissolveNoiseScale: {r: 1.52, g: 1.19, b: 0, a: 0}
+    - _SourceGlowDissolvePosition: {r: 2.01, g: 0.9, b: 0, a: 0}
     - _SplitToningHighlightsColor: {r: 1, g: 0.1, b: 0.1, a: 0}
     - _SplitToningShadowsColor: {r: 0.1, g: 0.4000002, b: 1, a: 0}
     - _SpriteSheetRect: {r: 0, g: 0, b: 1, a: 1}
