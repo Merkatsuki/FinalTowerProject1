@@ -390,7 +390,7 @@ Transform:
   m_GameObject: {fileID: 17072015}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -24.7574, y: -2.1720214, z: -0.09222105}
+  m_LocalPosition: {x: -24.73, y: -2.74, z: -0.09222105}
   m_LocalScale: {x: 48.90367, y: 0.6273, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -480,12 +480,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 402aeb949bdfc6f4a93a368962618c6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  energyLight: {fileID: 2084171816}
-  chargeTime: 2
-  rechargeDuration: 5
-  maxIntensity: 20
-  dockingPoint: {fileID: 73200123}
-  zoneType: 3
+  entryStrategies: []
+  exitStrategies: []
+  zoneEnergyType: 0
+  isOneTimeUse: 0
 --- !u!114 &73200126
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -502,6 +500,7 @@ MonoBehaviour:
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   robotInteractions:
   - {fileID: 11400000, guid: 06030e73886cc724ab28030a06e0e59e, type: 2}
+  isHandled: 0
 --- !u!212 &73200127
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -888,12 +887,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 402aeb949bdfc6f4a93a368962618c6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  energyLight: {fileID: 1215602295}
-  chargeTime: 2
-  rechargeDuration: 10
-  maxIntensity: 20
-  dockingPoint: {fileID: 145379759}
-  zoneType: 5
+  entryStrategies: []
+  exitStrategies: []
+  zoneEnergyType: 0
+  isOneTimeUse: 0
 --- !u!114 &145379762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -910,6 +907,7 @@ MonoBehaviour:
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   robotInteractions:
   - {fileID: 11400000, guid: 06030e73886cc724ab28030a06e0e59e, type: 2}
+  isHandled: 0
 --- !u!212 &145379763
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1456,19 +1454,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 194986eb07950a6448111cb09b4b45a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  promptMessage: Press [E] to interact
-  highlightVisual: {fileID: 110344490}
-  doorVisual: {fileID: 2008250596}
-  doorCollider: {fileID: 268597933}
-  openDistance: 2
-  openSpeed: 2
-  playerTransform: {fileID: 479168343}
-  closeDistanceThreshold: 4
-  autoCloseDelay: 0.5
-  lockedIcon: {fileID: 902973429}
-  requiresKey: 1
-  requiredItemID: Key01
-  requiresPuzzle: 0
+  entryStrategies: []
+  exitStrategies: []
+  isLocked: 1
+  requiredFlag: 
 --- !u!1 &312299828
 GameObject:
   m_ObjectHideFlags: 0
@@ -2047,7 +2036,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 4.82
+  orthographic size: 7.41
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2072,7 +2061,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -11.251, y: -0.902, z: -9.96875}
+  m_LocalPosition: {x: -8.9, y: -1, z: -9.96875}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2422,7 +2411,7 @@ MonoBehaviour:
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 60
-    OrthographicSize: 4.82
+    OrthographicSize: 7.41
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -2449,7 +2438,7 @@ Transform:
   m_GameObject: {fileID: 626871919}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -16.141474, y: 2.639528, z: -10.014931}
+  m_LocalPosition: {x: -13.790473, y: 2.541528, z: -10.014931}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7779,12 +7768,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 402aeb949bdfc6f4a93a368962618c6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  energyLight: {fileID: 2105650795}
-  chargeTime: 2
-  rechargeDuration: 10
-  maxIntensity: 20
-  dockingPoint: {fileID: 686612453}
-  zoneType: 4
+  entryStrategies: []
+  exitStrategies: []
+  zoneEnergyType: 0
+  isOneTimeUse: 0
 --- !u!114 &686612456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7801,6 +7788,7 @@ MonoBehaviour:
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   robotInteractions:
   - {fileID: 11400000, guid: 06030e73886cc724ab28030a06e0e59e, type: 2}
+  isHandled: 0
 --- !u!212 &686612457
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -8592,12 +8580,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 402aeb949bdfc6f4a93a368962618c6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  energyLight: {fileID: 2100840648}
-  chargeTime: 2
-  rechargeDuration: 10
-  maxIntensity: 20
-  dockingPoint: {fileID: 836153460}
-  zoneType: 1
+  entryStrategies: []
+  exitStrategies: []
+  zoneEnergyType: 0
+  isOneTimeUse: 0
 --- !u!114 &836153464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8614,6 +8600,7 @@ MonoBehaviour:
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   robotInteractions:
   - {fileID: 11400000, guid: 06030e73886cc724ab28030a06e0e59e, type: 2}
+  isHandled: 0
 --- !u!58 &836153465
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -8870,12 +8857,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 402aeb949bdfc6f4a93a368962618c6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  energyLight: {fileID: 2044717262}
-  chargeTime: 2
-  rechargeDuration: 10
-  maxIntensity: 20
-  dockingPoint: {fileID: 916722740}
-  zoneType: 2
+  entryStrategies: []
+  exitStrategies: []
+  zoneEnergyType: 0
+  isOneTimeUse: 0
 --- !u!114 &916722743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8892,6 +8877,7 @@ MonoBehaviour:
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   robotInteractions:
   - {fileID: 11400000, guid: 06030e73886cc724ab28030a06e0e59e, type: 2}
+  isHandled: 0
 --- !u!212 &916722744
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -9397,8 +9383,8 @@ Transform:
   m_GameObject: {fileID: 974393391}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 16.39214, y: 0.0817, z: -0.09222105}
-  m_LocalScale: {x: 0.7117393, y: 9.635845, z: 1}
+  m_LocalPosition: {x: 16.39214, y: -0.4303, z: -0.09222105}
+  m_LocalScale: {x: 0.7117393, y: 10.660135, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2048820255}
@@ -10020,6 +10006,9 @@ MonoBehaviour:
   promptMessage: Press [E] to interact
   lightVisual: {fileID: 1166021265}
   highlightVisual: {fileID: 1005840431}
+  nodeIndex: 0
+  controller: {fileID: 0}
+  <CurrentColorIndex>k__BackingField: 0
 --- !u!1001 &1035588005
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10307,6 +10296,9 @@ MonoBehaviour:
   promptMessage: Press [E] to interact
   lightVisual: {fileID: 1668686659}
   highlightVisual: {fileID: 246442783}
+  nodeIndex: 0
+  controller: {fileID: 0}
+  <CurrentColorIndex>k__BackingField: 0
 --- !u!1 &1110626159
 GameObject:
   m_ObjectHideFlags: 0
@@ -10406,6 +10398,7 @@ MonoBehaviour:
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   robotInteractions:
   - {fileID: 11400000, guid: 66b48651b54bb72458be2b53a203e2c5, type: 2}
+  isHandled: 0
 --- !u!114 &1110626164
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10418,11 +10411,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d22d53572d5348468f6ccd38ffac8d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  promptMessage: Press [E] to interact
-  highlightVisual: {fileID: 2013073882}
-  lightToToggle: {fileID: 945190123}
-  linkedInteractables:
-  - {fileID: 1772075474}
+  entryStrategies: []
+  exitStrategies: []
+  targetLight: {fileID: 0}
 --- !u!1 &1139041563
 GameObject:
   m_ObjectHideFlags: 0
@@ -10574,7 +10565,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb896d99b4b372243bf1b51fc5939bbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  noiseSpeedMultiplier: 1
+  horizontalNoiseSpeedScale: 0.05
+  verticalNoiseSpeedScale: 0.05
+  baseNoiseScale: {x: 10, y: 10}
+  scaleSensitivity: 0.05
+  scaleIncreasesWithSpeed: 0
 --- !u!1 &1166021263
 GameObject:
   m_ObjectHideFlags: 0
@@ -11000,12 +10995,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e8849b5a1eb5c4aa0983822317a21a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entryStrategies: []
+  exitStrategies: []
   requiredEnergy: 1
-  onGateActivated:
-    m_PersistentCalls:
-      m_Calls: []
-  gateLight: {fileID: 1089001033}
-  gateGlowIntensity: 20
+  gateBarrier: {fileID: 0}
 --- !u!114 &1234463138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11022,6 +11015,7 @@ MonoBehaviour:
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   robotInteractions:
   - {fileID: 11400000, guid: f796453d3d4699c4c80927fc496e4cb9, type: 2}
+  isHandled: 0
 --- !u!212 &1234463139
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -12046,19 +12040,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 194986eb07950a6448111cb09b4b45a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  promptMessage: Press [E] to interact
-  highlightVisual: {fileID: 108757376}
-  doorVisual: {fileID: 1212144003}
-  doorCollider: {fileID: 1420443766}
-  openDistance: 2
-  openSpeed: 2
-  playerTransform: {fileID: 479168343}
-  closeDistanceThreshold: 4
-  autoCloseDelay: 0.5
-  lockedIcon: {fileID: 423996981}
-  requiresKey: 0
-  requiredItemID: 
-  requiresPuzzle: 1
+  entryStrategies: []
+  exitStrategies: []
+  isLocked: 1
+  requiredFlag: 
 --- !u!1 &1421711772
 GameObject:
   m_ObjectHideFlags: 0
@@ -13131,12 +13116,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e8849b5a1eb5c4aa0983822317a21a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entryStrategies: []
+  exitStrategies: []
   requiredEnergy: 1
-  onGateActivated:
-    m_PersistentCalls:
-      m_Calls: []
-  gateLight: {fileID: 1199022556}
-  gateGlowIntensity: 20
+  gateBarrier: {fileID: 0}
 --- !u!58 &1582478842
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -13189,6 +13172,7 @@ MonoBehaviour:
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   robotInteractions:
   - {fileID: 11400000, guid: 41ad757ef9a498f45a61f920bb5dff32, type: 2}
+  isHandled: 0
 --- !u!212 &1582478844
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -14060,10 +14044,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9f0b17c0e419434387637ba6ce00f35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  promptMessage: Press [E] to interact
-  highlightVisual: {fileID: 1479387872}
-  pickupEffect: {fileID: 0}
-  itemID: Key01
+  entryStrategies: []
+  exitStrategies: []
+  itemId: 
 --- !u!114 &1772075475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14405,7 +14388,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -13.221, y: -0.452, z: 0}
-  m_LocalScale: {x: 0.65, y: 0.65, z: 0.65}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 690407113}
@@ -14522,12 +14505,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   followDistance: 0.5
-  currentEnergy: 0
+  energyState: {fileID: 0}
   robotGlowLight: {fileID: 1832866498}
   chargedGlowIntensity: 50
   energyDuration: 20
-  retargetCooldown: 0.2
   statusUI: {fileID: 1509196601}
+  retargetCooldown: 0.2
   currentEmotion: 0
 --- !u!114 &1932641928
 MonoBehaviour:
@@ -14578,8 +14561,8 @@ MonoBehaviour:
   rayLength: 1
   visualRoot: {fileID: 690407113}
   thrustParticles: {fileID: 681195944}
-  tiltMultiplier: 10
-  tiltSpeed: 5
+  tiltMultiplier: 15
+  tiltSpeed: 7
 --- !u!1 &1936580802
 GameObject:
   m_ObjectHideFlags: 0
@@ -14614,7 +14597,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0.79
+  m_Intensity: 0.21
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000
@@ -14757,9 +14740,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c17f4cc434506a4798595bed5c20cba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  promptMessage: Press [E] to interact
-  puzzleController: {fileID: 2131432417}
-  highlightVisual: {fileID: 441939387}
+  entryStrategies: []
+  exitStrategies: []
+  isLocked: 0
 --- !u!1001 &1958093709
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15761,12 +15744,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e8849b5a1eb5c4aa0983822317a21a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entryStrategies: []
+  exitStrategies: []
   requiredEnergy: 1
-  onGateActivated:
-    m_PersistentCalls:
-      m_Calls: []
-  gateLight: {fileID: 2043797435}
-  gateGlowIntensity: 20
+  gateBarrier: {fileID: 0}
 --- !u!114 &2081444397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15783,6 +15764,7 @@ MonoBehaviour:
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   robotInteractions:
   - {fileID: 11400000, guid: f796453d3d4699c4c80927fc496e4cb9, type: 2}
+  isHandled: 0
 --- !u!212 &2081444398
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -16347,7 +16329,7 @@ Transform:
   m_GameObject: {fileID: 2128071129}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.8351393, y: -4.432021, z: -0.09222105}
+  m_LocalPosition: {x: 7.27, y: -5.54, z: -0.09222105}
   m_LocalScale: {x: 18.838627, y: 0.6273, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16540,6 +16522,7 @@ MonoBehaviour:
   hoverProfile: {fileID: 11400000, guid: 53660dbe0095fce47828d6a1d3723a5e, type: 2}
   robotInteractions:
   - {fileID: 11400000, guid: 4ada70b1c8d504f468847deb2ff23097, type: 2}
+  isHandled: 0
 --- !u!61 &2131432416
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -16599,9 +16582,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorCycle:
-  - {r: 0.047409635, g: 0.4339623, b: 0, a: 1}
-  - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 0.45928705, g: 0, b: 0.6603774, a: 1}
+  - r: 0.047409635
+    g: 0.4339623
+    b: 0
+    a: 1
+  - r: 1
+    g: 0
+    b: 0
+    a: 1
+  - r: 0.45928705
+    g: 0
+    b: 0.6603774
+    a: 1
   solutionIndices: 0000000002000000
   lightNodes:
   - {fileID: 1092365580}
@@ -16609,6 +16601,7 @@ MonoBehaviour:
   activatableTargets:
   - {fileID: 1420443762}
   activateOnlyOnce: 1
+  isSolved: 0
 --- !u!1001 &9220196804736483692
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16695,11 +16688,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4283339434507965798, guid: 522ec864bf4a19844ac006a41d26aeca, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -11.251
+      value: -8.9
       objectReference: {fileID: 0}
     - target: {fileID: 4283339434507965798, guid: 522ec864bf4a19844ac006a41d26aeca, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.902
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 4283339434507965798, guid: 522ec864bf4a19844ac006a41d26aeca, type: 3}
       propertyPath: m_LocalPosition.z

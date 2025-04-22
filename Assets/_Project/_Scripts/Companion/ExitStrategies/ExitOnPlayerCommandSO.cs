@@ -1,11 +1,12 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Companion/ExitStrategies/Exit On Player Command")]
+[CreateAssetMenu(menuName = "Strategies/Exit/On Player Command")]
 public class ExitOnPlayerCommandSO : ExitStrategySO
 {
-    public override bool ShouldExit(CompanionController companion, CompanionClueInteractable target)
+    [SerializeField] private string commandFlag;
+
+    public override bool ShouldExit(IPuzzleInteractor actor, IWorldInteractable target)
     {
-        // Exit if there's a new or different command pending
-        return companion.HasPendingPlayerCommand() && !companion.WasCommanded(target);
+        return PuzzleManager.Instance.IsFlagSet(commandFlag);
     }
 }

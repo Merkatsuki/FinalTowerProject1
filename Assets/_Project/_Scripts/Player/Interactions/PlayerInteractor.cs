@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
+using Momentum;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -16,8 +18,9 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] private Camera mainCamera;
     [SerializeField] private InteractionPromptUI promptUI;
 
-    private List<InteractableBase> nearbyInteractables = new();
-    private InteractableBase currentTarget;
+    private List<IWorldInteractable> nearbyInteractables = new();
+    private IWorldInteractable currentTarget;
+    private Player player;
 
     private void OnEnable()
     {
@@ -29,6 +32,11 @@ public class PlayerInteractor : MonoBehaviour
     {
         interactAction.action.performed -= OnInteractPressed;
         interactAction.action.Disable();
+    }
+
+    private void Awake()
+    {
+        player = GetComponent<Player>();
     }
 
     void Update()
@@ -54,38 +62,36 @@ public class PlayerInteractor : MonoBehaviour
 
     private void UpdateFocus()
     {
-        InteractableBase best = GetBestInteractable();
+        IWorldInteractable best = GetBestInteractable();
 
         if (best != currentTarget)
         {
-            currentTarget?.OnFocusExit();
             currentTarget = best;
             if (currentTarget != null)
-                promptUI?.Show(currentTarget.promptMessage);
+                promptUI?.Show(currentTarget.GetDisplayName());
             else
                 promptUI?.Hide();
-            currentTarget?.OnFocusEnter();
         }
     }
 
     private void OnInteractPressed(InputAction.CallbackContext context)
     {
-        if (currentTarget != null)
+        if (currentTarget != null && currentTarget.CanBeInteractedWith(player))
         {
-            currentTarget.OnInteract();
+            currentTarget.OnInteract(player);
         }
     }
 
-    private InteractableBase GetBestInteractable()
+    private IWorldInteractable GetBestInteractable()
     {
-        InteractableBase best = null;
+        IWorldInteractable best = null;
         float bestDot = -1f;
 
         foreach (var interactable in nearbyInteractables)
         {
-            if (interactable == null || !interactable.CanInteract) continue;
+            if (interactable == null) continue;
 
-            Vector2 toTarget = (interactable.transform.position - visionConeObject.position).normalized;
+            Vector2 toTarget = (interactable.GetTransform().position - visionConeObject.position).normalized;
             float dot = Vector2.Dot(visionConeObject.right, toTarget);
 
             if (IsWithinFacingCone(toTarget) && dot > bestDot)
@@ -97,7 +103,7 @@ public class PlayerInteractor : MonoBehaviour
 
         return best;
     }
-    
+
     private bool IsWithinFacingCone(Vector2 toTarget)
     {
         float dot = Vector2.Dot(visionConeObject.right, toTarget.normalized);
@@ -106,7 +112,7 @@ public class PlayerInteractor : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.TryGetComponent(out InteractableBase interactable) && !nearbyInteractables.Contains(interactable))
+        if (other.TryGetComponent(out IWorldInteractable interactable) && !nearbyInteractables.Contains(interactable))
         {
             nearbyInteractables.Add(interactable);
         }
@@ -114,12 +120,11 @@ public class PlayerInteractor : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.TryGetComponent(out InteractableBase interactable))
+        if (other.TryGetComponent(out IWorldInteractable interactable))
         {
             nearbyInteractables.Remove(interactable);
             if (currentTarget == interactable)
             {
-                currentTarget?.OnFocusExit();
                 currentTarget = null;
                 promptUI?.Hide();
             }
@@ -134,35 +139,24 @@ public class PlayerInteractor : MonoBehaviour
         Vector3 origin = visionConeObject.position;
         Vector3 forward = visionConeObject.right;
 
-        // Draw the main facing direction line
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(origin, origin + forward * 4f);
 
-        // Draw the facing cone arc
         Handles.color = new Color(0f, 1f, 1f, 0.2f);
         float angle = Mathf.Acos(facingThreshold) * Mathf.Rad2Deg;
         Vector3 left = Quaternion.Euler(0, 0, -angle) * forward;
         Handles.DrawSolidArc(origin, Vector3.forward, left, angle * 2, 4f);
 
-        // Draw lines to each nearby interactable
         foreach (var interactable in nearbyInteractables)
         {
             if (interactable == null) continue;
 
-            Vector3 targetPos = interactable.transform.position;
+            Vector3 targetPos = interactable.GetTransform().position;
             Vector3 toTarget = (targetPos - origin).normalized;
             float dot = Vector2.Dot(forward, toTarget);
 
-            // Use color coding
-            if (dot > facingThreshold)
-            {
-                // Valid target
-                Gizmos.color = (interactable == currentTarget) ? Color.green : Color.yellow;
-            }
-            else
-            {
-                Gizmos.color = Color.red;
-            }
+            Gizmos.color = (dot > facingThreshold) ? Color.yellow : Color.red;
+            if (interactable == currentTarget) Gizmos.color = Color.green;
 
             Gizmos.DrawLine(origin, targetPos);
         }

@@ -1,48 +1,51 @@
-﻿using UnityEngine.Rendering.Universal;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using System.Collections;
 using System.Collections.Generic;
 
-#region Core Declaration
-public class CompanionController : MonoBehaviour
+public class CompanionController : MonoBehaviour, IPuzzleInteractor
 {
+    [Header("Flight & Perception")]
     public float followDistance = 2.5f;
-    [SerializeField] private EnergyType currentEnergy = EnergyType.None;
-    [SerializeField] private Light2D robotGlowLight;
-    [SerializeField] private float chargedGlowIntensity = 1.2f;
-    [SerializeField] private float energyDuration = 10f;
-
-    [SerializeField] private float retargetCooldown = 2.1f;  //Right now set to just longer than charge on EnergyDockingZone to avoid retargetting while charging.  Might make this more reaonable later.
-    private float retargetCooldownTimer = 0f;
-
-    [SerializeField] private CompanionStatusUI statusUI;
-    [SerializeField] private EmotionType currentEmotion = EmotionType.Neutral;
-
-
-    public CompanionFSM fsm { get; private set; }
     public RobotFlightController flightController { get; private set; }
     public CompanionPerception Perception { get; private set; }
-    public bool IsInteractionLocked { get; private set; } = false;
 
+    [Header("FSM & States")]
+    public CompanionFSM fsm { get; private set; }
     public CompanionFollowState followState;
     public CompanionIdleState idleState;
 
-    private Coroutine energyTimerCoroutine;
+    [Header("Status & Energy")]
+    [SerializeField] private EnergyStateComponent energyState;
+    [SerializeField] private Light2D robotGlowLight;
+    [SerializeField] private float chargedGlowIntensity = 1.2f;
+    [SerializeField] private float energyDuration = 10f;
+    [SerializeField] private CompanionStatusUI statusUI;
 
-    private IRobotPerceivable currentTarget;
-    public void SetCurrentTarget(IRobotPerceivable target) => currentTarget = target;
+    [Header("Cooldown & Lock")]
+    [SerializeField] private float retargetCooldown = 0.2f;
+    private float retargetCooldownTimer = 0f;
+    private Coroutine energyTimerCoroutine;
+    private bool interactionLocked = false;
+
+    [Header("Emotion")]
+    [SerializeField] private EmotionType currentEmotion = EmotionType.Neutral;
+
+    // Interaction targets
+    private IWorldInteractable currentTarget;
+    private IWorldInteractable playerCommandTarget;
+
+    public void SetCurrentTarget(IWorldInteractable target) => currentTarget = target;
     public void ClearCurrentTarget() => currentTarget = null;
-    public IRobotPerceivable GetCurrentTrackedTarget() => currentTarget;
+    public IWorldInteractable GetCurrentTrackedTarget() => currentTarget;
 
     public bool IsBusy => currentTarget != null || IsInteractionLocked;
     public bool CanInvestigate() => !IsBusy && retargetCooldownTimer <= 0f;
     public void StartRetargetCooldown() => retargetCooldownTimer = retargetCooldown;
 
-
-    // 🧩 Required by Entry/Exit Strategies & Debug
-
-    private CompanionClueInteractable playerCommandTarget;
-    private Dictionary<CompanionClueInteractable, float> lastSeenTimes = new();
+    public bool IsInteractionLocked => interactionLocked;
+    public void LockInteraction() => interactionLocked = true;
+    public void UnlockInteraction() => interactionLocked = false;
 
     public CompanionFSM GetFSM() => fsm;
     public CompanionPerception GetPerception() => Perception;
@@ -50,16 +53,13 @@ public class CompanionController : MonoBehaviour
     public EmotionType GetEmotion() => currentEmotion;
     public void SetEmotion(EmotionType emotion) => currentEmotion = emotion;
 
-    public void IssuePlayerCommand(CompanionClueInteractable target) => playerCommandTarget = target;
-    public bool WasCommanded(CompanionClueInteractable target) => playerCommandTarget == target;
+    public void IssuePlayerCommand(IWorldInteractable target) => playerCommandTarget = target;
+    public bool WasCommanded(IWorldInteractable target) => playerCommandTarget == target;
     public bool HasPendingPlayerCommand() => playerCommandTarget != null;
     public void ClearPlayerCommand() => playerCommandTarget = null;
 
-    public void RecordPerceptionTime(CompanionClueInteractable clue) => lastSeenTimes[clue] = Time.time;
-    public float GetLastSeenTime(CompanionClueInteractable clue) => lastSeenTimes.TryGetValue(clue, out var time) ? time : float.MinValue;
-    #endregion
-
     #region Unity Lifecycle
+
     private void Awake()
     {
         InitializeComponents();
@@ -81,6 +81,7 @@ public class CompanionController : MonoBehaviour
     #endregion
 
     #region Initialization
+
     private void InitializeComponents()
     {
         fsm = new CompanionFSM();
@@ -88,14 +89,13 @@ public class CompanionController : MonoBehaviour
         Perception = GetComponent<CompanionPerception>();
         followState = new CompanionFollowState(this, fsm);
         idleState = new CompanionIdleState(this, fsm);
-
-        // Inject the FSM and the status UI reference
         fsm.Initialize(idleState, statusUI);
     }
 
     #endregion
 
-    #region Investigation Logic
+    #region Auto Investigate
+
     public bool TryAutoInvestigate()
     {
         if (!CanInvestigate()) return false;
@@ -112,16 +112,17 @@ public class CompanionController : MonoBehaviour
 
     #endregion
 
-    #region Interaction Locking
-    public void LockInteraction() => IsInteractionLocked = true;
-    public void UnlockInteraction() => IsInteractionLocked = false;
+    #region Energy Management
 
-    #endregion
+    public EnergyType GetEnergyType() => energyState?.GetEnergy() ?? EnergyType.None;
+    public GameObject GetInteractorObject() => gameObject;
+    public string GetDisplayName() => "Companion";
 
-    #region Energy System
     public void SetEnergyType(EnergyType type)
     {
-        currentEnergy = type;
+        if (energyState != null)
+            energyState.SetEnergy(type);
+
         if (energyTimerCoroutine != null)
             StopCoroutine(energyTimerCoroutine);
 
@@ -146,16 +147,14 @@ public class CompanionController : MonoBehaviour
 
     public void ClearEnergy(bool skipFade = false)
     {
-        currentEnergy = EnergyType.None;
+        if (energyState != null)
+            energyState.SetEnergy(EnergyType.None);
 
         if (robotGlowLight != null && skipFade)
             robotGlowLight.intensity = 0f;
     }
 
-    public EnergyType GetEnergyType() => currentEnergy;
-
     public Light2D GetRobotLight() => robotGlowLight;
-
     public float GetChargedGlowIntensity() => chargedGlowIntensity;
 
     public IEnumerator ChargeGlow(Color color, float duration)
@@ -180,7 +179,8 @@ public class CompanionController : MonoBehaviour
 
     #endregion
 
-    #region Gizmos & Editor Debug
+    #region Editor Debug
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
@@ -207,6 +207,6 @@ public class CompanionController : MonoBehaviour
         }
     }
 #endif
-}
 
-#endregion
+    #endregion
+}

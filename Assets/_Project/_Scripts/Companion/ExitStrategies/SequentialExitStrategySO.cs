@@ -1,37 +1,34 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
-[CreateAssetMenu(menuName = "Exit Strategy/Sequential")]
+[CreateAssetMenu(menuName = "Strategies/Exit/Sequential Exit")]
 public class SequentialExitStrategySO : ExitStrategySO
 {
-    public List<ExitStrategySO> steps;
+    [SerializeField] private List<ExitStrategySO> steps;
+    private int currentIndex = 0;
 
-    private int currentStepIndex = 0;
-
-    public override void OnEnter(CompanionController companion, CompanionClueInteractable target)
+    public override bool ShouldExit(IPuzzleInteractor actor, IWorldInteractable target)
     {
-        currentStepIndex = 0;
-        if (steps.Count > 0)
+        if (steps == null || steps.Count == 0) return true;
+
+        while (currentIndex < steps.Count)
         {
-            steps[0]?.OnEnter(companion, target);
+            var current = steps[currentIndex];
+            if (current != null && current.ShouldExit(actor, target))
+            {
+                currentIndex++;
+            }
+            else
+            {
+                return false;
+            }
         }
+
+        return true;
     }
 
-    public override bool ShouldExit(CompanionController companion, CompanionClueInteractable target)
+    public override void OnEnter(IPuzzleInteractor actor, IWorldInteractable target)
     {
-        if (steps.Count == 0) return true;
-
-        var current = steps[currentStepIndex];
-        if (current.ShouldExit(companion, target))
-        {
-            currentStepIndex++;
-
-            if (currentStepIndex >= steps.Count)
-                return true;
-
-            steps[currentStepIndex].OnEnter(companion, target);
-        }
-
-        return false;
+        currentIndex = 0;
     }
 }

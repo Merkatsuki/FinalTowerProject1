@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ public class PuzzleManager : MonoBehaviour
 
     private readonly Dictionary<string, PuzzleProfileSO> registeredProfiles = new();
     private readonly List<PuzzleProfileSO> activeProfiles = new();
+    private readonly List<PuzzleRuntimeController> activeRuntimes = new();
 
     private void Awake()
     {
@@ -86,5 +88,23 @@ public class PuzzleManager : MonoBehaviour
     }
 
     public List<PuzzleProfileSO> GetActivePuzzles() => activeProfiles;
+
+    internal IEnumerable<object> GetActivePuzzleRuntimes()
+    {
+        throw new NotImplementedException();
+    }
+    #endregion
+
+    #region Puzzle Runtime Management
+    public void RegisterRuntime(string id, PuzzleRuntimeController controller)
+    {
+        if (!activeRuntimes.Contains(controller))
+            activeRuntimes.Add(controller);
+    }
+
+    public IEnumerable<PuzzleRuntimeController> GetAllActivePuzzleRuntimes()
+    {
+        return activeRuntimes;
+    }
     #endregion
 }

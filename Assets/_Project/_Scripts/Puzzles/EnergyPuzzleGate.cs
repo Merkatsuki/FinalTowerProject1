@@ -1,35 +1,39 @@
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Rendering.Universal;
 
-public class EnergyPuzzleGate : MonoBehaviour
+public class EnergyPuzzleGate : InteractableBase
 {
-    [SerializeField] private EnergyType requiredEnergy;
-    [SerializeField] private UnityEvent onGateActivated;
-    [SerializeField] private Light2D gateLight;
-    [SerializeField] private float gateGlowIntensity = 20f;
+    [SerializeField] private EnergyType requiredEnergy = EnergyType.None;
+    [SerializeField] private GameObject gateBarrier;
 
-    private bool isActivated = false;
+    private bool isUnlocked = false;
 
-    public void AcceptEnergyFrom(CompanionController companion)
+    public override bool CanBeInteractedWith(IPuzzleInteractor actor)
     {
-        EnergyType energy = companion.GetEnergyType();
+        if (isUnlocked) return false;
+        if (actor.GetEnergyType() != requiredEnergy) return false;
 
-        if (energy != requiredEnergy || isActivated) return;
-
-        if (gateLight != null)
+        foreach (var strategy in entryStrategies)
         {
-            gateLight.color = EnergyColorMap.GetColor(energy);
-            gateLight.intensity = gateGlowIntensity;
+            if (strategy != null && !strategy.CanEnter(actor, this))
+                return false;
         }
 
-        // Keep companion's energy — allow multiple activations
-        isActivated = true;
-        onGateActivated?.Invoke();
-        Debug.Log($"Gate activated with energy: {energy}");
+        return true;
     }
 
-    public EnergyType GetRequiredEnergy() => requiredEnergy;
-    public bool IsActivated() => isActivated;
-}
+    public override void OnInteract(IPuzzleInteractor actor)
+    {
+        if (!CanBeInteractedWith(actor)) return;
 
+        isUnlocked = true;
+        if (gateBarrier != null)
+        {
+            gateBarrier.SetActive(false);
+        }
+
+        Debug.Log($"[EnergyPuzzleGate] Unlocked by {actor.GetDisplayName()} with {actor.GetEnergyType()}");
+
+        var puzzleObj = GetComponent<PuzzleObject>();
+        PuzzleInteractionRouter.HandleInteraction(puzzleObj, actor);
+    }
+}

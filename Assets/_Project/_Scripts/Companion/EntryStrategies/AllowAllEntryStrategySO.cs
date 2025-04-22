@@ -1,10 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "EntryStrategy/Allow All")]
+[CreateAssetMenu(menuName = "Strategies/Entry/Allow All")]
 public class AllowAllEntryStrategySO : EntryStrategySO
 {
-    public override bool CanEnter(CompanionController companion, CompanionClueInteractable target)
-    {
-        return true;
-    }
+    public override bool CanEnter(IPuzzleInteractor actor, IWorldInteractable target) => true;
 }

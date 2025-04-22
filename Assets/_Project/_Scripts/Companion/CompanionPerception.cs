@@ -15,23 +15,17 @@ public class CompanionPerception : MonoBehaviour
     [SerializeField] private Color currentTargetLineColor = Color.green;
     [SerializeField] private Color handledTargetColor = Color.gray;
 
-    private readonly SortedList<float, IRobotPerceivable> currentTargets = new();
-    private readonly HashSet<IRobotPerceivable> handledTargets = new();
+    private readonly SortedList<float, IWorldInteractable> currentTargets = new();
+    private readonly HashSet<IWorldInteractable> handledTargets = new();
 
     private CompanionController controller;
     private float checkTimer;
 
-
-    #region Initialization
     private void Awake()
     {
         controller = GetComponent<CompanionController>();
     }
 
-
-    #endregion
-
-    #region Update Loop
     private void Update()
     {
         checkTimer -= Time.deltaTime;
@@ -42,10 +36,6 @@ public class CompanionPerception : MonoBehaviour
         }
     }
 
-
-    #endregion
-
-    #region Target Scanning
     private void ScanForTargets()
     {
         if (controller.IsInteractionLocked) return;
@@ -56,53 +46,32 @@ public class CompanionPerception : MonoBehaviour
         foreach (var hit in hits)
         {
             if (
-                hit.TryGetComponent<IRobotPerceivable>(out var target)
-                && !HasBeenHandled(target)
+                hit.TryGetComponent<IWorldInteractable>(out var target)
+                && !handledTargets.Contains(target)
+                && target.CanBeInteractedWith(controller)
             )
             {
-                if (target is CompanionClueInteractable clue)
-                {
-                    bool hasValidInteraction = false;
-                    foreach (var interaction in clue.GetRobotInteractions())
-                    {
-                        if (interaction.CanExecute(controller, clue) && !clue.HasUsedInteraction(interaction))
-                        {
-                            hasValidInteraction = true;
-                            break;
-                            // ⬆️ End ScanForTargets
-                        }
-                    }
-
-                    if (!hasValidInteraction)
-                        continue;
-                }
-
-                float score = target.GetPriority();
+                float score = Vector2.Distance(transform.position, target.GetTransform().position);
                 while (currentTargets.ContainsKey(score)) score += 0.001f;
                 currentTargets.Add(score, target);
             }
         }
     }
 
-    public IRobotPerceivable GetCurrentTarget()
+    public IWorldInteractable GetCurrentTarget()
     {
         return currentTargets.Count > 0 ? currentTargets.Values[^1] : null;
     }
 
-    public void MarkAsHandled(IRobotPerceivable target)
+    public void MarkAsHandled(IWorldInteractable target)
     {
-        if (target is CompanionClueInteractable clue && clue.TryGetComponent<EnergyDockingZone>(out _))
-        {
-            return;
-        }
-
         if (!handledTargets.Contains(target))
         {
             handledTargets.Add(target);
         }
     }
 
-    public bool HasBeenHandled(IRobotPerceivable target) => handledTargets.Contains(target);
+    public bool HasBeenHandled(IWorldInteractable target) => handledTargets.Contains(target);
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
@@ -114,19 +83,16 @@ public class CompanionPerception : MonoBehaviour
 
         if (!Application.isPlaying) return;
 
-        // All perceived targets
         foreach (var kvp in currentTargets)
         {
             var target = kvp.Value;
             var pos = target.GetTransform().position;
 
-            // Differentiate handled targets
             Gizmos.color = HasBeenHandled(target) ? handledTargetColor : allTargetLineColor;
             Gizmos.DrawLine(transform.position, pos);
             Gizmos.DrawSphere(pos, 0.1f);
         }
 
-        // Highlight current target
         var current = GetCurrentTarget();
         if (current != null)
         {
@@ -136,7 +102,4 @@ public class CompanionPerception : MonoBehaviour
         }
     }
 #endif
-
 }
-
-#endregion

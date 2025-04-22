@@ -15,6 +15,6 @@ MonoBehaviour:
   entryStrategies:
   - {fileID: 11400000, guid: cada3a3a825b9eb47bcd6b8498884d82, type: 2}
   - {fileID: 11400000, guid: d3f1cf4b48b32114fb2592340e2de040, type: 2}
-  - {fileID: 11400000, guid: 97af7c00322184041885ddb24f7f9375, type: 2}
   exitStrategies:
   - {fileID: 11400000, guid: adfff014d1b512a4c8a7b5f3188a9a95, type: 2}
+  IsRepeatable: 1

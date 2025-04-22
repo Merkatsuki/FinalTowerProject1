@@ -1,75 +1,53 @@
-// CompanionInvestigateState.cs
 using UnityEngine;
 
 public class CompanionInvestigateState : CompanionState
 {
-    private IRobotPerceivable target;
-    private Transform targetTransform;
-    private float arrivalThreshold = 0.5f;
+    private IWorldInteractable target;
+    private const float arrivalDistance = 0.5f;
 
-    public CompanionInvestigateState(CompanionController companion, CompanionFSM fsm, IRobotPerceivable target)
+    public CompanionInvestigateState(CompanionController companion, CompanionFSM fsm, IWorldInteractable target)
         : base(companion, fsm)
     {
         this.target = target;
-        this.targetTransform = target.GetTransform();
     }
 
     public override void OnEnter()
     {
-        Debug.Log($"Investigating: {target}");
-
-        if (!IsValidTarget()) return;
-
-        if (!targetTransform.TryGetComponent<IHoverProfileProvider>(out var provider))
+        if (target == null)
         {
-            Debug.LogWarning($"InvestigateState: Target '{targetTransform.name}' does not implement IHoverProfileProvider.");
-            fsm.ChangeState(companion.idleState);
+            Debug.LogWarning("[Companion] InvestigateState received null target.");
+            fsm.ChangeState(new CompanionIdleState(companion, fsm));
             return;
         }
 
-        HoverStagingProfileSO profile = provider.GetHoverProfile();
-        if (profile == null)
+        Debug.Log($"[Companion] Investigating target: {target.GetDisplayName()}");
+
+        if (target.GetTransform().TryGetComponent<IHoverProfileProvider>(out var provider))
         {
-            Debug.LogWarning($"InvestigateState: Target '{targetTransform.name}' did not provide a HoverStagingProfileSO.");
-            fsm.ChangeState(companion.idleState);
-            return;
+            var profile = provider.GetHoverProfile();
+            if (profile != null)
+            {
+                companion.flightController.SetTargetWithHoverProfile(target.GetTransform().position, profile);
+                return;
+            }
         }
 
-        companion.flightController.SetTargetWithHoverProfile(targetTransform.position, profile);
+        // fallback
+        companion.flightController.SetTarget(target.GetTransform().position);
     }
 
     public override void Tick()
     {
-        if (!IsValidTarget()) return;
-
-        if (companion.flightController.ReachedTarget(arrivalThreshold))
+        if (target == null)
         {
-            TransitionToInteractionOrIdle();
-        }
-    }
-
-    private bool IsValidTarget()
-    {
-        if (target == null) return false;
-
-        if (target is CompanionClueInteractable clue)
-        {
-            return clue.HasValidInteractions(companion);
+            fsm.ChangeState(new CompanionIdleState(companion, fsm));
+            return;
         }
 
-        return true;
-    }
-
-    private void TransitionToInteractionOrIdle()
-    {
-        if (targetTransform.TryGetComponent(out CompanionClueInteractable clue))
+        if (companion.flightController.ReachedTarget(arrivalDistance))
         {
-            fsm.ChangeState(new CompanionInteractWithObjectState(companion, fsm, clue));
-        }
-        else
-        {
-            companion.ClearCurrentTarget();
-            fsm.ChangeState(companion.idleState);
+            Debug.Log($"[Companion] Reached target: {target.GetDisplayName()}");
+            fsm.ChangeState(new CompanionInteractWithObjectState(companion, fsm, target));
         }
     }
 

@@ -3,51 +3,46 @@ using System.Collections.Generic;
 
 public class CompanionInteractWithObjectState : CompanionState
 {
-    private CompanionClueInteractable target;
-    private List<RobotInteractionSO> interactions;
-    private bool hasExecuted;
+    private IWorldInteractable target;
+    private float waitTimer = 0f;
+    private float maxWaitTime = 5f;
 
-    public CompanionInteractWithObjectState(CompanionController companion, CompanionFSM fsm, CompanionClueInteractable target)
+    public CompanionInteractWithObjectState(CompanionController companion, CompanionFSM fsm, IWorldInteractable target)
         : base(companion, fsm)
     {
         this.target = target;
-        this.interactions = target.GetRobotInteractions();
     }
 
     public override void OnEnter()
     {
-        hasExecuted = true;
-        companion.LockInteraction();
-
-        foreach (var interaction in interactions)
+        if (target == null)
         {
-            interaction.OnEnter(companion, target);
-            interaction.Execute(companion, target);
+            fsm.ChangeState(new CompanionIdleState(companion, fsm));
+            return;
         }
+
+        Debug.Log($"[Companion] Interacting with: {target.GetDisplayName()}");
+        target.OnInteract(companion);
     }
 
     public override void Tick()
     {
-        if (!hasExecuted) return;
+        waitTimer += Time.deltaTime;
 
-        bool allReady = true;
-        foreach (var interaction in interactions)
+        foreach (var strategy in target.GetExitStrategies())
         {
-            if (!interaction.ShouldExit(companion, target))
+            if (strategy != null && strategy.ShouldExit(companion, target))
             {
-                allReady = false;
-                break;
+                Debug.Log("[Companion] Exit strategy met, returning to Idle.");
+                fsm.ChangeState(new CompanionIdleState(companion, fsm));
+                return;
             }
         }
 
-        if (allReady)
+        if (waitTimer >= maxWaitTime)
         {
-            target.MarkHandled();
-            companion.Perception.MarkAsHandled(target);
-            companion.ClearCurrentTarget();
-            companion.StartRetargetCooldown();
-            companion.UnlockInteraction();
-            fsm.ChangeState(companion.idleState);
+            Debug.LogWarning("[Companion] Max interaction time reached. Forcing return to Idle.");
+            fsm.ChangeState(new CompanionIdleState(companion, fsm));
         }
     }
 

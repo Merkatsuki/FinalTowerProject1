@@ -1,37 +1,27 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
-[CreateAssetMenu(menuName = "Companion/EntryStrategies/Composite")]
+[CreateAssetMenu(menuName = "Strategies/Entry/Composite Entry")]
 public class CompositeEntryStrategySO : EntryStrategySO
 {
-    [SerializeField] private CompositeStrategyMode mode = CompositeStrategyMode.All;
+    public enum LogicMode { All, Any }
+
+    [SerializeField] private LogicMode mode = LogicMode.All;
     [SerializeField] private List<EntryStrategySO> strategies;
 
-    public override bool CanEnter(CompanionController companion, CompanionClueInteractable target)
+    public override bool CanEnter(IPuzzleInteractor actor, IWorldInteractable target)
     {
-        if (strategies == null || strategies.Count == 0)
-            return true; // No entry conditions = allow by default
-
-        switch (mode)
+        if (mode == LogicMode.All)
         {
-            case CompositeStrategyMode.All:
-                foreach (var strategy in strategies)
-                {
-                    if (strategy != null && !strategy.CanEnter(companion, target))
-                        return false;
-                }
-                return true;
-
-            case CompositeStrategyMode.Any:
-                foreach (var strategy in strategies)
-                {
-                    if (strategy != null && strategy.CanEnter(companion, target))
-                        return true;
-                }
-                return false;
-
-            default:
-                return true;
+            foreach (var strategy in strategies)
+                if (strategy != null && !strategy.CanEnter(actor, target)) return false;
+            return true;
+        }
+        else // Any
+        {
+            foreach (var strategy in strategies)
+                if (strategy != null && strategy.CanEnter(actor, target)) return true;
+            return false;
         }
     }
 }

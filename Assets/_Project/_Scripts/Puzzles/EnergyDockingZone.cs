@@ -1,102 +1,26 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
-[RequireComponent(typeof(Collider2D))]
-public class EnergyDockingZone : MonoBehaviour
+public class EnergyDockingZone : InteractableBase
 {
-    [SerializeField] private Light2D energyLight;
-    [SerializeField] private float chargeTime = 3f;
-    [SerializeField] private float rechargeDuration = 5f;
-    [SerializeField] private float maxIntensity = 20f;
+    [SerializeField] private EnergyType zoneEnergyType = EnergyType.None;
+    [SerializeField] private bool isOneTimeUse = false;
+    private bool hasBeenUsed = false;
 
-    [Tooltip("Optional point where the robot should position itself.")]
-    public Transform dockingPoint;
-    public EnergyType zoneType;
-
-    private bool isCharging = false;
-
-    private void Start()
+    public override void OnInteract(IPuzzleInteractor actor)
     {
-        if (energyLight != null)
+        if (hasBeenUsed && isOneTimeUse) return;
+        if (actor is CompanionController companion)
         {
-            energyLight.intensity = maxIntensity;
-            energyLight.color = GetChargeColor();
-        }
-    }
-
-    public void Dock(CompanionController companion)
-    {
-        if (isCharging) return;
-        StartCoroutine(ChargeSequence(companion));
-    }
-
-    private IEnumerator ChargeSequence(CompanionController companion)
-    {
-        isCharging = true;
-        Color energyColor = EnergyColorMap.GetColor(zoneType);
-
-        if (energyLight != null)
-        {
-            float initialIntensity = energyLight.intensity;
-            float elapsed = 0f;
-
-            while (elapsed < chargeTime)
+            var energyComp = companion.GetComponent<EnergyStateComponent>();
+            if (energyComp != null)
             {
-                float t = elapsed / chargeTime;
-                energyLight.intensity = Mathf.Lerp(initialIntensity, 0f, t);
-                elapsed += Time.deltaTime;
-                yield return null;
+                energyComp.SetEnergy(zoneEnergyType);
+                Debug.Log($"[DockingZone] {companion.name} charged with {zoneEnergyType}");
+                hasBeenUsed = true;
+
+                var puzzleObj = GetComponent<PuzzleObject>();
+                PuzzleInteractionRouter.HandleInteraction(puzzleObj, actor);
             }
-
-            energyLight.intensity = 0f;
         }
-
-        StartCoroutine(companion.ChargeGlow(energyColor, chargeTime));
-        companion.SetEnergyType(zoneType);
-        StartCoroutine(RechargeDockLight());
-    }
-
-    private IEnumerator RechargeDockLight()
-    {
-        float elapsed = 0f;
-        while (elapsed < rechargeDuration)
-        {
-            float t = elapsed / rechargeDuration;
-            if (energyLight != null)
-                energyLight.intensity = Mathf.Lerp(0f, maxIntensity, t);
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        if (energyLight != null)
-            energyLight.intensity = maxIntensity;
-
-        isCharging = false;
-
-        if (TryGetComponent<CompanionClueInteractable>(out var clue))
-        {
-            clue.ResetHandled();
-        }
-    }
-
-    public Light2D GetEnergyLight() => energyLight;
-
-    public Color GetChargeColor()
-    {
-        return EnergyColorMap.GetColor(zoneType);
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(dockingPoint ? dockingPoint.position : transform.position, 0.3f);
-
-        float radius = 0.25f;
-        Color dockColor = isCharging ? Color.red : Color.cyan;
-        Gizmos.color = dockColor;
-        Gizmos.DrawSphere(transform.position, radius);
-
-        UnityEditor.Handles.Label(transform.position + Vector3.up * 0.5f, zoneType.ToString());
     }
 }

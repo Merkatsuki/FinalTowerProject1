@@ -1,22 +1,37 @@
 using System.Collections.Generic;
 using UnityEngine;
-using static CompanionInvestigateState;
 
-public abstract class InteractableBase : MonoBehaviour
+public abstract class InteractableBase : MonoBehaviour, IWorldInteractable
 {
-    [Tooltip("Text shown in the interaction prompt UI.")]
-    public string promptMessage = "Press [E] to interact";
+    [Header("Strategy Settings")]
+    [SerializeField] protected List<EntryStrategySO> entryStrategies;
+    [SerializeField] protected List<ExitStrategySO> exitStrategies;
 
-    public virtual bool CanInteract => true;
+    public virtual string GetDisplayName() => gameObject.name;
+    public virtual Transform GetTransform() => transform;
 
-    // Called when the player triggers an interaction
-    public virtual void OnInteract() { }
+    public virtual bool CanBeInteractedWith(IPuzzleInteractor actor)
+    {
+        foreach (var strategy in entryStrategies)
+        {
+            if (strategy != null && !strategy.CanEnter(actor, this))
+                return false;
+        }
+        return true;
+    }
 
-    // Called when the player is now targeting this object
-    public virtual void OnFocusEnter() { }
+    public virtual List<ExitStrategySO> GetExitStrategies() => exitStrategies;
 
-    // Called when the player stops targeting this object
-    public virtual void OnFocusExit() { }
+    public abstract void OnInteract(IPuzzleInteractor actor);
 
-    public virtual void SetHighlighted(bool isHighlighted) { }
+    public bool ShouldExit(IPuzzleInteractor actor)
+    {
+        foreach (var strategy in exitStrategies)
+        {
+            if (strategy != null && strategy.ShouldExit(actor, this))
+                return true;
+        }
+
+        return false;
+    }
 }

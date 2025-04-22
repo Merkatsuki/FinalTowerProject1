@@ -1,18 +1,13 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class LevelEndTriggerInteractable : InteractableBase
 {
-    [SerializeField] private GameObject highlightVisual;
-    [SerializeField] private string memoryTag;
-
-    public override void OnFocusEnter() => SetHighlighted(true);
-    public override void OnFocusExit() => SetHighlighted(false);
-
-    public override void SetHighlighted(bool isHighlighted)
+    public override void OnInteract(IPuzzleInteractor actor)
     {
-        if (highlightVisual != null)
-            highlightVisual.SetActive(isHighlighted);
-    }
+        Debug.Log($"{actor.GetDisplayName()} triggered end of level.");
+        var puzzleObj = GetComponent<PuzzleObject>();
+        PuzzleInteractionRouter.HandleInteraction(puzzleObj, actor);
 
-   
+        // TODO: Add level transition logic or event
+    }
 }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Move: 1
   Sprint: 1
-  Crouch: 1
+  Crouch: 0
   Jump: 1
   Dash: 1
   LedgeHang: 0

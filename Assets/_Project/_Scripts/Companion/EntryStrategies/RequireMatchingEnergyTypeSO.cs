@@ -1,12 +1,12 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "EntryStrategy/Require Matching Energy Type")]
+[CreateAssetMenu(menuName = "Strategies/Entry/Require Matching Energy")]
 public class RequireMatchingEnergyTypeSO : EntryStrategySO
 {
-    public override bool CanEnter(CompanionController companion, CompanionClueInteractable target)
-    {
-        if (!target.TryGetComponent(out EnergyPuzzleGate gate)) return true;
+    [SerializeField] private EnergyType requiredType;
 
-        return companion.GetEnergyType() == gate.GetRequiredEnergy();
+    public override bool CanEnter(IPuzzleInteractor actor, IWorldInteractable target)
+    {
+        return actor.GetEnergyType() == requiredType;
     }
 }

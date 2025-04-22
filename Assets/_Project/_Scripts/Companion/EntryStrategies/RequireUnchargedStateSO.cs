@@ -1,11 +1,10 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "EntryStrategy/Require Uncharged State")]
+[CreateAssetMenu(menuName = "Strategies/Entry/Require Uncharged State")]
 public class RequireUnchargedStateSO : EntryStrategySO
 {
-    public override bool CanEnter(CompanionController companion, CompanionClueInteractable target)
+    public override bool CanEnter(IPuzzleInteractor actor, IWorldInteractable target)
     {
-        return companion.GetEnergyType() == EnergyType.None;
+        return actor.GetEnergyType() == EnergyType.None;
     }
 }
-

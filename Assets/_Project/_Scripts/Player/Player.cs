@@ -5,9 +5,11 @@ using TMPro;
 
 namespace Momentum 
 {
-	public class Player : MonoBehaviour
+	public class Player : MonoBehaviour, IPuzzleInteractor
 	{
-		public PlayerStateMachine StateMachine { get; private set; } // Manages all our states
+        [SerializeField] private EnergyStateComponent energyState;
+
+        public PlayerStateMachine StateMachine { get; private set; } // Manages all our states
 		public PlayerActionCheck CanDoAction { get; private set; } // Checks if we can transition to another state
 		
 		public event Action OnStartEvent; // Calls every method subscribed to this in Start(). We will manually subscribe any states we need to have access to Start in this script
@@ -121,5 +123,9 @@ namespace Momentum
 		}
 		public void debug(RaycastHit2D r) {  Debug.Log(r); }
 		public void LedgeClimbAnimationFinished() { LedgeClimbState.Climb(); } // Called by animation event to trigger ledge climb after the animation finishes
-	}
+
+        public GameObject GetInteractorObject() => gameObject;
+        public EnergyType GetEnergyType() => energyState?.GetEnergy() ?? EnergyType.None;
+        public string GetDisplayName() => "Player";
+    }
 }

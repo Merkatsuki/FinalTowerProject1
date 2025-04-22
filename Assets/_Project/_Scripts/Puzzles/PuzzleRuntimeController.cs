@@ -3,56 +3,58 @@ using System.Collections.Generic;
 
 public class PuzzleRuntimeController : MonoBehaviour
 {
-    [SerializeField] private PuzzleProfileSO puzzleProfile;
+    [SerializeField] private PuzzleProfileSO profile;
 
-    private HashSet<string> completedSteps = new();
+    private HashSet<string> completedStepIds = new();
+    private bool puzzleSolved = false;
 
-    private void Start()
+    private void Awake()
     {
-        if (puzzleProfile == null)
+        PuzzleManager.Instance.RegisterRuntime(profile.puzzleId, this);
+    }
+
+    public void TryProcessInteraction(PuzzleObject target, IPuzzleInteractor actor)
+    {
+        if (puzzleSolved) return;
+
+        foreach (var step in profile.steps)
         {
-            Debug.LogWarning("PuzzleRuntimeController has no profile assigned.");
+            if (completedStepIds.Contains(step.stepId)) continue;
+            if (step.targetObject != target) continue;
+            if (step.requiredEnergy != EnergyType.None && actor.GetEnergyType() != step.requiredEnergy) continue;
+
+            Debug.Log($"[Puzzle] Step matched: {step.stepId}");
+
+            if (step.markStepWhenInteractionTriggered)
+            {
+                completedStepIds.Add(step.stepId);
+                if (!string.IsNullOrEmpty(step.flagToSet))
+                {
+                    PuzzleManager.Instance.SetFlag(step.flagToSet);
+                }
+
+                CheckIfPuzzleComplete();
+                return;
+            }
+        }
+    }
+
+    private void CheckIfPuzzleComplete()
+    {
+        if (!profile.requireAllStepsToSolve)
+        {
+            puzzleSolved = true;
+            profile.onPuzzleSolved?.Invoke();
             return;
         }
 
-        PuzzleManager.Instance.RegisterPuzzle(puzzleProfile);
-        PuzzleManager.Instance.RegisterActivePuzzle(puzzleProfile);
-    }
-
-    public void HandleInteraction(CompanionClueInteractable clue, RobotInteractionSO interaction, EnergyType energy)
-    {
-        foreach (var step in puzzleProfile.steps)
+        foreach (var step in profile.steps)
         {
-            if (completedSteps.Contains(step.stepId)) continue;
-            if (step.targetClue != clue) continue;
-            if (step.requiredInteraction != null && step.requiredInteraction != interaction) continue;
-            if (step.requiredEnergy != EnergyType.None && step.requiredEnergy != energy) continue;
-
-            completedSteps.Add(step.stepId);
-
-            if (!string.IsNullOrEmpty(step.flagToSet))
-                PuzzleManager.Instance.SetFlag(step.flagToSet);
-
-            if (step.markStepWhenInteractionTriggered)
-                Debug.Log($"Step {step.stepId} completed in puzzle '{puzzleProfile.puzzleId}'");
-
-            CheckPuzzleSolved();
-        }
-    }
-
-    private void CheckPuzzleSolved()
-    {
-        if (puzzleProfile.requireAllStepsToSolve)
-        {
-            foreach (var step in puzzleProfile.steps)
-            {
-                if (!completedSteps.Contains(step.stepId))
-                    return;
-            }
+            if (!completedStepIds.Contains(step.stepId)) return;
         }
 
-        PuzzleManager.Instance.MarkPuzzleSolved(puzzleProfile.puzzleId);
-        puzzleProfile.onPuzzleSolved?.Invoke();
-        PuzzleManager.Instance.UnregisterActivePuzzle(puzzleProfile);
+        puzzleSolved = true;
+        Debug.Log($"[Puzzle] Puzzle complete: {profile.puzzleId}");
+        profile.onPuzzleSolved?.Invoke();
     }
 }

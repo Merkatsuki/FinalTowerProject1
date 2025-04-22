@@ -1,35 +1,65 @@
 using UnityEngine;
+using Momentum;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class OutlineShaderMover : MonoBehaviour
 {
-    public float noiseSpeedMultiplier = 1.0f; // Adjust this to control the effect's intensity
+    [Header("Noise Scroll Speed")]
+    [Tooltip("How fast the noise scrolls horizontally.")]
+    public float horizontalNoiseSpeedScale = 0.05f;
+
+    [Tooltip("How fast the noise scrolls vertically.")]
+    public float verticalNoiseSpeedScale = 0.05f;
+
+    [Header("Noise Scale Control")]
+    [Tooltip("Base noise scale applied at zero speed.")]
+    public Vector2 baseNoiseScale = new Vector2(1f, 1f);
+
+    [Tooltip("How much movement speed influences noise scale.")]
+    public float scaleSensitivity = 0.5f;
+
+    [Tooltip("If true, scale increases with speed. If false, scale decreases with speed.")]
+    public bool scaleIncreasesWithSpeed = true;
 
     private SpriteRenderer spriteRenderer;
     private Material material;
-    private Vector3 previousPosition;
+    private PlayerReferences playerReferences;
+
+    private static readonly int NoiseSpeedID = Shader.PropertyToID("_OuterOutlineNoiseSpeed");
+    private static readonly int NoiseScaleID = Shader.PropertyToID("_OuterOutlineNoiseScale");
 
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        material = spriteRenderer.material;
-        previousPosition = transform.position;
+        material = new Material(spriteRenderer.material); // ensure unique material
+        spriteRenderer.material = material;
+
+        playerReferences = GetComponent<PlayerReferences>();
     }
 
     void Update()
     {
-        Vector3 currentPosition = transform.position;
-        Vector3 movement = currentPosition - previousPosition;
+        if (playerReferences == null) return;
 
-        // Calculate movement direction
-        Vector2 movementDirection = new Vector2(movement.x, movement.y).normalized;
+        Vector2 velocity = playerReferences.PRB.linearVelocity;
 
-        // Scale the movement direction
-        Vector2 noiseSpeed = movementDirection * noiseSpeedMultiplier;
+        // Set noise scroll direction (based on velocity)
+        float noiseX = Mathf.Abs(velocity.x) * horizontalNoiseSpeedScale;
+        float noiseY = -velocity.y * verticalNoiseSpeedScale;
+        material.SetVector(NoiseSpeedID, new Vector2(noiseX, noiseY));
 
-        // Update the shader property
-        material.SetVector("_OuterOutlineNoiseSpeed", noiseSpeed);
+        // Calculate dynamic scale multiplier
+        float speedMagnitude = velocity.magnitude;
+        float scaleFactor = 1f + (scaleSensitivity * speedMagnitude);
 
-        previousPosition = currentPosition;
+        if (!scaleIncreasesWithSpeed)
+        {
+            // Avoid zero or negative scale
+            scaleFactor = Mathf.Max(0.1f, 1f - (scaleSensitivity * speedMagnitude));
+        }
+
+        // Apply scale factor
+        Vector2 scaledNoise = baseNoiseScale * scaleFactor;
+        material.SetVector(NoiseScaleID, scaledNoise);
     }
 }
