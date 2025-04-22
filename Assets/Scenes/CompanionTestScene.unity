@@ -390,8 +390,8 @@ Transform:
   m_GameObject: {fileID: 17072015}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -24.73, y: -2.74, z: -0.09222105}
-  m_LocalScale: {x: 48.90367, y: 0.6273, z: 1}
+  m_LocalPosition: {x: -43.8796, y: -2.4722, z: -0.09222105}
+  m_LocalScale: {x: 87.205025, y: 1.1629515, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2048820255}
@@ -10567,9 +10567,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   horizontalNoiseSpeedScale: 0.05
   verticalNoiseSpeedScale: 0.05
-  baseNoiseScale: {x: 10, y: 10}
-  scaleSensitivity: 0.05
-  scaleIncreasesWithSpeed: 0
+  baseScaleX: 15
+  baseScaleY: 15
+  xScaleSensitivity: 0.87
+  xScaleIncreasesWithSpeed: 0
+  yScaleSensitivity: 0.64
+  yScaleIncreasesWithSpeed: 0
 --- !u!1 &1166021263
 GameObject:
   m_ObjectHideFlags: 0

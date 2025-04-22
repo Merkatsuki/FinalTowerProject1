@@ -5,21 +5,20 @@ using Momentum;
 public class OutlineShaderMover : MonoBehaviour
 {
     [Header("Noise Scroll Speed")]
-    [Tooltip("How fast the noise scrolls horizontally.")]
     public float horizontalNoiseSpeedScale = 0.05f;
-
-    [Tooltip("How fast the noise scrolls vertically.")]
     public float verticalNoiseSpeedScale = 0.05f;
 
-    [Header("Noise Scale Control")]
-    [Tooltip("Base noise scale applied at zero speed.")]
-    public Vector2 baseNoiseScale = new Vector2(1f, 1f);
+    [Header("Base Noise Scale")]
+    public float baseScaleX = 1f;
+    public float baseScaleY = 1f;
 
-    [Tooltip("How much movement speed influences noise scale.")]
-    public float scaleSensitivity = 0.5f;
+    [Header("Noise Scale - X (Left/Right)")]
+    public float xScaleSensitivity = 0.5f;
+    public bool xScaleIncreasesWithSpeed = true;
 
-    [Tooltip("If true, scale increases with speed. If false, scale decreases with speed.")]
-    public bool scaleIncreasesWithSpeed = true;
+    [Header("Noise Scale - Y (Up/Down)")]
+    public float yScaleSensitivity = 0.5f;
+    public bool yScaleIncreasesWithSpeed = true;
 
     private SpriteRenderer spriteRenderer;
     private Material material;
@@ -31,7 +30,7 @@ public class OutlineShaderMover : MonoBehaviour
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        material = new Material(spriteRenderer.material); // ensure unique material
+        material = new Material(spriteRenderer.material); // Create instance
         spriteRenderer.material = material;
 
         playerReferences = GetComponent<PlayerReferences>();
@@ -43,23 +42,38 @@ public class OutlineShaderMover : MonoBehaviour
 
         Vector2 velocity = playerReferences.PRB.linearVelocity;
 
-        // Set noise scroll direction (based on velocity)
+        // === Noise SPEED ===
         float noiseX = Mathf.Abs(velocity.x) * horizontalNoiseSpeedScale;
-        float noiseY = -velocity.y * verticalNoiseSpeedScale;
+        float noiseY = velocity.y * verticalNoiseSpeedScale;
         material.SetVector(NoiseSpeedID, new Vector2(noiseX, noiseY));
 
-        // Calculate dynamic scale multiplier
-        float speedMagnitude = velocity.magnitude;
-        float scaleFactor = 1f + (scaleSensitivity * speedMagnitude);
+        // === Noise SCALE ===
+        float xSpeed = Mathf.Abs(velocity.x);
+        float ySpeed = Mathf.Abs(velocity.y);
 
-        if (!scaleIncreasesWithSpeed)
+        float scaleX = baseScaleX;
+        float scaleY = baseScaleY;
+
+        // Modify X scale based on X movement
+        if (xScaleIncreasesWithSpeed)
         {
-            // Avoid zero or negative scale
-            scaleFactor = Mathf.Max(0.1f, 1f - (scaleSensitivity * speedMagnitude));
+            scaleX += xSpeed * xScaleSensitivity;
+        }
+        else
+        {
+            scaleX = Mathf.Max(0.05f, baseScaleX - xSpeed * xScaleSensitivity);
         }
 
-        // Apply scale factor
-        Vector2 scaledNoise = baseNoiseScale * scaleFactor;
-        material.SetVector(NoiseScaleID, scaledNoise);
+        // Modify Y scale based on Y movement
+        if (yScaleIncreasesWithSpeed)
+        {
+            scaleY += ySpeed * yScaleSensitivity;
+        }
+        else
+        {
+            scaleY = Mathf.Max(0.05f, baseScaleY - ySpeed * yScaleSensitivity);
+        }
+
+        material.SetVector(NoiseScaleID, new Vector2(scaleX, scaleY));
     }
 }
