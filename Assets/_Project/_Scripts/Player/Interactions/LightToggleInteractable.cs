@@ -9,8 +9,5 @@ public class LightToggleInteractable : InteractableBase
         if (targetLight == null) return;
 
         targetLight.enabled = !targetLight.enabled;
-
-        var puzzleObj = GetComponent<PuzzleObject>();
-        PuzzleInteractionRouter.HandleInteraction(puzzleObj, actor);
     }
 }

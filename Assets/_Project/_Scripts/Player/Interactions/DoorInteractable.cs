@@ -12,8 +12,6 @@ public class DoorInteractable : InteractableBase
         {
             isOpen = true;
             doorAnimator?.SetTrigger("Open");
-            var puzzleObj = GetComponent<PuzzleObject>();
-            PuzzleInteractionRouter.HandleInteraction(puzzleObj, actor);
             Invoke(nameof(CloseDoor), closeDelay);
         }
     }

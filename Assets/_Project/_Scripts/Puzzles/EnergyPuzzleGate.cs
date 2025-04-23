@@ -32,8 +32,5 @@ public class EnergyPuzzleGate : InteractableBase
         }
 
         Debug.Log($"[EnergyPuzzleGate] Unlocked by {actor.GetDisplayName()} with {actor.GetEnergyType()}");
-
-        var puzzleObj = GetComponent<PuzzleObject>();
-        PuzzleInteractionRouter.HandleInteraction(puzzleObj, actor);
     }
 }

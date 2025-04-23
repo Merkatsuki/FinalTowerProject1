@@ -12,28 +12,30 @@ public class OutlineShaderMover : MonoBehaviour
     public float baseScaleX = 1f;
     public float baseScaleY = 1f;
 
-    [Header("Noise Scale - X (Left/Right)")]
-    public float xScaleSensitivity = 0.5f;
-    public bool xScaleIncreasesWithSpeed = true;
+    [Header("Noise Scale Curves")]
+    [Tooltip("Controls how noise scale X changes based on horizontal speed.")]
+    public AnimationCurve xScaleCurve = AnimationCurve.Linear(0, 1, 10, 2);
 
-    [Header("Noise Scale - Y (Up/Down)")]
-    public float yScaleSensitivity = 0.5f;
-    public bool yScaleIncreasesWithSpeed = true;
+    [Tooltip("Controls how noise scale Y changes based on vertical speed.")]
+    public AnimationCurve yScaleCurve = AnimationCurve.Linear(0, 1, 10, 2);
 
+    // --- Private references
     private SpriteRenderer spriteRenderer;
     private Material material;
     private PlayerReferences playerReferences;
 
+    // --- Shader Property IDs
     private static readonly int NoiseSpeedID = Shader.PropertyToID("_OuterOutlineNoiseSpeed");
     private static readonly int NoiseScaleID = Shader.PropertyToID("_OuterOutlineNoiseScale");
 
+    // --- Burst System (not active yet)
+    private Vector2 burstScaleOffset = Vector2.zero;
+    private float burstTimer = 0f;
+    private float burstDuration = 0f;
+
     void Start()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        material = new Material(spriteRenderer.material); // Create instance
-        spriteRenderer.material = material;
-
-        playerReferences = GetComponent<PlayerReferences>();
+        InitializeReferences();
     }
 
     void Update()
@@ -42,38 +44,78 @@ public class OutlineShaderMover : MonoBehaviour
 
         Vector2 velocity = playerReferences.PRB.linearVelocity;
 
-        // === Noise SPEED ===
+        UpdateNoiseSpeed(velocity);
+        UpdateNoiseScale(velocity);
+        UpdateBurstTimer();
+
+        ApplyShaderValues();
+    }
+
+    // -------------------------
+    // Initialization
+    // -------------------------
+    private void InitializeReferences()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        material = new Material(spriteRenderer.material); // ensure unique material
+        spriteRenderer.material = material;
+
+        playerReferences = GetComponent<PlayerReferences>();
+    }
+
+    // -------------------------
+    // Noise Scroll Speed
+    // -------------------------
+    private void UpdateNoiseSpeed(Vector2 velocity)
+    {
         float noiseX = Mathf.Abs(velocity.x) * horizontalNoiseSpeedScale;
         float noiseY = velocity.y * verticalNoiseSpeedScale;
+
         material.SetVector(NoiseSpeedID, new Vector2(noiseX, noiseY));
+    }
 
-        // === Noise SCALE ===
-        float xSpeed = Mathf.Abs(velocity.x);
-        float ySpeed = Mathf.Abs(velocity.y);
+    // -------------------------
+    // Noise Scale (Curve + Burst)
+    // -------------------------
+    private void UpdateNoiseScale(Vector2 velocity)
+    {
+        float scaleX = baseScaleX * xScaleCurve.Evaluate(Mathf.Abs(velocity.x));
+        float scaleY = baseScaleY * yScaleCurve.Evaluate(Mathf.Abs(velocity.y));
 
-        float scaleX = baseScaleX;
-        float scaleY = baseScaleY;
+        // Add burst offset if any
+        Vector2 finalScale = new Vector2(scaleX, scaleY) + burstScaleOffset;
 
-        // Modify X scale based on X movement
-        if (xScaleIncreasesWithSpeed)
+        material.SetVector(NoiseScaleID, finalScale);
+    }
+
+    // -------------------------
+    // Burst System (Prep Only)
+    // -------------------------
+    private void UpdateBurstTimer()
+    {
+        if (burstTimer > 0f)
         {
-            scaleX += xSpeed * xScaleSensitivity;
+            burstTimer -= Time.deltaTime;
+            if (burstTimer <= 0f)
+            {
+                burstScaleOffset = Vector2.zero;
+            }
         }
-        else
-        {
-            scaleX = Mathf.Max(0.05f, baseScaleX - xSpeed * xScaleSensitivity);
-        }
+    }
 
-        // Modify Y scale based on Y movement
-        if (yScaleIncreasesWithSpeed)
-        {
-            scaleY += ySpeed * yScaleSensitivity;
-        }
-        else
-        {
-            scaleY = Mathf.Max(0.05f, baseScaleY - ySpeed * yScaleSensitivity);
-        }
+    public void TriggerNoiseBurst(Vector2 burstAmount, float duration)
+    {
+        burstScaleOffset = burstAmount;
+        burstDuration = duration;
+        burstTimer = duration;
+    }
 
-        material.SetVector(NoiseScaleID, new Vector2(scaleX, scaleY));
+    // -------------------------
+    // Apply to Shader
+    // -------------------------
+    private void ApplyShaderValues()
+    {
+        // Speed and scale are already applied inside the update methods
+        // This is here if additional properties need to be batched later
     }
 }

@@ -18,8 +18,6 @@ public class PuzzleUnlockInteractable : InteractableBase
         }
 
         Debug.Log("PuzzleUnlockInteractable activated.");
-        var puzzleObj = GetComponent<PuzzleObject>();
-        PuzzleInteractionRouter.HandleInteraction(puzzleObj, actor);
 
         // Additional visual/audio effects can go here
     }

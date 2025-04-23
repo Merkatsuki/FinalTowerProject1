@@ -17,9 +17,6 @@ public class EnergyDockingZone : InteractableBase
                 energyComp.SetEnergy(zoneEnergyType);
                 Debug.Log($"[DockingZone] {companion.name} charged with {zoneEnergyType}");
                 hasBeenUsed = true;
-
-                var puzzleObj = GetComponent<PuzzleObject>();
-                PuzzleInteractionRouter.HandleInteraction(puzzleObj, actor);
             }
         }
     }

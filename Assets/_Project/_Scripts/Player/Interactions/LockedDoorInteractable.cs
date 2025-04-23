@@ -20,7 +20,5 @@ public class LockedDoorInteractable : InteractableBase
 
         isLocked = false;
         Debug.Log("Locked door unlocked.");
-        var puzzleObj = GetComponent<PuzzleObject>();
-        PuzzleInteractionRouter.HandleInteraction(puzzleObj, actor);
     }
 }

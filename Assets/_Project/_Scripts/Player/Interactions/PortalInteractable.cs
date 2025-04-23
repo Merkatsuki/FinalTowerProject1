@@ -19,8 +19,6 @@ public class PortalInteractable : InteractableBase
         }
 
         Debug.Log($"{actor.GetDisplayName()} activated portal to {sceneToLoad}.");
-        var puzzleObj = GetComponent<PuzzleObject>();
-        PuzzleInteractionRouter.HandleInteraction(puzzleObj, actor);
 
         // TODO: Scene loading logic goes here
     }

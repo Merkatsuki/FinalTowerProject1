@@ -19,8 +19,5 @@ public class PuzzleDebugPanel : MonoBehaviour
     private void UpdateDisplay()
     {
         if (displayText == null) return;
-
-        var puzzles = PuzzleManager.Instance.GetAllSolvedPuzzles();
-        displayText.text = "<b>Solved Puzzles:</b>\n" + string.Join("\n", puzzles.Select(k => "- " + k));
     }
 }
