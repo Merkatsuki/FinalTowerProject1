@@ -9,14 +9,19 @@ using UnityEditor;
 
 public class PlayerInteractor : MonoBehaviour
 {
+    [SerializeField] private CompanionController companion;
+
     [Header("Facing Settings")]
     [SerializeField] private Transform visionConeObject;
     [SerializeField] private float facingThreshold = 0.5f;
 
     [Header("Interaction Settings")]
     [SerializeField] private InputActionReference interactAction;
+    [SerializeField] private InputActionReference rightClickAction;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private InteractionPromptUI promptUI;
+    [SerializeField] private GameObject commandOverlay;
+
 
     private List<IWorldInteractable> nearbyInteractables = new();
     private IWorldInteractable currentTarget;
@@ -26,11 +31,13 @@ public class PlayerInteractor : MonoBehaviour
     {
         interactAction.action.Enable();
         interactAction.action.performed += OnInteractPressed;
+        rightClickAction.action.performed += HandleRightClick;
     }
 
     private void OnDisable()
     {
         interactAction.action.performed -= OnInteractPressed;
+        rightClickAction.action.performed -= HandleRightClick;
         interactAction.action.Disable();
     }
 
@@ -43,6 +50,30 @@ public class PlayerInteractor : MonoBehaviour
     {
         UpdateFacingDirection();
         UpdateFocus();
+        
+        commandOverlay?.SetActive(InputManager.instance.IsCommandMode);     
+
+    }
+
+    private void HandleRightClick(InputAction.CallbackContext context)
+    {
+        if (!InputManager.instance.IsCommandMode) return;
+        TryIssueCommandToCompanion();
+    }
+
+    private void TryIssueCommandToCompanion()
+    {
+        Debug.Log($"[PlayerInteractor] Attempting to issue command to companion.");
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            var target = hit.collider.GetComponent<IWorldInteractable>();
+            if (target != null && target.CanBeInteractedWith(companion))
+            {
+                companion.IssuePlayerCommand(target);
+                Debug.Log($"[PlayerInteractor] Commanded companion to interact with: {target.GetDisplayName()}");
+            }
+        }
     }
 
     private void UpdateFacingDirection()

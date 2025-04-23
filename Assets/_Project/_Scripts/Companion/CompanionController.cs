@@ -53,7 +53,11 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
     public EmotionType GetEmotion() => currentEmotion;
     public void SetEmotion(EmotionType emotion) => currentEmotion = emotion;
 
-    public void IssuePlayerCommand(IWorldInteractable target) => playerCommandTarget = target;
+    public void IssuePlayerCommand(IWorldInteractable target)
+    {
+        playerCommandTarget = target;
+        Debug.Log($"[Companion] Received command to investigate: {target.GetDisplayName()}");
+    }
     public bool WasCommanded(IWorldInteractable target) => playerCommandTarget == target;
     public bool HasPendingPlayerCommand() => playerCommandTarget != null;
     public void ClearPlayerCommand() => playerCommandTarget = null;

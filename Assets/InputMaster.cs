@@ -89,6 +89,33 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Command Mode"",
+                    ""type"": ""Button"",
+                    ""id"": ""31e56e59-55d5-4bf2-8002-d1517854fadf"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Hold"",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""LeftSelect"",
+                    ""type"": ""Button"",
+                    ""id"": ""79781b19-c669-40d4-a14e-c575393f9408"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightSelect"",
+                    ""type"": ""Button"",
+                    ""id"": ""72c755bf-ee09-4a93-a314-57e335294167"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -197,7 +224,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/f"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard and Mouse"",
                     ""action"": ""Dash"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -208,8 +235,41 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard and Mouse"",
                     ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""242b23ef-00e3-4807-b54d-9a85fa3de1be"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard and Mouse"",
+                    ""action"": ""Command Mode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""adc0de3d-a723-4050-9c9b-2acbc67c976a"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard and Mouse"",
+                    ""action"": ""LeftSelect"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6707fac8-73af-4a01-a7d2-f27a6863d102"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard and Mouse"",
+                    ""action"": ""RightSelect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -244,6 +304,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Player_Grab = m_Player.FindAction("Grab", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
+        m_Player_CommandMode = m_Player.FindAction("Command Mode", throwIfNotFound: true);
+        m_Player_LeftSelect = m_Player.FindAction("LeftSelect", throwIfNotFound: true);
+        m_Player_RightSelect = m_Player.FindAction("RightSelect", throwIfNotFound: true);
     }
 
     ~@InputMaster()
@@ -317,6 +380,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Grab;
     private readonly InputAction m_Player_Dash;
     private readonly InputAction m_Player_Interact;
+    private readonly InputAction m_Player_CommandMode;
+    private readonly InputAction m_Player_LeftSelect;
+    private readonly InputAction m_Player_RightSelect;
     public struct PlayerActions
     {
         private @InputMaster m_Wrapper;
@@ -328,6 +394,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         public InputAction @Grab => m_Wrapper.m_Player_Grab;
         public InputAction @Dash => m_Wrapper.m_Player_Dash;
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
+        public InputAction @CommandMode => m_Wrapper.m_Player_CommandMode;
+        public InputAction @LeftSelect => m_Wrapper.m_Player_LeftSelect;
+        public InputAction @RightSelect => m_Wrapper.m_Player_RightSelect;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -358,6 +427,15 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Interact.started += instance.OnInteract;
             @Interact.performed += instance.OnInteract;
             @Interact.canceled += instance.OnInteract;
+            @CommandMode.started += instance.OnCommandMode;
+            @CommandMode.performed += instance.OnCommandMode;
+            @CommandMode.canceled += instance.OnCommandMode;
+            @LeftSelect.started += instance.OnLeftSelect;
+            @LeftSelect.performed += instance.OnLeftSelect;
+            @LeftSelect.canceled += instance.OnLeftSelect;
+            @RightSelect.started += instance.OnRightSelect;
+            @RightSelect.performed += instance.OnRightSelect;
+            @RightSelect.canceled += instance.OnRightSelect;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -383,6 +461,15 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Interact.started -= instance.OnInteract;
             @Interact.performed -= instance.OnInteract;
             @Interact.canceled -= instance.OnInteract;
+            @CommandMode.started -= instance.OnCommandMode;
+            @CommandMode.performed -= instance.OnCommandMode;
+            @CommandMode.canceled -= instance.OnCommandMode;
+            @LeftSelect.started -= instance.OnLeftSelect;
+            @LeftSelect.performed -= instance.OnLeftSelect;
+            @LeftSelect.canceled -= instance.OnLeftSelect;
+            @RightSelect.started -= instance.OnRightSelect;
+            @RightSelect.performed -= instance.OnRightSelect;
+            @RightSelect.canceled -= instance.OnRightSelect;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -418,5 +505,8 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         void OnGrab(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
+        void OnCommandMode(InputAction.CallbackContext context);
+        void OnLeftSelect(InputAction.CallbackContext context);
+        void OnRightSelect(InputAction.CallbackContext context);
     }
 }

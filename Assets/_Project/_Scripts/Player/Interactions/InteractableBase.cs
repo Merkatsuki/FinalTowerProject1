@@ -34,4 +34,11 @@ public abstract class InteractableBase : MonoBehaviour, IWorldInteractable
 
         return false;
     }
+
+    public virtual void BroadcastEvent(string eventId)
+    {
+        //World Event System.  
+        // Plan to use SciptableObjects to define events and their parameters.
+        // Consider if we want this in the base class or in individual concrete classes.  
+    }
 }

@@ -15,17 +15,18 @@ namespace Momentum
 
 		[NonSerialized] public Action JumpPressed; // Public so other classes can subscribe to this. Tagged to not show up in inspector
 		[NonSerialized] public Action JumpReleased;
-		
-		public bool JumpHeld { get; private set; }
+
+        public bool JumpHeld { get; private set; }
 		public bool IsSprint { get; private set; }
 		public bool IsDash { get; private set; }
 		public bool IsCrouch { get; private set; }
 		public bool IsGrab { get; private set; }
 		public bool IsAttack { get; private set; }
+		public bool IsCommandMode { get; private set; }
 
-		#endregion
-		
-		private void Awake()
+        #endregion
+
+        private void Awake()
 		{
 			// The Singleton Pattern makes sure there is only one instance of this class
 			#region Singleton
@@ -60,9 +61,9 @@ namespace Momentum
 			if (_controls.Player.Dash.IsPressed()) { IsDash = true; } else if (!_controls.Player.Dash.IsPressed()) { IsDash = false; }
 			if (_controls.Player.Crouch.IsPressed()) { IsCrouch = true; } else if (!_controls.Player.Crouch.IsPressed()) { IsCrouch = false; }
 			if (_controls.Player.Grab.IsPressed()) { IsGrab = true; } else if (!_controls.Player.Grab.IsPressed()) { IsGrab = false; }
-			
-			#endregion
-		}
+            IsCommandMode = _controls.Player.CommandMode.IsPressed();
+            #endregion
+        }
 
 		#region Enable/Disable Input
 
