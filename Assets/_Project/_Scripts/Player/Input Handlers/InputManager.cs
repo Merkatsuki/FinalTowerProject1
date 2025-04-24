@@ -12,8 +12,9 @@ namespace Momentum
 		// Avalible for the rest of the classes to use (Mainly should be used by PlayerAction as a front end for other classes)
 
 		public Vector2 WASDInput { get; private set; }
+        public Vector2 MousePosition { get; private set; }
 
-		[NonSerialized] public Action JumpPressed; // Public so other classes can subscribe to this. Tagged to not show up in inspector
+        [NonSerialized] public Action JumpPressed; // Public so other classes can subscribe to this. Tagged to not show up in inspector
 		[NonSerialized] public Action JumpReleased;
 
         public bool JumpHeld { get; private set; }
@@ -23,6 +24,8 @@ namespace Momentum
 		public bool IsGrab { get; private set; }
 		public bool IsAttack { get; private set; }
 		public bool IsCommandMode { get; private set; }
+        
+
 
         #endregion
 
@@ -50,9 +53,12 @@ namespace Momentum
 		{
 			#region Read Input
 
+            MousePosition = _controls.Player.PointerPosition.ReadValue<Vector2>();
+            IsCommandMode = _controls.Player.CommandMode.IsPressed();
 			WASDInput = _controls.Player.MovementControls.ReadValue<Vector2>();
-			
-			if (_controls.Player.Jump.WasPressedThisFrame()) { JumpPressed?.Invoke(); } // THe ? makes sure the varaible isn't null before invoking
+
+
+            if (_controls.Player.Jump.WasPressedThisFrame()) { JumpPressed?.Invoke(); } // THe ? makes sure the varaible isn't null before invoking
 			if (_controls.Player.Jump.WasReleasedThisFrame()) { JumpReleased?.Invoke(); }
 			JumpHeld = _controls.Player.Jump.inProgress;
 			
@@ -61,7 +67,6 @@ namespace Momentum
 			if (_controls.Player.Dash.IsPressed()) { IsDash = true; } else if (!_controls.Player.Dash.IsPressed()) { IsDash = false; }
 			if (_controls.Player.Crouch.IsPressed()) { IsCrouch = true; } else if (!_controls.Player.Crouch.IsPressed()) { IsCrouch = false; }
 			if (_controls.Player.Grab.IsPressed()) { IsGrab = true; } else if (!_controls.Player.Grab.IsPressed()) { IsGrab = false; }
-            IsCommandMode = _controls.Player.CommandMode.IsPressed();
             #endregion
         }
 

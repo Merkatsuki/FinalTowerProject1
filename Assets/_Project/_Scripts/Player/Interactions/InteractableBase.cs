@@ -1,11 +1,19 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public abstract class InteractableBase : MonoBehaviour, IWorldInteractable
 {
     [Header("Strategy Settings")]
     [SerializeField] protected List<EntryStrategySO> entryStrategies;
     [SerializeField] protected List<ExitStrategySO> exitStrategies;
+
+    [Header("Highlight Settings")]
+    [SerializeField] private Light2D highlightLight;
+    [SerializeField] private float highlightIntensity = 8.0f;
+
+    private Coroutine highlightRoutine;
 
     public virtual string GetDisplayName() => gameObject.name;
     public virtual Transform GetTransform() => transform;
@@ -33,6 +41,33 @@ public abstract class InteractableBase : MonoBehaviour, IWorldInteractable
         }
 
         return false;
+    }
+
+    public virtual void SetHighlight(bool enabled)
+    {
+        if (highlightLight == null) return;
+
+        if (highlightRoutine != null)
+            StopCoroutine(highlightRoutine);
+
+        float target = enabled ? highlightIntensity : 0f;
+        highlightRoutine = StartCoroutine(LerpHighlightIntensity(target));
+    }
+
+
+    private IEnumerator LerpHighlightIntensity(float target)
+    {
+        float start = highlightLight.intensity;
+        float t = 0f;
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime * 7.5f;
+            highlightLight.intensity = Mathf.Lerp(start, target, t);
+            yield return null;
+        }
+
+        highlightLight.intensity = target;
     }
 
     public virtual void BroadcastEvent(string eventId)

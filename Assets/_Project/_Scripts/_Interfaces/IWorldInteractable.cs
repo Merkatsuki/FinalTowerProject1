@@ -8,4 +8,5 @@ public interface IWorldInteractable
     Transform GetTransform();
     bool CanBeInteractedWith(IPuzzleInteractor actor);
     void OnInteract(IPuzzleInteractor actor);
+    void SetHighlight(bool enabled);
 }

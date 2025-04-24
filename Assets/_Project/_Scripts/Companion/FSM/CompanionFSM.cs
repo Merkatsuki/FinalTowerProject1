@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public class CompanionFSM
+﻿public class CompanionFSM
 {
     private CompanionStatusUI statusUI;
     private CompanionState currentState;
@@ -30,7 +28,6 @@ public class CompanionFSM
         return currentState?.GetType().Name;
 
     }
-
-
 }
+
 

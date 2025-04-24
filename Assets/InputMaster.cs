@@ -116,6 +116,15 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PointerPosition"",
+                    ""type"": ""Value"",
+                    ""id"": ""f9bb319b-0d25-4e1d-8198-82cddaf73555"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -272,6 +281,17 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""action"": ""RightSelect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""51e7422b-6c0b-46bb-b3d0-f3f08d60dc7a"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PointerPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -307,6 +327,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Player_CommandMode = m_Player.FindAction("Command Mode", throwIfNotFound: true);
         m_Player_LeftSelect = m_Player.FindAction("LeftSelect", throwIfNotFound: true);
         m_Player_RightSelect = m_Player.FindAction("RightSelect", throwIfNotFound: true);
+        m_Player_PointerPosition = m_Player.FindAction("PointerPosition", throwIfNotFound: true);
     }
 
     ~@InputMaster()
@@ -383,6 +404,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_CommandMode;
     private readonly InputAction m_Player_LeftSelect;
     private readonly InputAction m_Player_RightSelect;
+    private readonly InputAction m_Player_PointerPosition;
     public struct PlayerActions
     {
         private @InputMaster m_Wrapper;
@@ -397,6 +419,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         public InputAction @CommandMode => m_Wrapper.m_Player_CommandMode;
         public InputAction @LeftSelect => m_Wrapper.m_Player_LeftSelect;
         public InputAction @RightSelect => m_Wrapper.m_Player_RightSelect;
+        public InputAction @PointerPosition => m_Wrapper.m_Player_PointerPosition;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -436,6 +459,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @RightSelect.started += instance.OnRightSelect;
             @RightSelect.performed += instance.OnRightSelect;
             @RightSelect.canceled += instance.OnRightSelect;
+            @PointerPosition.started += instance.OnPointerPosition;
+            @PointerPosition.performed += instance.OnPointerPosition;
+            @PointerPosition.canceled += instance.OnPointerPosition;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -470,6 +496,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @RightSelect.started -= instance.OnRightSelect;
             @RightSelect.performed -= instance.OnRightSelect;
             @RightSelect.canceled -= instance.OnRightSelect;
+            @PointerPosition.started -= instance.OnPointerPosition;
+            @PointerPosition.performed -= instance.OnPointerPosition;
+            @PointerPosition.canceled -= instance.OnPointerPosition;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -508,5 +537,6 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         void OnCommandMode(InputAction.CallbackContext context);
         void OnLeftSelect(InputAction.CallbackContext context);
         void OnRightSelect(InputAction.CallbackContext context);
+        void OnPointerPosition(InputAction.CallbackContext context);
     }
 }

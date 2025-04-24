@@ -1,8 +1,9 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class LightToggleInteractable : InteractableBase
 {
-    [SerializeField] private Light targetLight;
+    [SerializeField] private Light2D targetLight;
 
     public override void OnInteract(IPuzzleInteractor actor)
     {

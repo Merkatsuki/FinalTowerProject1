@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class RobotFlightController : MonoBehaviour
+public class CompanionFlightController : MonoBehaviour
 {
     [Header("Flight Movement")]
     public float speed = 3f;

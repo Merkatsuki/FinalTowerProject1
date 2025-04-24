@@ -7,7 +7,7 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
 {
     [Header("Flight & Perception")]
     public float followDistance = 2.5f;
-    public RobotFlightController flightController { get; private set; }
+    public CompanionFlightController flightController { get; private set; }
     public CompanionPerception Perception { get; private set; }
 
     [Header("FSM & States")]
@@ -89,11 +89,21 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
     private void InitializeComponents()
     {
         fsm = new CompanionFSM();
-        flightController = GetComponent<RobotFlightController>();
+        flightController = GetComponent<CompanionFlightController>();
         Perception = GetComponent<CompanionPerception>();
         followState = new CompanionFollowState(this, fsm);
         idleState = new CompanionIdleState(this, fsm);
         fsm.Initialize(idleState, statusUI);
+    }
+
+    #endregion
+
+    #region Player Commands
+
+    public void CommandMoveToPoint(Vector3 worldPosition)
+    {
+        fsm.ChangeState(new CompanionCommandMoveState(this, fsm, worldPosition));
+        Debug.Log($"[Companion] Moving to commanded point: {worldPosition}");
     }
 
     #endregion

@@ -23,5 +23,6 @@ public enum CompanionStateType
     Follow,
     Investigate,
     InteractWithObject,
-    Glitch
+    Glitch,
+    CommandMove
 }
