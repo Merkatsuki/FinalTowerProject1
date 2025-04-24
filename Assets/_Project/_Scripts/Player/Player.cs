@@ -38,12 +38,14 @@ namespace Momentum
 		public PlayerWallGrabState WallGrabState { get; private set; }
 		public PlayerWallSlideState WallSlideState { get; private set; }
 		public PlayerWallClimbState WallClimbState { get; private set; }
-		
-		#endregion
 
-		#region Animation Strings
-		
-		[field: SerializeField] public string AnimIdle { get; private set; } = "Idle";
+        public PlayerCommandState CommandState { get; private set; }
+
+        #endregion
+
+        #region Animation Strings
+
+        [field: SerializeField] public string AnimIdle { get; private set; } = "Idle";
 		[field: SerializeField] public string AnimMove { get; private set; } = "Walk";
 		[field: SerializeField] public string AnimSprint { get; private set; } = "Run";
 		[field: SerializeField] public string AnimCrouchIdle { get; private set; } = "Crouch";
@@ -96,9 +98,11 @@ namespace Momentum
 			WallGrabState = new PlayerWallGrabState(this, StateMachine, _playerReferences.PData, _playerReferences.PChecks, _playerReferences, AnimWallGrab);
 			WallSlideState = new PlayerWallSlideState(this, StateMachine, _playerReferences.PData, _playerReferences.PChecks, _playerReferences, AnimWallSlide);
 			WallClimbState = new PlayerWallClimbState(this, StateMachine, _playerReferences.PData, _playerReferences.PChecks, _playerReferences, AnimWallClimb);
-			
-			// Subscribe States to Start()
-			OnStartEvent += JumpState.Start;
+
+            CommandState = new PlayerCommandState(this, StateMachine, _playerReferences.PData, _playerReferences.PChecks, _playerReferences, "Command");
+
+            // Subscribe States to Start()
+            OnStartEvent += JumpState.Start;
 			OnStartEvent += DashState.Start;
 			OnStartEvent += WallGrabState.Start;
 			OnStartEvent += WallJumpState.Start;
@@ -127,5 +131,10 @@ namespace Momentum
         public GameObject GetInteractorObject() => gameObject;
         public EnergyType GetEnergyType() => energyState?.GetEnergy() ?? EnergyType.None;
         public string GetDisplayName() => "Player";
+
+        public void SetVelocityZero()
+        {
+            _playerReferences.PRB.linearVelocity = Vector2.zero;
+        }
     }
 }

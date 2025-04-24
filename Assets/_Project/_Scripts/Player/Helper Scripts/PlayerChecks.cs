@@ -49,7 +49,7 @@ namespace Momentum
 		
 		private void Update()
 		{
-			StartFrameCache(); // Cache the Box Colliuder Info
+            StartFrameCache(); // Cache the Box Colliuder Info
 			
 			IsFacing = CheckFaceDirection(); // Set the Facing and Grounded bools using methods
             UpdateVisualFacing();
@@ -75,11 +75,15 @@ namespace Momentum
 		}
 
 		private Facing CheckFaceDirection() // Check what direction player is facing
-		{
-			if (InputManager.instance.WASDInput.x < 0 && CanFlipPlayer) { return Facing.Left; }
-			else if (InputManager.instance.WASDInput.x > 0 && CanFlipPlayer) { return Facing.Right; }
-			else { return IsFacing; }	
-		}
+        {
+            if (InputManager.instance != null && InputManager.instance.IsCommandMode)
+                return IsFacing;
+
+            if (InputManager.instance.WASDInput.x < 0 && CanFlipPlayer) return Facing.Left;
+            if (InputManager.instance.WASDInput.x > 0 && CanFlipPlayer) return Facing.Right;
+
+            return IsFacing;
+        }
 		
 		public void SetFacing(Facing facing) 
 		{

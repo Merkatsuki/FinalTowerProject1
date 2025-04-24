@@ -15,12 +15,9 @@ public class CompanionInvestigateState : CompanionState
     {
         if (target == null)
         {
-            Debug.LogWarning("[Companion] InvestigateState received null target.");
             fsm.ChangeState(new CompanionIdleState(companion, fsm));
             return;
         }
-
-        Debug.Log($"[Companion] Investigating target: {target.GetDisplayName()}");
 
         if (target.GetTransform().TryGetComponent<IHoverProfileProvider>(out var provider))
         {

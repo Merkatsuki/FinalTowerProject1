@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using Momentum;
 using System;
+using DG.Tweening;
 
 
 #if UNITY_EDITOR
@@ -13,6 +14,7 @@ public class PlayerInteractor : MonoBehaviour
 {
     [SerializeField] private CompanionController companion;
     [SerializeField] private CameraController cameraController;
+    [SerializeField] private Player player;
 
     [Header("Facing Settings")]
     [SerializeField] private Transform visionConeObject;
@@ -26,6 +28,7 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] private InteractionPromptUI promptUI;
     [SerializeField] private float clickMarkerLifetime = 1.5f;
     [SerializeField] private float interactRadius = 4f;
+    [SerializeField] private LayerMask interactableLayerMask;
 
     [Header("Command Mode Settings")]
     [SerializeField] private GameObject clickMarkerPrefab;
@@ -38,7 +41,6 @@ public class PlayerInteractor : MonoBehaviour
 
     private List<IWorldInteractable> nearbyInteractables = new();
     private IWorldInteractable currentTarget;
-    private Player player;
     private CircleCollider2D triggerCollider;
     private bool wasCommandModeActive = false;
 
@@ -63,11 +65,6 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (InputManager.instance != null)
             SyncColliderRadius();
-    }
-
-    private void Awake()
-    {
-        player = GetComponent<Player>();
     }
 
     private void Start()
@@ -124,7 +121,6 @@ public class PlayerInteractor : MonoBehaviour
 
     private void TryIssueCommandToCompanion()
     {
-        Debug.Log($"[PlayerInteractor] Attempting to issue command to companion.");
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(InputManager.instance.MousePosition);
 
         RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
@@ -155,46 +151,82 @@ public class PlayerInteractor : MonoBehaviour
 
     private void UpdateFacingDirection()
     {
-        if (!Application.isPlaying) return;
-
-        Camera renderCamera = Camera.main;
-        if (renderCamera == null) return;
+        if (mainCamera == null)
+            mainCamera = Camera.main;
 
         Vector3 mouseScreenPos = InputManager.instance.MousePosition;
-        Vector3 mouseWorldPos = renderCamera.ScreenToWorldPoint(mouseScreenPos);
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(mouseScreenPos);
         mouseWorldPos.z = 0f;
 
-        Vector2 direction = (mouseWorldPos - visionConeObject.position).normalized;
+        Vector3 anchorPos = InputManager.instance.IsCommandMode && companion != null
+            ? companion.transform.position
+            : visionConeObject.position;
+
+        Vector2 direction = (mouseWorldPos - anchorPos).normalized;
         visionConeObject.right = direction;
 
-        Debug.DrawLine(visionConeObject.position, mouseWorldPos, Color.green);
+        Debug.DrawLine(anchorPos, mouseWorldPos, Color.green);
     }
 
     private void UpdateFocus()
     {
-        IWorldInteractable best = GetBestInteractable();
+        IWorldInteractable newTarget;
 
-        bool shouldUpdate =
-            (best == null && currentTarget != null) ||
-            (best != null && best != currentTarget);   
+        if (InputManager.instance.IsCommandMode)
+        {
+            newTarget = GetHoveredInteractable();
+        }
+        else
+        {
+            // Get target via cone/facing logic
+            newTarget = GetBestInteractable();
 
-        if (!shouldUpdate) return;
+            // But override if something is hovered with mouse
+            var hovered = GetHoveredInteractable();
+            if (hovered != null && nearbyInteractables.Contains(hovered))
+            {
+                newTarget = hovered;
+            }
+        }
+
+        if (newTarget == currentTarget) return;
 
         if (currentTarget != null)
             currentTarget.SetHighlight(false);
 
-        currentTarget = best;
+        currentTarget = newTarget;
 
         if (currentTarget != null)
         {
             currentTarget.SetHighlight(true);
-            promptUI?.Show(currentTarget.GetDisplayName());
+
+            if (!InputManager.instance.IsCommandMode)
+                promptUI?.Show(currentTarget.GetDisplayName());
         }
         else
         {
-            promptUI?.Hide();
+            if (!InputManager.instance.IsCommandMode)
+                promptUI?.Hide();
         }
     }
+
+
+    private IWorldInteractable GetHoveredInteractable()
+    {
+        Vector3 mouseScreenPos = InputManager.instance.MousePosition;
+        Ray ray = Camera.main.ScreenPointToRay(mouseScreenPos);
+
+        Debug.DrawRay(ray.origin, ray.direction * 100f, Color.cyan);
+
+        RaycastHit2D hit = Physics2D.GetRayIntersection(ray, 100f);
+
+        if (hit.collider != null)
+        {
+            return hit.collider.GetComponentInParent<IWorldInteractable>();
+        }
+        return null;
+    }
+
 
     private float GetCurrentInteractRadius()
     {
@@ -203,18 +235,22 @@ public class PlayerInteractor : MonoBehaviour
 
     private void HandleCommandModeChanged(bool isCommandMode)
     {
-        // Update camera and visuals
         cameraController?.SetCameraMode(isCommandMode);
-
         UpdateCommandOverlay(isCommandMode);
-
-        // Optional: adjust collider
         SyncColliderRadius();
+
+        if (isCommandMode)
+            player.StateMachine.ChangeState(player.CommandState);  // New state!
+        else
+            player.StateMachine.ChangeState(player.IdleState);     // Return to idle (or resume normal logic)
     }
 
     private void UpdateCommandOverlay(bool isCommandMode)
     {
-        commandOverlay.alpha = isCommandMode ? 1f : 0f;
+        commandOverlay.DOFade(isCommandMode ? 1f : 0f, 0.3f)
+            .SetEase(Ease.OutQuad)
+            .SetUpdate(true);
+
         commandOverlay.interactable = false;
         commandOverlay.blocksRaycasts = false;
     }
@@ -236,12 +272,18 @@ public class PlayerInteractor : MonoBehaviour
         IWorldInteractable best = null;
         float bestDot = -1f;
 
+        Vector3 origin = InputManager.instance.IsCommandMode && companion != null
+            ? companion.transform.position
+            : visionConeObject.position;
+
+        Vector3 forward = visionConeObject.right;
+
         foreach (var interactable in nearbyInteractables)
         {
             if (interactable == null) continue;
 
-            Vector2 toTarget = (interactable.GetTransform().position - visionConeObject.position).normalized;
-            float dot = Vector2.Dot(visionConeObject.right, toTarget);
+            Vector2 toTarget = (interactable.GetTransform().position - origin).normalized;
+            float dot = Vector2.Dot(forward, toTarget);
 
             if (dot > facingThreshold && dot > bestDot)
             {
@@ -280,7 +322,10 @@ public class PlayerInteractor : MonoBehaviour
 #if UNITY_EDITOR
         if (visionConeObject == null) return;
 
-        Vector3 origin = visionConeObject.position;
+        Vector3 origin = InputManager.instance != null && InputManager.instance.IsCommandMode && companion != null
+            ? companion.transform.position
+            : visionConeObject.position;
+
         Vector3 forward = visionConeObject.right;
 
         float displayRadius = interactRadius + (Application.isPlaying && InputManager.instance != null && InputManager.instance.IsCommandMode ? commandModeRadiusBoost : 0f);
