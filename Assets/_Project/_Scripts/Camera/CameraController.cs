@@ -5,14 +5,21 @@ using Unity.Cinemachine;
 public class CameraController : MonoBehaviour
 {
     [Header("Cinemachine References")]
-    [SerializeField] private CinemachineCamera virtualCamera;
+    [SerializeField] private CinemachineCamera playerVirtualCamera;
+    [SerializeField] private CinemachineCamera companionVirtualCamera;
+
 
     [Header("Zoom Settings")]
-    [SerializeField] private float defaultZoom = 5f;
+    [SerializeField] private float defaultZoom = 5.5f;
     [SerializeField] private float zoomSpeed = 1f;
 
     [Header("Shake Settings")]
     [SerializeField] private float shakeFrequency = 2f;
+
+    [Header("Command Settings")]
+    [SerializeField] private CanvasGroup commandOverlay;
+
+    private bool isZoomedForCommand = false;
 
     private Coroutine zoomCoroutine;
     private Coroutine shakeCoroutine;
@@ -22,14 +29,14 @@ public class CameraController : MonoBehaviour
 
     private void Awake()
     {
-        if (virtualCamera == null)
+        if (playerVirtualCamera == null)
         {
             Debug.LogError("CameraController: Virtual Camera reference is missing.");
             return;
         }
 
-        positionComposer = virtualCamera.GetComponent<CinemachinePositionComposer>();
-        noise = virtualCamera.GetComponent<CinemachineBasicMultiChannelPerlin>();
+        positionComposer = playerVirtualCamera.GetComponent<CinemachinePositionComposer>();
+        noise = playerVirtualCamera.GetComponent<CinemachineBasicMultiChannelPerlin>();
 
         if (positionComposer == null)
             Debug.LogWarning("CameraController: PositionComposer component is missing.");
@@ -40,45 +47,39 @@ public class CameraController : MonoBehaviour
 
     public void FollowTarget(Transform target)
     {
-        virtualCamera.Follow = target;
-        virtualCamera.LookAt = target;
+        playerVirtualCamera.Follow = target;
+        playerVirtualCamera.LookAt = target;
     }
 
     public void FocusOn(Transform target, float blendTime = 1f)
     {
-        virtualCamera.Follow = target;
+        playerVirtualCamera.Follow = target;
         if (positionComposer != null)
             positionComposer.Damping.x = blendTime;
     }
 
-    public void SetZoom(float newZoom, float duration = 0f)
+    public void SetZoom(float newZoom, float duration)
     {
         if (zoomCoroutine != null)
             StopCoroutine(zoomCoroutine);
 
-        if (duration <= 0f)
-        {
-            positionComposer.CameraDistance = newZoom;
-        }
-        else
-        {
-            zoomCoroutine = StartCoroutine(SmoothZoom(newZoom, duration));
-        }
+        zoomCoroutine = StartCoroutine(SmoothZoom(newZoom, duration));
     }
 
     private IEnumerator SmoothZoom(float targetZoom, float duration)
     {
-        float startZoom = positionComposer.CameraDistance;
-        float elapsed = 0f;
+        float startZoom = playerVirtualCamera.Lens.OrthographicSize;
+        float time = 0f;
 
-        while (elapsed < duration)
+        while (time < duration)
         {
-            elapsed += Time.deltaTime;
-            positionComposer.CameraDistance = Mathf.Lerp(startZoom, targetZoom, elapsed / duration);
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / duration);
+            playerVirtualCamera.Lens.OrthographicSize = Mathf.Lerp(startZoom, targetZoom, t);
             yield return null;
         }
 
-        positionComposer.CameraDistance = targetZoom;
+        playerVirtualCamera.Lens.OrthographicSize = targetZoom;
     }
 
     public void ShakeCamera(float intensity = 1f, float duration = 0.5f)
@@ -104,7 +105,7 @@ public class CameraController : MonoBehaviour
 
     public void SetConfinerBounds(Collider2D bounds)
     {
-        var confiner = virtualCamera.GetComponent<CinemachineConfiner2D>();
+        var confiner = playerVirtualCamera.GetComponent<CinemachineConfiner2D>();
         if (confiner != null)
         {
             confiner.BoundingShape2D = bounds;
@@ -116,8 +117,20 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    public void ResetZoom()
+    public void SetCameraMode(bool isCommandMode)
     {
-        SetZoom(defaultZoom, 0.5f);
+        if (playerVirtualCamera != null && companionVirtualCamera != null)
+        {
+            playerVirtualCamera.Priority = isCommandMode ? 0 : 10;
+            companionVirtualCamera.Priority = isCommandMode ? 10 : 0;
+        }
     }
+
+    public void SetCommandOverlayActive(bool isActive)
+    {
+        commandOverlay.alpha = isActive ? 1f : 0f;
+        commandOverlay.interactable = false;
+        commandOverlay.blocksRaycasts = false;
+    }
+
 }

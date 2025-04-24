@@ -7,14 +7,15 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: HighlightOutline
-  m_Shader: {fileID: 4800000, guid: da8efd605fdd20949a21be6242000625, type: 3}
+  m_Name: OverlayScreen
+  m_Shader: {fileID: 4800000, guid: 5e4bf3b9c0504574189d87c35b2cd3f6, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _ENABLEOUTEROUTLINE_ON
+  - _ENABLEHOLOGRAM_ON
+  - _ENABLEMETAL_ON
   - _SHADERFADING_NONE
-  - _SHADERSPACE_UV
+  - _SHADERSPACE_UI_GRAPHIC
   - _TEXTURELAYER1SHEETTOGGLE_ON
   - _TEXTURELAYER2SHEETTOGGLE_ON
   m_InvalidKeywords: []
@@ -216,13 +217,13 @@ Material:
     - _EnableGaussianBlur: 0
     - _EnableGlitch: 0
     - _EnableHalftone: 0
-    - _EnableHologram: 0
+    - _EnableHologram: 1
     - _EnableHue: 0
     - _EnableInkSpread: 0
     - _EnableInnerOutline: 0
-    - _EnableMetal: 0
+    - _EnableMetal: 1
     - _EnableNegative: 0
-    - _EnableOuterOutline: 1
+    - _EnableOuterOutline: 0
     - _EnablePingPongGlow: 0
     - _EnablePixelOutline: 0
     - _EnablePixelate: 0
@@ -297,16 +298,16 @@ Material:
     - _HalftoneFadeWidth: 1.5
     - _HalftoneInvert: 0
     - _HalftoneTiling: 4
-    - _HologramContrast: 1
-    - _HologramDistortionDensity: 0.5
-    - _HologramDistortionOffset: 0.5
-    - _HologramDistortionScale: 10
-    - _HologramDistortionSpeed: 2
+    - _HologramContrast: 0.07
+    - _HologramDistortionDensity: 0.62
+    - _HologramDistortionOffset: 0.58
+    - _HologramDistortionScale: 14.81
+    - _HologramDistortionSpeed: 2.31
     - _HologramFade: 1
-    - _HologramLineFrequency: 500
-    - _HologramLineGap: 3
+    - _HologramLineFrequency: 253.9
+    - _HologramLineGap: 0.83
     - _HologramLineSpeed: 0.01
-    - _HologramMinAlpha: 0.2
+    - _HologramMinAlpha: 0.11
     - _Hue: 0
     - _InkSpreadContrast: 2
     - _InkSpreadDistance: 3
@@ -317,13 +318,13 @@ Material:
     - _InnerOutlineFade: 1
     - _InnerOutlineOutlineOnlyToggle: 0
     - _InnerOutlineTextureToggle: 0
-    - _InnerOutlineWidth: 0.79
+    - _InnerOutlineWidth: 0.02
     - _IsText: 0
     - _IsTextMeshPro: 0
     - _MaskBrightness: 1
-    - _MetalContrast: 2
+    - _MetalContrast: 1.25
     - _MetalFade: 1
-    - _MetalHighlightContrast: 2
+    - _MetalHighlightContrast: 0.22
     - _MetalHighlightDensity: 1
     - _MetalMaskToggle: 0
     - _NegativeFade: 1
@@ -332,7 +333,7 @@ Material:
     - _OuterOutlineFade: 1
     - _OuterOutlineOutlineOnlyToggle: 0
     - _OuterOutlineTextureToggle: 0
-    - _OuterOutlineWidth: 0
+    - _OuterOutlineWidth: 0.04
     - _PingPongGlowContrast: 1
     - _PingPongGlowFade: 1
     - _PingPongGlowFrequency: 3
@@ -369,11 +370,11 @@ Material:
     - _ScreenTilingPixelsPerUnit: 100
     - _ScreenWidthUnits: 10
     - _ShaderFading: 0
-    - _ShaderSpace: 0
+    - _ShaderSpace: 5
     - _ShadowFade: 1
-    - _SharpenFactor: 4
+    - _SharpenFactor: 16.6
     - _SharpenFade: 1
-    - _SharpenOffset: 2
+    - _SharpenOffset: 7.57
     - _ShiftHueSpeed: 0.5
     - _ShiftingBrightness: 1
     - _ShiftingContrast: 0.5
@@ -382,15 +383,15 @@ Material:
     - _ShiftingRainbowToggle: 0
     - _ShiftingSaturation: 0.8
     - _ShiftingSpeed: 0.5
-    - _ShineContrast: 2
-    - _ShineFade: 1
-    - _ShineFrequency: 0.3
+    - _ShineContrast: 2.25
+    - _ShineFade: 0.21
+    - _ShineFrequency: 2.49
     - _ShineMaskToggle: 0
     - _ShineRotation: 30
-    - _ShineSaturation: 0.5
+    - _ShineSaturation: 0.12
     - _ShineSmooth: 1
-    - _ShineSpeed: 5
-    - _ShineWidth: 0.1
+    - _ShineSpeed: 6.74
+    - _ShineWidth: -0.43
     - _SineGlowContrast: 1
     - _SineGlowFade: 1
     - _SineGlowFrequency: 4
@@ -563,19 +564,19 @@ Material:
     - _InkSpreadColor: {r: 8.47419, g: 5.013525, b: 0.08873497, a: 0}
     - _InkSpreadNoiseScale: {r: 0.4, g: 0.4, b: 0, a: 0}
     - _InkSpreadPosition: {r: 0.5, g: -1, b: 0, a: 0}
-    - _InnerOutlineColor: {r: 63.999996, g: 52.600006, b: 0, a: 1}
+    - _InnerOutlineColor: {r: 11.98431, g: 1.254902, b: 1.254902, a: 1}
     - _InnerOutlineDistortionIntensity: {r: 0.01, g: 0.01, b: 0, a: 0}
     - _InnerOutlineNoiseScale: {r: 4, g: 4, b: 0, a: 0}
     - _InnerOutlineNoiseSpeed: {r: 0, g: 0.1, b: 0, a: 0}
     - _InnerOutlineTextureSpeed: {r: 0.5, g: 0, b: 0, a: 0}
-    - _MetalColor: {r: 5.992157, g: 3.639216, b: 0.3137255, a: 1}
-    - _MetalHighlightColor: {r: 5.992157, g: 3.796078, b: 0.6588235, a: 1}
+    - _MetalColor: {r: 0.3137254, g: 4.751867, b: 5.992157, a: 1}
+    - _MetalHighlightColor: {r: 4.421502, g: 5.9809885, b: 6.943396, a: 1}
     - _MetalNoiseDistortion: {r: 0.5, g: 0.5, b: 0, a: 0}
-    - _MetalNoiseDistortionScale: {r: 0.2, g: 0.2, b: 0, a: 0}
-    - _MetalNoiseDistortionSpeed: {r: -0.05, g: -0.05, b: 0, a: 0}
+    - _MetalNoiseDistortionScale: {r: 0.6, g: 0.6, b: 0, a: 0}
+    - _MetalNoiseDistortionSpeed: {r: -0.02, g: -0.02, b: 0, a: 0}
     - _MetalNoiseScale: {r: 0.25, g: 0.25, b: 0, a: 0}
-    - _MetalNoiseSpeed: {r: 0.05, g: 0.05, b: 0, a: 0}
-    - _OuterOutlineColor: {r: 1.6415093, g: 1.6415093, b: 1.6415093, a: 1}
+    - _MetalNoiseSpeed: {r: 0.02, g: 0.03, b: 0, a: 0}
+    - _OuterOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _OuterOutlineDistortionIntensity: {r: 0.01, g: 0.01, b: 0, a: 0}
     - _OuterOutlineNoiseScale: {r: 4, g: 4, b: 0, a: 0}
     - _OuterOutlineNoiseSpeed: {r: 0, g: 0.1, b: 0, a: 0}

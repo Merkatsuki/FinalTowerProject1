@@ -2,6 +2,8 @@
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using Momentum;
+using System;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -10,6 +12,7 @@ using UnityEditor;
 public class PlayerInteractor : MonoBehaviour
 {
     [SerializeField] private CompanionController companion;
+    [SerializeField] private CameraController cameraController;
 
     [Header("Facing Settings")]
     [SerializeField] private Transform visionConeObject;
@@ -18,12 +21,17 @@ public class PlayerInteractor : MonoBehaviour
     [Header("Interaction Settings")]
     [SerializeField] private InputActionReference interactAction;
     [SerializeField] private InputActionReference rightClickAction;
+    [SerializeField] private InputActionReference leftClickAction;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private InteractionPromptUI promptUI;
-    [SerializeField] private GameObject commandOverlay;
-    [SerializeField] private GameObject clickMarkerPrefab;
     [SerializeField] private float clickMarkerLifetime = 1.5f;
-    [SerializeField] private float interactRadius = 2f;
+    [SerializeField] private float interactRadius = 4f;
+
+    [Header("Command Mode Settings")]
+    [SerializeField] private GameObject clickMarkerPrefab;
+    [SerializeField] private GameObject commandOverlay;
+    [SerializeField] private float commandModeRadiusBoost = 2f;
+    [SerializeField] private float commandModeFacingBonus = 0.2f;
 
     [Header("Gizmo Settings")]
     [SerializeField] private float markerRadius = 0.2f;
@@ -32,31 +40,41 @@ public class PlayerInteractor : MonoBehaviour
     private IWorldInteractable currentTarget;
     private Player player;
     private CircleCollider2D triggerCollider;
+    private bool wasCommandModeActive = false;
 
     private void OnEnable()
     {
         interactAction.action.Enable();
         interactAction.action.performed += OnInteractPressed;
         rightClickAction.action.performed += HandleRightClick;
+        leftClickAction.action.performed += HandleLeftClick;
     }
 
     private void OnDisable()
     {
         interactAction.action.performed -= OnInteractPressed;
         rightClickAction.action.performed -= HandleRightClick;
+        leftClickAction.action.performed -= HandleLeftClick;
+        InputManager.instance.OnCommandModeChanged -= HandleCommandModeChanged;
         interactAction.action.Disable();
     }
 
     private void OnValidate()
     {
-        SyncColliderRadius();
+        if (InputManager.instance != null)
+            SyncColliderRadius();
     }
 
     private void Awake()
     {
         player = GetComponent<Player>();
+    }
 
+    private void Start()
+    {
         SyncColliderRadius();
+
+        InputManager.instance.OnCommandModeChanged += HandleCommandModeChanged;
     }
 
     private void SyncColliderRadius()
@@ -66,9 +84,9 @@ public class PlayerInteractor : MonoBehaviour
 
         if (triggerCollider != null)
         {
-            // Compensate for the largest axis of local scale
             float maxScale = Mathf.Max(transform.localScale.x, transform.localScale.y);
-            triggerCollider.radius = interactRadius / maxScale;
+            float radius = interactRadius + (InputManager.instance.IsCommandMode ? commandModeRadiusBoost : 0f);
+            triggerCollider.radius = radius / maxScale;
         }
     }
 
@@ -76,15 +94,32 @@ public class PlayerInteractor : MonoBehaviour
     {
         UpdateFacingDirection();
         UpdateFocus();
-        
-        commandOverlay?.SetActive(InputManager.instance.IsCommandMode);     
+        UpdateCollider(); 
 
+    }
+
+
+    private void UpdateCollider()
+    {
+        bool isCommanding = InputManager.instance != null && InputManager.instance.IsCommandMode;
+
+        if (isCommanding != wasCommandModeActive)
+        {
+            wasCommandModeActive = isCommanding;
+            SyncColliderRadius();
+        }
     }
 
     private void HandleRightClick(InputAction.CallbackContext context)
     {
         if (!InputManager.instance.IsCommandMode) return;
         TryIssueCommandToCompanion();
+    }
+
+    private void HandleLeftClick(InputAction.CallbackContext context)
+    {
+        if (!InputManager.instance.IsCommandMode) return;
+        OnInteractPressed(context);
     }
 
     private void TryIssueCommandToCompanion()
@@ -120,17 +155,19 @@ public class PlayerInteractor : MonoBehaviour
 
     private void UpdateFacingDirection()
     {
-        if (mainCamera == null) return;
+        if (!Application.isPlaying) return;
 
-        Vector3 mouseWorldPos = Mouse.current.position.ReadValue();
-        mouseWorldPos = mainCamera.ScreenToWorldPoint(mouseWorldPos);
+        Camera renderCamera = Camera.main;
+        if (renderCamera == null) return;
+
+        Vector3 mouseScreenPos = InputManager.instance.MousePosition;
+        Vector3 mouseWorldPos = renderCamera.ScreenToWorldPoint(mouseScreenPos);
         mouseWorldPos.z = 0f;
 
         Vector2 direction = (mouseWorldPos - visionConeObject.position).normalized;
-        if (direction.sqrMagnitude > 0.001f)
-        {
-            visionConeObject.right = direction;
-        }
+        visionConeObject.right = direction;
+
+        Debug.DrawLine(visionConeObject.position, mouseWorldPos, Color.green);
     }
 
     private void UpdateFocus()
@@ -138,18 +175,16 @@ public class PlayerInteractor : MonoBehaviour
         IWorldInteractable best = GetBestInteractable();
 
         bool shouldUpdate =
-            (best == null && currentTarget != null) || // We had a target, now we don’t
-            (best != null && best != currentTarget);   // Target changed
+            (best == null && currentTarget != null) ||
+            (best != null && best != currentTarget);   
 
         if (!shouldUpdate) return;
 
-        // Disable old highlight
         if (currentTarget != null)
             currentTarget.SetHighlight(false);
 
         currentTarget = best;
 
-        // Enable new highlight
         if (currentTarget != null)
         {
             currentTarget.SetHighlight(true);
@@ -161,14 +196,30 @@ public class PlayerInteractor : MonoBehaviour
         }
     }
 
+    private float GetCurrentInteractRadius()
+    {
+        return interactRadius + (InputManager.instance.IsCommandMode ? commandModeRadiusBoost : 0f);
+    }
 
+    private void HandleCommandModeChanged(bool isCommandMode)
+    {
+        // Update camera and visuals
+        cameraController?.SetCameraMode(isCommandMode);
+        commandOverlay?.SetActive(isCommandMode);
 
+        // Optional: adjust collider
+        SyncColliderRadius();
+    }
 
     private void OnInteractPressed(InputAction.CallbackContext context)
     {
         if (currentTarget != null && currentTarget.CanBeInteractedWith(player))
         {
-            currentTarget.OnInteract(player);
+            float distToTarget = Vector2.Distance(transform.position, currentTarget.GetTransform().position);
+            if (distToTarget <= GetCurrentInteractRadius())
+            {
+                currentTarget.OnInteract(player);
+            }
         }
     }
 
@@ -184,7 +235,6 @@ public class PlayerInteractor : MonoBehaviour
             Vector2 toTarget = (interactable.GetTransform().position - visionConeObject.position).normalized;
             float dot = Vector2.Dot(visionConeObject.right, toTarget);
 
-            //if (IsWithinFacingCone(toTarget) && dot > bestDot)
             if (dot > facingThreshold && dot > bestDot)
             {
                 best = interactable;
@@ -217,29 +267,28 @@ public class PlayerInteractor : MonoBehaviour
         }
     }
 
-#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
+#if UNITY_EDITOR
         if (visionConeObject == null) return;
 
         Vector3 origin = visionConeObject.position;
         Vector3 forward = visionConeObject.right;
 
-        // Draw cone direction line
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(origin, origin + forward * 4f);
-
-        // Draw interaction radius
-        Gizmos.color = new Color(1f, 1f, 1f, 0.1f);
-        Gizmos.DrawWireSphere(origin, interactRadius);
-
-        // Draw cone arc
-        UnityEditor.Handles.color = new Color(0f, 1f, 1f, 0.2f);
+        float displayRadius = interactRadius + (Application.isPlaying && InputManager.instance != null && InputManager.instance.IsCommandMode ? commandModeRadiusBoost : 0f);
         float angle = Mathf.Acos(facingThreshold) * Mathf.Rad2Deg;
-        Vector3 left = Quaternion.Euler(0, 0, -angle) * forward;
-        UnityEditor.Handles.DrawSolidArc(origin, Vector3.forward, left, angle * 2, 4f);
+        float coneLength = 4f + (Application.isPlaying && InputManager.instance != null && InputManager.instance.IsCommandMode ? commandModeRadiusBoost : 0f);
 
-        // Per-interactable debug
+        Gizmos.color = new Color(1f, 1f, 1f, 0.1f);
+        Gizmos.DrawWireSphere(origin, displayRadius);
+
+        Handles.color = new Color(0f, 1f, 1f, 0.2f);
+        Vector3 left = Quaternion.Euler(0, 0, -angle) * forward;
+        Handles.DrawSolidArc(origin, Vector3.forward, left, angle * 2, coneLength);
+
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(origin, origin + forward * coneLength);
+
         foreach (var interactable in nearbyInteractables)
         {
             if (interactable == null) continue;
@@ -252,11 +301,10 @@ public class PlayerInteractor : MonoBehaviour
             if (interactable == currentTarget) Gizmos.color = Color.green;
 
             Gizmos.DrawLine(origin, targetPos);
-
-            // Optional debug label
-            UnityEditor.Handles.Label(targetPos + Vector3.up * 0.2f, $"Dot: {dot:F2}");
+            Handles.Label(targetPos + Vector3.up * 0.2f, $"Dot: {dot:F2}");
         }
-    }
 #endif
+    }
+
 
 }

@@ -16,6 +16,7 @@ namespace Momentum
 
         [NonSerialized] public Action JumpPressed; // Public so other classes can subscribe to this. Tagged to not show up in inspector
 		[NonSerialized] public Action JumpReleased;
+        public event Action<bool> OnCommandModeChanged;
 
         public bool JumpHeld { get; private set; }
 		public bool IsSprint { get; private set; }
@@ -54,8 +55,8 @@ namespace Momentum
 			#region Read Input
 
             MousePosition = _controls.Player.PointerPosition.ReadValue<Vector2>();
-            IsCommandMode = _controls.Player.CommandMode.IsPressed();
-			WASDInput = _controls.Player.MovementControls.ReadValue<Vector2>();
+            _controls.Player.CommandMode.performed += ctx => ToggleCommandMode();
+            WASDInput = _controls.Player.MovementControls.ReadValue<Vector2>();
 
 
             if (_controls.Player.Jump.WasPressedThisFrame()) { JumpPressed?.Invoke(); } // THe ? makes sure the varaible isn't null before invoking
@@ -81,7 +82,13 @@ namespace Momentum
 		{
 			_controls.Disable();
 		}
-		
-		#endregion
-	}
+
+        private void ToggleCommandMode()
+        {
+            IsCommandMode = !IsCommandMode;
+            OnCommandModeChanged?.Invoke(IsCommandMode);
+        }
+
+        #endregion
+    }
 }
