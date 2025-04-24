@@ -269,7 +269,7 @@ MonoBehaviour:
   clickMarkerLifetime: 1.5
   interactRadius: 4
   clickMarkerPrefab: {fileID: 6387897462884694156, guid: f2d5316dfff88564098eaf4607049303, type: 3}
-  commandOverlay: {fileID: 669143293}
+  commandOverlay: {fileID: 1500075134}
   commandModeRadiusBoost: 2
   commandModeFacingBonus: 0.2
   markerRadius: 0.2

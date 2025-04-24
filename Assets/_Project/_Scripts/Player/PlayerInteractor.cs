@@ -29,7 +29,7 @@ public class PlayerInteractor : MonoBehaviour
 
     [Header("Command Mode Settings")]
     [SerializeField] private GameObject clickMarkerPrefab;
-    [SerializeField] private GameObject commandOverlay;
+    [SerializeField] private CanvasGroup commandOverlay;
     [SerializeField] private float commandModeRadiusBoost = 2f;
     [SerializeField] private float commandModeFacingBonus = 0.2f;
 
@@ -205,10 +205,18 @@ public class PlayerInteractor : MonoBehaviour
     {
         // Update camera and visuals
         cameraController?.SetCameraMode(isCommandMode);
-        commandOverlay?.SetActive(isCommandMode);
+
+        UpdateCommandOverlay(isCommandMode);
 
         // Optional: adjust collider
         SyncColliderRadius();
+    }
+
+    private void UpdateCommandOverlay(bool isCommandMode)
+    {
+        commandOverlay.alpha = isCommandMode ? 1f : 0f;
+        commandOverlay.interactable = false;
+        commandOverlay.blocksRaycasts = false;
     }
 
     private void OnInteractPressed(InputAction.CallbackContext context)
