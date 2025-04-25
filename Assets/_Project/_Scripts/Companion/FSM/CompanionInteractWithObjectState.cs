@@ -13,15 +13,25 @@ public class CompanionInteractWithObjectState : CompanionState
         this.target = target;
     }
 
+    public override CompanionStateType StateType => CompanionStateType.InteractWithObject;
+
     public override void OnEnter()
     {
-        if (target == null)
+        if (target == null || !target.CanBeInteractedWith(companion))
         {
-            fsm.ChangeState(new CompanionIdleState(companion, fsm));
+            Debug.LogWarning("[InteractWithObject] Invalid or blocked target.");
+            fsm.ChangeState(companion.idleState);
             return;
         }
 
-        Debug.Log($"[Companion] Interacting with: {target.GetDisplayName()}");
+        Debug.Log($"[InteractWithObject] Beginning interaction with: {target.GetDisplayName()}");
+        waitTimer = 0f;
+
+        foreach (var strategy in target.GetExitStrategies())
+        {
+            strategy?.OnEnter(companion, target);
+        }
+
         target.OnInteract(companion);
     }
 
@@ -33,16 +43,16 @@ public class CompanionInteractWithObjectState : CompanionState
         {
             if (strategy != null && strategy.ShouldExit(companion, target))
             {
-                Debug.Log("[Companion] Exit strategy met, returning to Idle.");
-                fsm.ChangeState(new CompanionIdleState(companion, fsm));
+                Debug.Log("[InteractWithObject] Exit condition met.");
+                fsm.ChangeState(companion.idleState);
                 return;
             }
         }
 
         if (waitTimer >= maxWaitTime)
         {
-            Debug.LogWarning("[Companion] Max interaction time reached. Forcing return to Idle.");
-            fsm.ChangeState(new CompanionIdleState(companion, fsm));
+            Debug.LogWarning("[InteractWithObject] Timeout. Returning to Idle.");
+            fsm.ChangeState(companion.idleState);
         }
     }
 
@@ -50,6 +60,4 @@ public class CompanionInteractWithObjectState : CompanionState
     {
         companion.flightController.allowDefaultFollow = false;
     }
-
-    public override CompanionStateType StateType => CompanionStateType.InteractWithObject;
 }

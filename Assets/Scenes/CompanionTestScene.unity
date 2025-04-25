@@ -12275,10 +12275,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb896d99b4b372243bf1b51fc5939bbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalNoiseSpeedScale: 0.05
-  verticalNoiseSpeedScale: 0.05
+  horizontalNoiseSpeedScale: 0.08
+  verticalNoiseSpeedScale: 0.07
   baseScaleX: 20
-  baseScaleY: 2
+  baseScaleY: 10
   xScaleCurve:
     serializedVersion: 2
     m_Curve:
@@ -15618,7 +15618,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1726152718
 RectTransform:
   m_ObjectHideFlags: 0

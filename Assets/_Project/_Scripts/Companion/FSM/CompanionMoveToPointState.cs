@@ -15,8 +15,6 @@ public class CompanionMoveToPointState : CompanionState
         var target = companion.CurrentTarget;
         _targetPosition = target.Position;
 
-        Debug.Log($"[MoveToPoint] Entering state. Target position: {_targetPosition}");
-
         _arrived = false;
         companion.flightController.SetTarget(_targetPosition);
     }
@@ -25,12 +23,10 @@ public class CompanionMoveToPointState : CompanionState
     {
         base.Tick();
         float dist = Vector2.Distance(companion.transform.position, _targetPosition);
-        Debug.Log($"[MoveToPoint] Distance to target: {dist}");
 
         if (!_arrived && dist < _arrivalThreshold)
         {
             _arrived = true;
-            Debug.Log("[MoveToPoint] Arrived at target. Switching to Idle.");
             companion.fsm.ChangeState(companion.idleState);
         }
     }
@@ -39,7 +35,6 @@ public class CompanionMoveToPointState : CompanionState
     {
         companion.flightController.allowDefaultFollow = false;
 
-        Debug.Log("[MoveToPoint] Exiting state. Clearing target.");
         companion.flightController.ClearTarget();
     }
 }
