@@ -48,5 +48,10 @@ public class CompanionInvestigateState : CompanionState
         }
     }
 
+    public override void OnExit()
+    {
+        companion.flightController.allowDefaultFollow = false;
+    }
+
     public override CompanionStateType StateType => CompanionStateType.Investigate;
 }

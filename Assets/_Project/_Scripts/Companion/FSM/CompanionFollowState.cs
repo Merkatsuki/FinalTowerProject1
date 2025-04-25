@@ -1,13 +1,17 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CompanionFollowState : CompanionState
 {
     public CompanionFollowState(CompanionController companion, CompanionFSM fsm) : base(companion, fsm) { }
 
+    public override void OnEnter()
+    {
+        companion.flightController.allowDefaultFollow = true;
+    }
+
     public override void Tick()
     {
-        if (!companion.IsInteractionLocked && companion.TryAutoInvestigate()) return;
-
         if (companion.flightController.defaultFollowTarget == null)
         {
             Debug.LogWarning("No defaultFollowTarget set.");
@@ -31,6 +35,7 @@ public class CompanionFollowState : CompanionState
 
     public override void OnExit()
     {
+        companion.flightController.allowDefaultFollow = false;
         companion.flightController.ClearTarget();
     }
 

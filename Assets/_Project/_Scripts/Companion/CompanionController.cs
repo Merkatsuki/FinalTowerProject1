@@ -2,6 +2,8 @@
 using UnityEngine.Rendering.Universal;
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using Momentum;
 
 public class CompanionController : MonoBehaviour, IPuzzleInteractor
 {
@@ -14,6 +16,7 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
     public CompanionFSM fsm { get; private set; }
     public CompanionFollowState followState;
     public CompanionIdleState idleState;
+    public CompanionMoveToPointState moveToPointState;
 
     [Header("Status & Energy")]
     [SerializeField] private EnergyStateComponent energyState;
@@ -34,6 +37,10 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
     // Interaction targets
     private IWorldInteractable currentTarget;
     private IWorldInteractable playerCommandTarget;
+    
+    public TargetData CurrentTarget { get; private set; }
+    public void SetCurrentTarget(TargetData data) => CurrentTarget = data;
+
 
     public void SetCurrentTarget(IWorldInteractable target) => currentTarget = target;
     public void ClearCurrentTarget() => currentTarget = null;
@@ -69,6 +76,12 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
         InitializeComponents();
     }
 
+    private void Start()
+    {
+        InputManager.instance.ToggleFollowPressed += ToggleFollowMode;
+    }
+
+
     private void Update()
     {
         fsm.Tick();
@@ -93,6 +106,7 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
         Perception = GetComponent<CompanionPerception>();
         followState = new CompanionFollowState(this, fsm);
         idleState = new CompanionIdleState(this, fsm);
+        moveToPointState = new CompanionMoveToPointState(this, fsm);
         fsm.Initialize(idleState, statusUI);
     }
 
@@ -100,10 +114,25 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
 
     #region Player Commands
 
-    public void CommandMoveToPoint(Vector3 worldPosition)
+    public void CommandMoveToPoint(Vector2 worldPosition)
     {
-        fsm.ChangeState(new CompanionCommandMoveState(this, fsm, worldPosition));
+        SetCurrentTarget(new TargetData(worldPosition));
+        fsm.ChangeState(moveToPointState);
         Debug.Log($"[Companion] Moving to commanded point: {worldPosition}");
+    }
+
+    public void ToggleFollowMode()
+    {
+        if (fsm.CurrentStateType == CompanionStateType.Follow)
+        {
+            fsm.ChangeState(idleState);
+            Debug.Log("[Companion] Exiting Follow Mode.");
+        }
+        else
+        {
+            fsm.ChangeState(followState);
+            Debug.Log("[Companion] Entering Follow Mode.");
+        }
     }
 
     #endregion

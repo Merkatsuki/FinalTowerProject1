@@ -24,5 +24,6 @@ public enum CompanionStateType
     Investigate,
     InteractWithObject,
     Glitch,
-    CommandMove
+    MoveToPoint
 }
+

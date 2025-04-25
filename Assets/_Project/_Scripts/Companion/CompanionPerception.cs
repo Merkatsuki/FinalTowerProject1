@@ -1,6 +1,22 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+public struct TargetData
+{
+    public Vector2 Position;
+    public IWorldInteractable Interactable;
+    public IHoverProfileProvider HoverProfile;
+
+    public TargetData(Vector2 position, IWorldInteractable interactable = null, IHoverProfileProvider hoverProfile = null)
+    {
+        Position = position;
+        Interactable = interactable;
+        HoverProfile = hoverProfile;
+    }
+
+    public bool HasInteractable => Interactable != null;
+}
+
 public class CompanionPerception : MonoBehaviour
 {
     [Header("Detection Settings")]

@@ -125,6 +125,15 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ToggleFollow"",
+                    ""type"": ""Button"",
+                    ""id"": ""1e9c24d6-acee-46a5-8656-766d376834cb"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -230,7 +239,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""c0edfa34-ddc3-421f-a373-d93ec343eb15"",
-                    ""path"": ""<Keyboard>/f"",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard and Mouse"",
@@ -292,6 +301,17 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""action"": ""PointerPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e679bb1f-8f3c-4333-8b19-4201fb330922"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleFollow"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -328,6 +348,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Player_LeftSelect = m_Player.FindAction("LeftSelect", throwIfNotFound: true);
         m_Player_RightSelect = m_Player.FindAction("RightSelect", throwIfNotFound: true);
         m_Player_PointerPosition = m_Player.FindAction("PointerPosition", throwIfNotFound: true);
+        m_Player_ToggleFollow = m_Player.FindAction("ToggleFollow", throwIfNotFound: true);
     }
 
     ~@InputMaster()
@@ -405,6 +426,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_LeftSelect;
     private readonly InputAction m_Player_RightSelect;
     private readonly InputAction m_Player_PointerPosition;
+    private readonly InputAction m_Player_ToggleFollow;
     public struct PlayerActions
     {
         private @InputMaster m_Wrapper;
@@ -420,6 +442,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         public InputAction @LeftSelect => m_Wrapper.m_Player_LeftSelect;
         public InputAction @RightSelect => m_Wrapper.m_Player_RightSelect;
         public InputAction @PointerPosition => m_Wrapper.m_Player_PointerPosition;
+        public InputAction @ToggleFollow => m_Wrapper.m_Player_ToggleFollow;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -462,6 +485,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @PointerPosition.started += instance.OnPointerPosition;
             @PointerPosition.performed += instance.OnPointerPosition;
             @PointerPosition.canceled += instance.OnPointerPosition;
+            @ToggleFollow.started += instance.OnToggleFollow;
+            @ToggleFollow.performed += instance.OnToggleFollow;
+            @ToggleFollow.canceled += instance.OnToggleFollow;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -499,6 +525,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @PointerPosition.started -= instance.OnPointerPosition;
             @PointerPosition.performed -= instance.OnPointerPosition;
             @PointerPosition.canceled -= instance.OnPointerPosition;
+            @ToggleFollow.started -= instance.OnToggleFollow;
+            @ToggleFollow.performed -= instance.OnToggleFollow;
+            @ToggleFollow.canceled -= instance.OnToggleFollow;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -538,5 +567,6 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         void OnLeftSelect(InputAction.CallbackContext context);
         void OnRightSelect(InputAction.CallbackContext context);
         void OnPointerPosition(InputAction.CallbackContext context);
+        void OnToggleFollow(InputAction.CallbackContext context);
     }
 }

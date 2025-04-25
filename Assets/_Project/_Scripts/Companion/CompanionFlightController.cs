@@ -3,6 +3,8 @@
 [RequireComponent(typeof(Rigidbody2D))]
 public class CompanionFlightController : MonoBehaviour
 {
+    public bool allowDefaultFollow = false;
+
     [Header("Flight Movement")]
     public float speed = 3f;
     public float acceleration = 6f;
@@ -40,7 +42,7 @@ public class CompanionFlightController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!hasTarget && defaultFollowTarget != null)
+        if (allowDefaultFollow && !hasTarget && defaultFollowTarget != null)
         {
             SetTarget(defaultFollowTarget.position);
         }

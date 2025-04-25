@@ -16,6 +16,7 @@ namespace Momentum
 
         [NonSerialized] public Action JumpPressed; // Public so other classes can subscribe to this. Tagged to not show up in inspector
 		[NonSerialized] public Action JumpReleased;
+        [NonSerialized] public Action ToggleFollowPressed;
         public event Action<bool> OnCommandModeChanged;
 
         public bool JumpHeld { get; private set; }
@@ -47,15 +48,17 @@ namespace Momentum
 				return; // Close method
 			}
 
-			#endregion
-		}
+            #endregion
+
+            _controls.Player.ToggleFollow.performed += ctx => ToggleFollowPressed?.Invoke();
+            _controls.Player.CommandMode.performed += ctx => ToggleCommandMode();
+        }
 		
 		private void Update()
 		{
 			#region Read Input
 
             MousePosition = _controls.Player.PointerPosition.ReadValue<Vector2>();
-            _controls.Player.CommandMode.performed += ctx => ToggleCommandMode();
             WASDInput = _controls.Player.MovementControls.ReadValue<Vector2>();
 
 

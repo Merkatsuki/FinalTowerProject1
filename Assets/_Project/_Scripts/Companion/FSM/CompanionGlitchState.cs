@@ -24,5 +24,10 @@ public class CompanionGlitchState : CompanionState
         // Optional: erratic movement here
     }
 
+    public override void OnExit()
+    {
+        companion.flightController.allowDefaultFollow = false;
+    }
+
     public override CompanionStateType StateType => CompanionStateType.Glitch;
 }
