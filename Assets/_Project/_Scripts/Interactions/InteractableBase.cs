@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-public abstract class InteractableBase : MonoBehaviour, IWorldInteractable
+public class InteractableBase : MonoBehaviour, IWorldInteractable
 {
     [Header("Strategy Settings")]
     [SerializeField] protected List<EntryStrategySO> entryStrategies;
@@ -30,7 +30,13 @@ public abstract class InteractableBase : MonoBehaviour, IWorldInteractable
 
     public virtual List<ExitStrategySO> GetExitStrategies() => exitStrategies;
 
-    public abstract void OnInteract(IPuzzleInteractor actor);
+    public virtual void OnInteract(IPuzzleInteractor actor)
+    {
+        foreach (var feature in GetComponents<IInteractableFeature>())
+        {
+            feature.OnInteract(actor);
+        }
+    }
 
     public bool ShouldExit(IPuzzleInteractor actor)
     {
@@ -39,7 +45,6 @@ public abstract class InteractableBase : MonoBehaviour, IWorldInteractable
             if (strategy != null && strategy.ShouldExit(actor, this))
                 return true;
         }
-
         return false;
     }
 
@@ -53,7 +58,6 @@ public abstract class InteractableBase : MonoBehaviour, IWorldInteractable
         float target = enabled ? highlightIntensity : 0f;
         highlightRoutine = StartCoroutine(LerpHighlightIntensity(target));
     }
-
 
     private IEnumerator LerpHighlightIntensity(float target)
     {
@@ -72,8 +76,6 @@ public abstract class InteractableBase : MonoBehaviour, IWorldInteractable
 
     public virtual void BroadcastEvent(string eventId)
     {
-        //World Event System.  
-        // Plan to use SciptableObjects to define events and their parameters.
-        // Consider if we want this in the base class or in individual concrete classes.  
+        // Future event system integration
     }
 }

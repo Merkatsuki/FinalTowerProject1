@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class FinalPortalAutoUnlocker : MonoBehaviour
 {
-    [SerializeField] private PortalInteractable portalToUnlock;
+    [SerializeField] private PortalFeature portalToUnlock;
 
     private void Start()
     {
@@ -15,7 +15,7 @@ public class FinalPortalAutoUnlocker : MonoBehaviour
         if (MemoryProgressTracker.Instance != null &&
             MemoryProgressTracker.Instance.AreAllTrackedMemoriesComplete())
         {
-            portalToUnlock.Unlock();
+            portalToUnlock.UnlockPortal();
         }
     }
 }
