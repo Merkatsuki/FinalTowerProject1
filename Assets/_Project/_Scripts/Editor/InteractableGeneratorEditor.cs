@@ -84,7 +84,6 @@ public class InteractableGeneratorEditor : EditorWindow
 
     private void ApplyPreset(int presetIndex)
     {
-        // Clear all features first
         addDialogueFeature = false;
         addLightToggleFeature = false;
         addEnergyFeature = false;
@@ -96,22 +95,22 @@ public class InteractableGeneratorEditor : EditorWindow
 
         switch (presetIndex)
         {
-            case 1: // Memory Fragment
+            case 1:
                 addDialogueFeature = true;
                 addHighlightLight = true;
                 addSpriteRenderer = true;
                 break;
-            case 2: // Locked Puzzle Door
+            case 2:
                 addDoorFeature = true;
                 addLockedDoorFeature = true;
                 addHighlightLight = true;
                 break;
-            case 3: // Energy Gate
+            case 3:
                 addPuzzleUnlockFeature = true;
                 addEnergyFeature = true;
                 addHighlightLight = true;
                 break;
-            case 4: // Lore Terminal
+            case 4:
                 addDialogueFeature = true;
                 addHighlightLight = true;
                 addSpriteRenderer = true;
@@ -132,15 +131,22 @@ public class InteractableGeneratorEditor : EditorWindow
             spriteRenderer.sortingOrder = 1;
         }
 
+        // Set to Notables Layer if available
+        int notablesLayer = LayerMask.NameToLayer("Notables");
+        if (notablesLayer != -1)
+            go.layer = notablesLayer;
+
+        Light2D highlightLight = null;
         if (addHighlightLight)
         {
             var lightObj = new GameObject("HighlightLight");
             lightObj.transform.SetParent(go.transform);
             lightObj.transform.localPosition = Vector3.zero;
-            var light = lightObj.AddComponent<Light2D>();
-            light.intensity = 0f;
-            light.lightType = Light2D.LightType.Point;
-            light.pointLightOuterRadius = 2.5f;
+            highlightLight = lightObj.AddComponent<Light2D>();
+            highlightLight.intensity = 0f;
+            highlightLight.lightType = Light2D.LightType.Point;
+            highlightLight.pointLightOuterRadius = 2.5f;
+            baseInteractable.SetHighlightLight(highlightLight);
         }
 
         if (addDialogueFeature) { go.AddComponent<DialogueFeature>(); metadata.AddFeatureTag("Dialogue"); }
@@ -148,8 +154,30 @@ public class InteractableGeneratorEditor : EditorWindow
         {
             var feature = go.AddComponent<LightToggleFeature>();
             metadata.AddFeatureTag("LightToggle");
+            // Create Toggleable Light2D
+            var toggleObj = new GameObject("ToggleableLight");
+            toggleObj.transform.SetParent(go.transform);
+            toggleObj.transform.localPosition = Vector3.zero;
+            var toggleLight = toggleObj.AddComponent<Light2D>();
+            toggleLight.intensity = 0f;
+            toggleLight.lightType = Light2D.LightType.Point;
+            toggleLight.pointLightOuterRadius = 2.5f;
+            feature.SetToggleLight(toggleLight);
         }
-        if (addEnergyFeature) { go.AddComponent<EnergyFeature>(); metadata.AddFeatureTag("Energy"); }
+        if (addEnergyFeature)
+        {
+            var feature = go.AddComponent<EnergyFeature>();
+            metadata.AddFeatureTag("Energy");
+            // Create Energy Light2D
+            var energyObj = new GameObject("EnergyLight");
+            energyObj.transform.SetParent(go.transform);
+            energyObj.transform.localPosition = Vector3.zero;
+            var energyLight = energyObj.AddComponent<Light2D>();
+            energyLight.intensity = 0f;
+            energyLight.lightType = Light2D.LightType.Point;
+            energyLight.pointLightOuterRadius = 2.5f;
+            feature.SetEnergyLight(energyLight);
+        }
         if (addDoorFeature) { go.AddComponent<DoorFeature>(); metadata.AddFeatureTag("Door"); }
         if (addPortalFeature) { go.AddComponent<PortalFeature>(); metadata.AddFeatureTag("Portal"); }
         if (addCollectibleFeature) { go.AddComponent<CollectibleFeature>(); metadata.AddFeatureTag("Collectible"); }

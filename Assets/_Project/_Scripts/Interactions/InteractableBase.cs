@@ -11,7 +11,7 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
 
     [Header("Highlight Settings")]
     [SerializeField] private Light2D highlightLight;
-    [SerializeField] private float highlightIntensity = 8.0f;
+    [SerializeField] private float highlightIntensity = 2.0f;
 
     private Coroutine highlightRoutine;
 
@@ -77,5 +77,9 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
     public virtual void BroadcastEvent(string eventId)
     {
         // Future event system integration
+    }
+    public void SetHighlightLight(Light2D light)
+    {
+        highlightLight = light;
     }
 }

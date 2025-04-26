@@ -13,17 +13,13 @@ public class EnergyFeature : MonoBehaviour, IInteractableFeature
 
     private void Awake()
     {
-        energyLight = GetComponentInChildren<Light2D>();
         if (energyLight == null)
         {
-            GameObject lightObj = new GameObject("EnergyLight");
-            lightObj.transform.SetParent(transform);
-            lightObj.transform.localPosition = Vector3.zero;
-            energyLight = lightObj.AddComponent<Light2D>();
-            energyLight.lightType = Light2D.LightType.Point;
-            energyLight.pointLightOuterRadius = 2.5f;
-            energyLight.intensity = 0f;
-            Debug.Log("[EnergyFeature] Auto-created Energy Light.");
+            Transform energyChild = transform.Find("EnergyLight");
+            if (energyChild != null)
+            {
+                energyLight = energyChild.GetComponent<Light2D>();
+            }
         }
 
         UpdateEnergyLightColor();
@@ -74,4 +70,10 @@ public class EnergyFeature : MonoBehaviour, IInteractableFeature
     }
 
     public bool IsCharged() => isCharged;
+
+    public void SetEnergyLight(Light2D light)
+    {
+        energyLight = light;
+        UpdateEnergyLightColor();
+    }
 }

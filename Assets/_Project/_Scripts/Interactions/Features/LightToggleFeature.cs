@@ -1,29 +1,24 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using DG.Tweening;
 
 public class LightToggleFeature : MonoBehaviour, IInteractableFeature
 {
     [SerializeField] private Light2D targetLight;
+    [SerializeField] private float toggleDuration = 0.5f;
+    [SerializeField] private float maxIntensity = 8.5f;
+
+    private bool isOn = false;
+    private Tween activeTween;
 
     private void Awake()
     {
         if (targetLight == null)
         {
-            Transform lightChild = transform.Find("ToggleableLight");
-            if (lightChild == null)
+            Transform toggleChild = transform.Find("ToggleableLight");
+            if (toggleChild != null)
             {
-                GameObject lightObj = new GameObject("ToggleableLight");
-                lightObj.transform.SetParent(transform);
-                lightObj.transform.localPosition = Vector3.zero;
-                targetLight = lightObj.AddComponent<Light2D>();
-                targetLight.intensity = 0f;
-                targetLight.lightType = Light2D.LightType.Point;
-                targetLight.pointLightOuterRadius = 2.5f;
-                Debug.Log("[LightToggleFeature] Auto-created Toggleable Light.");
-            }
-            else
-            {
-                targetLight = lightChild.GetComponent<Light2D>();
+                targetLight = toggleChild.GetComponent<Light2D>();
             }
         }
     }
@@ -33,11 +28,34 @@ public class LightToggleFeature : MonoBehaviour, IInteractableFeature
         ToggleLight();
     }
 
-    public void ToggleLight()
+    private void ToggleLight()
     {
-        if (targetLight == null) return;
+        if (targetLight == null)
+        {
+            Debug.LogWarning("[LightToggleFeature] No target light assigned!");
+            return;
+        }
 
-        targetLight.enabled = !targetLight.enabled;
-        Debug.Log("[LightToggleFeature] Toggled light state.");
+        if (activeTween != null && activeTween.IsActive())
+        {
+            activeTween.Kill();
+        }
+
+        float startIntensity = targetLight.intensity;
+        float targetIntensity = isOn ? 0f : maxIntensity;
+
+        activeTween = DOTween.To(
+            () => targetLight.intensity,
+            x => targetLight.intensity = x,
+            targetIntensity,
+            toggleDuration
+        );
+
+        isOn = !isOn;
+    }
+
+    public void SetToggleLight(Light2D light)
+    {
+        targetLight = light;
     }
 }

@@ -41,6 +41,7 @@ public class PlayerInteractor : MonoBehaviour
 
     private List<IWorldInteractable> nearbyInteractables = new();
     private IWorldInteractable currentTarget;
+    private IWorldInteractable lastHoveredTarget;
     private CircleCollider2D triggerCollider;
     private bool wasCommandModeActive = false;
 
@@ -116,14 +117,19 @@ public class PlayerInteractor : MonoBehaviour
     private void HandleLeftClick(InputAction.CallbackContext context)
     {
         if (!InputManager.instance.IsCommandMode) return;
-        OnInteractPressed(context);
+
+        Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(InputManager.instance.MousePosition);
+        companion.CommandMoveToPoint(mouseWorldPos);
+        SpawnClickMarker(mouseWorldPos);
     }
+
 
     private void TryIssueCommandToCompanion()
     {
-        Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(InputManager.instance.MousePosition);
+        Vector3 mouseScreenPos = InputManager.instance.MousePosition;
+        Ray ray = Camera.main.ScreenPointToRay(mouseScreenPos);
 
-        RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
+        RaycastHit2D hit = Physics2D.GetRayIntersection(ray, 100f, interactableLayerMask);
 
         if (hit.collider != null)
         {
@@ -136,10 +142,10 @@ public class PlayerInteractor : MonoBehaviour
             }
         }
 
-        // If no valid interactable, still move to the clicked world point
+        // If no valid interactable, just move
+        Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
         companion.CommandMoveToPoint(mouseWorldPos);
         SpawnClickMarker(mouseWorldPos);
-        Debug.Log($"[Command] Companion moving to point: {mouseWorldPos}");
     }
 
     void SpawnClickMarker(Vector2 worldPos)
@@ -170,23 +176,33 @@ public class PlayerInteractor : MonoBehaviour
 
     private void UpdateFocus()
     {
-        IWorldInteractable newTarget;
+        IWorldInteractable hoverTarget = GetHoveredInteractable();
 
         if (InputManager.instance.IsCommandMode)
         {
-            newTarget = GetHoveredInteractable();
-        }
-        else
-        {
-            // Get target via cone/facing logic
-            newTarget = GetBestInteractable();
-
-            // But override if something is hovered with mouse
-            var hovered = GetHoveredInteractable();
-            if (hovered != null && nearbyInteractables.Contains(hovered))
+            if (lastHoveredTarget != null && lastHoveredTarget != hoverTarget)
             {
-                newTarget = hovered;
+                Debug.Log($"[Highlight OFF] {lastHoveredTarget?.GetDisplayName()}");
+                lastHoveredTarget.SetHighlight(false);
             }
+
+            if (hoverTarget != null)
+            {
+                Debug.Log($"[Highlight ON] {hoverTarget.GetDisplayName()}");
+                hoverTarget.SetHighlight(true);
+            }
+
+            lastHoveredTarget = hoverTarget;
+            return;
+        }
+
+        // ---- Normal gameplay targeting ----
+
+        IWorldInteractable newTarget = GetBestInteractable();
+        var hovered = GetHoveredInteractable();
+        if (hovered != null && nearbyInteractables.Contains(hovered))
+        {
+            newTarget = hovered;
         }
 
         if (newTarget == currentTarget) return;
@@ -199,17 +215,13 @@ public class PlayerInteractor : MonoBehaviour
         if (currentTarget != null)
         {
             currentTarget.SetHighlight(true);
-
-            if (!InputManager.instance.IsCommandMode)
-                promptUI?.Show(currentTarget.GetDisplayName());
+            promptUI?.Show(currentTarget.GetDisplayName());
         }
         else
         {
-            if (!InputManager.instance.IsCommandMode)
-                promptUI?.Hide();
+            promptUI?.Hide();
         }
     }
-
 
     private IWorldInteractable GetHoveredInteractable()
     {
@@ -218,15 +230,15 @@ public class PlayerInteractor : MonoBehaviour
 
         Debug.DrawRay(ray.origin, ray.direction * 100f, Color.cyan);
 
-        RaycastHit2D hit = Physics2D.GetRayIntersection(ray, 100f);
+        RaycastHit2D hit = Physics2D.GetRayIntersection(ray, 100f, interactableLayerMask);
 
         if (hit.collider != null)
         {
             return hit.collider.GetComponentInParent<IWorldInteractable>();
         }
+
         return null;
     }
-
 
     private float GetCurrentInteractRadius()
     {
@@ -257,6 +269,9 @@ public class PlayerInteractor : MonoBehaviour
 
     private void OnInteractPressed(InputAction.CallbackContext context)
     {
+        if (InputManager.instance.IsCommandMode)
+            return; // <<<< EARLY EXIT if in Command Mode!
+
         if (currentTarget != null && currentTarget.CanBeInteractedWith(player))
         {
             float distToTarget = Vector2.Distance(transform.position, currentTarget.GetTransform().position);
@@ -266,6 +281,7 @@ public class PlayerInteractor : MonoBehaviour
             }
         }
     }
+
 
     private IWorldInteractable GetBestInteractable()
     {
