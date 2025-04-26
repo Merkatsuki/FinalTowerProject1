@@ -6,8 +6,8 @@ using UnityEngine.Rendering.Universal;
 public class InteractableBase : MonoBehaviour, IWorldInteractable
 {
     [Header("Strategy Settings")]
-    [SerializeField] protected List<EntryStrategySO> entryStrategies;
-    [SerializeField] protected List<ExitStrategySO> exitStrategies;
+    public List<EntryStrategySO> entryStrategies;
+    public List<ExitStrategySO> exitStrategies;
 
     [Header("Highlight Settings")]
     [SerializeField] private Light2D highlightLight;

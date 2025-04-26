@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Interactions/ExitStrategies/ExitOnFlagSet")]
+[CreateAssetMenu(menuName = "Strategies/Exit/ExitOnFlagSet")]
 public class ExitOnFlagSetSO : ExitStrategySO
 {
     [SerializeField] private string requiredFlag;

@@ -32,7 +32,8 @@ public class CompanionInteractWithObjectState : CompanionState
             strategy?.OnEnter(companion, target);
         }
 
-        target.OnInteract(companion);
+        Debug.Log($"[CompanionInteractWithObjectState] Entered. Target: {target?.GetDisplayName()}");
+        InteractWithTarget();
     }
 
     public override void Tick()
@@ -59,5 +60,18 @@ public class CompanionInteractWithObjectState : CompanionState
     public override void OnExit()
     {
         companion.flightController.allowDefaultFollow = false;
+    }
+
+    private void InteractWithTarget()
+    {
+        if (target != null)
+        {
+            Debug.Log($"[CompanionInteractWithObjectState] Interacting with: {target.GetDisplayName()}");
+            target.OnInteract(companion);
+        }
+        else
+        {
+            Debug.LogWarning("[CompanionInteractWithObjectState] No target to interact with.");
+        }
     }
 }

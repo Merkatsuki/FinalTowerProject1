@@ -3,7 +3,7 @@ using UnityEngine;
 public class CompanionInvestigateState : CompanionState
 {
     private IWorldInteractable target;
-    private const float arrivalDistance = 0.5f;
+    private const float arrivalDistance = 1f;
 
     public CompanionInvestigateState(CompanionController companion, CompanionFSM fsm, IWorldInteractable target)
         : base(companion, fsm)

@@ -1,9 +1,11 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Interactions/ExitStrategies/ExitAfterCompanionInteracts")]
+[CreateAssetMenu(menuName = "Strategies/Exit/ExitAfterCompanionInteracts")]
 public class ExitAfterCompanionInteractsSO : ExitStrategySO
 {
     private bool companionInteracted = false;
+
+    // IMPORTANT: Requires CompanionController (or similar) to call MarkCompanionInteracted() manually after interaction complete.
 
     public override bool ShouldExit(IPuzzleInteractor actor, IWorldInteractable interactable)
     {

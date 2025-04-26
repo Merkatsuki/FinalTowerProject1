@@ -1,7 +1,7 @@
 using Momentum;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Interactions/ExitStrategies/ExitAfterPlayerCommandedMove")]
+[CreateAssetMenu(menuName = "Strategies/Exit/ExitAfterPlayerCommandedMove")]
 public class ExitAfterPlayerCommandedMoveSO : ExitStrategySO
 {
     private bool playerMoved = false;

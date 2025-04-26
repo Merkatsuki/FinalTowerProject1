@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Interactions/EntryStrategies/EntryCooldown")]
+[CreateAssetMenu(menuName = "Strategies/Entry/EntryCooldown")]
 public class EntryCooldownStrategySO : EntryStrategySO
 {
     [SerializeField] private float cooldownDuration = 5f;

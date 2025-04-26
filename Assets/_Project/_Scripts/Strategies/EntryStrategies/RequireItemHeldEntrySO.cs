@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Interactions/EntryStrategies/RequireItemHeldEntry")]
+[CreateAssetMenu(menuName = "Strategies/Entry/RequireItemHeldEntry")]
 public class RequireItemHeldEntrySO : EntryStrategySO
 {
     [SerializeField] private string requiredItemId;

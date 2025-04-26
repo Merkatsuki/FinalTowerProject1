@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Interactions/EntryStrategies/RequirePuzzleSolvedEntry")]
+[CreateAssetMenu(menuName = "Strategies/Entry/RequirePuzzleSolvedEntry")]
 public class RequirePuzzleSolvedEntrySO : EntryStrategySO
 {
     [SerializeField] private string requiredPuzzleFlag;

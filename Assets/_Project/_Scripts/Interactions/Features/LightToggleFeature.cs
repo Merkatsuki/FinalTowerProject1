@@ -25,6 +25,7 @@ public class LightToggleFeature : MonoBehaviour, IInteractableFeature
 
     public void OnInteract(IPuzzleInteractor actor)
     {
+        Debug.Log($"[LightToggleFeature] OnInteract called by: {actor.GetType().Name}");
         ToggleLight();
     }
 
