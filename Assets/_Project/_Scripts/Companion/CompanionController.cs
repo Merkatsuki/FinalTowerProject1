@@ -112,7 +112,6 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
     {
         SetCurrentTarget(new TargetData(worldPosition));
         fsm.ChangeState(moveToPointState);
-        Debug.Log($"[Companion] Moving to commanded point: {worldPosition}");
     }
 
     public void ToggleFollowMode()
@@ -120,12 +119,10 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
         if (fsm.CurrentStateType == CompanionStateType.Follow)
         {
             fsm.ChangeState(idleState);
-            Debug.Log("[Companion] Exiting Follow Mode.");
         }
         else
         {
             fsm.ChangeState(followState);
-            Debug.Log("[Companion] Entering Follow Mode.");
         }
     }
 

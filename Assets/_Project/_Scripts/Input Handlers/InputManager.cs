@@ -7,16 +7,18 @@ namespace Momentum
 	{
 		public static InputManager instance; // Creates one instance for everyone to use
 		private InputMaster _controls; // Reference to the InputMaster script where our controls are stored
-		
-		#region Player Input Map
-		// Avalible for the rest of the classes to use (Mainly should be used by PlayerAction as a front end for other classes)
 
-		public Vector2 WASDInput { get; private set; }
+        #region Player Input Map
+        // Avalible for the rest of the classes to use (Mainly should be used by PlayerAction as a front end for other classes)
+
+        private Vector2 previousWASDInput;
+        public Vector2 WASDInput { get; private set; }
         public Vector2 MousePosition { get; private set; }
 
         [NonSerialized] public Action JumpPressed; // Public so other classes can subscribe to this. Tagged to not show up in inspector
 		[NonSerialized] public Action JumpReleased;
         [NonSerialized] public Action ToggleFollowPressed;
+        public event Action OnMoveCommand;
         public event Action<bool> OnCommandModeChanged;
 
         public bool JumpHeld { get; private set; }
@@ -27,8 +29,6 @@ namespace Momentum
 		public bool IsAttack { get; private set; }
 		public bool IsCommandMode { get; private set; }
         
-
-
         #endregion
 
         private void Awake()
@@ -61,6 +61,12 @@ namespace Momentum
             MousePosition = _controls.Player.PointerPosition.ReadValue<Vector2>();
             WASDInput = _controls.Player.MovementControls.ReadValue<Vector2>();
 
+            if (WASDInput != Vector2.zero && previousWASDInput == Vector2.zero)
+            {
+                OnMoveCommand?.Invoke();
+            }
+
+            previousWASDInput = WASDInput;
 
             if (_controls.Player.Jump.WasPressedThisFrame()) { JumpPressed?.Invoke(); } // THe ? makes sure the varaible isn't null before invoking
 			if (_controls.Player.Jump.WasReleasedThisFrame()) { JumpReleased?.Invoke(); }

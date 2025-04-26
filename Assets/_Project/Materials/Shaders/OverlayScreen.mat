@@ -12,8 +12,8 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - _ENABLEGLITCH_ON
   - _ENABLEHOLOGRAM_ON
-  - _ENABLEMETAL_ON
   - _SHADERFADING_NONE
   - _SHADERSPACE_UI_GRAPHIC
   - _TEXTURELAYER1SHEETTOGGLE_ON
@@ -215,13 +215,13 @@ Material:
     - _EnableFullDistortion: 0
     - _EnableFullGlowDissolve: 0
     - _EnableGaussianBlur: 0
-    - _EnableGlitch: 0
+    - _EnableGlitch: 1
     - _EnableHalftone: 0
     - _EnableHologram: 1
     - _EnableHue: 0
     - _EnableInkSpread: 0
     - _EnableInnerOutline: 0
-    - _EnableMetal: 1
+    - _EnableMetal: 0
     - _EnableNegative: 0
     - _EnableOuterOutline: 0
     - _EnablePingPongGlow: 0
@@ -290,24 +290,24 @@ Material:
     - _FullGlowDissolveWidth: 0.5
     - _GaussianBlurFade: 1
     - _GaussianBlurOffset: 0.5
-    - _GlitchBrightness: 4
-    - _GlitchFade: 1
+    - _GlitchBrightness: 5.22
+    - _GlitchFade: 0.33
     - _GlitchHueSpeed: 1
-    - _GlitchMaskMin: 0.4
+    - _GlitchMaskMin: 0.44
     - _HalftoneFade: 1
     - _HalftoneFadeWidth: 1.5
     - _HalftoneInvert: 0
     - _HalftoneTiling: 4
-    - _HologramContrast: 0.07
-    - _HologramDistortionDensity: 0.62
-    - _HologramDistortionOffset: 0.58
-    - _HologramDistortionScale: 14.81
-    - _HologramDistortionSpeed: 2.31
+    - _HologramContrast: 0.11
+    - _HologramDistortionDensity: 0.61
+    - _HologramDistortionOffset: 5.61
+    - _HologramDistortionScale: 7.91
+    - _HologramDistortionSpeed: 3.16
     - _HologramFade: 1
-    - _HologramLineFrequency: 253.9
-    - _HologramLineGap: 0.83
-    - _HologramLineSpeed: 0.01
-    - _HologramMinAlpha: 0.11
+    - _HologramLineFrequency: 418.21
+    - _HologramLineGap: 1.8
+    - _HologramLineSpeed: 0.42
+    - _HologramMinAlpha: 0.63
     - _Hue: 0
     - _InkSpreadContrast: 2
     - _InkSpreadDistance: 3
@@ -557,8 +557,8 @@ Material:
     - _GlitchDistortionSpeed: {r: 0, g: 1, b: 0, a: 0}
     - _GlitchMaskScale: {r: 0, g: 0.2, b: 0, a: 0}
     - _GlitchMaskSpeed: {r: 0, g: 4, b: 0, a: 0}
-    - _GlitchNoiseScale: {r: 0, g: 3, b: 0, a: 0}
-    - _GlitchNoiseSpeed: {r: 0, g: 1, b: 0, a: 0}
+    - _GlitchNoiseScale: {r: 1.42, g: 3.16, b: 0, a: 0}
+    - _GlitchNoiseSpeed: {r: 0, g: 0.33, b: 0, a: 0}
     - _HalftonePosition: {r: 0, g: 0, b: 0, a: 0}
     - _HologramTint: {r: 0.3137255, g: 1.662745, b: 2.996078, a: 1}
     - _InkSpreadColor: {r: 8.47419, g: 5.013525, b: 0.08873497, a: 0}

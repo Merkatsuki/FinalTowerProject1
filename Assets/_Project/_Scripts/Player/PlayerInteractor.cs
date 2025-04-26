@@ -143,9 +143,9 @@ public class PlayerInteractor : MonoBehaviour
         }
 
         // If no valid interactable, just move
-        Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
-        companion.CommandMoveToPoint(mouseWorldPos);
-        SpawnClickMarker(mouseWorldPos);
+        //Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+        //companion.CommandMoveToPoint(mouseWorldPos);
+        //SpawnClickMarker(mouseWorldPos);
     }
 
     void SpawnClickMarker(Vector2 worldPos)
@@ -182,13 +182,11 @@ public class PlayerInteractor : MonoBehaviour
         {
             if (lastHoveredTarget != null && lastHoveredTarget != hoverTarget)
             {
-                Debug.Log($"[Highlight OFF] {lastHoveredTarget?.GetDisplayName()}");
                 lastHoveredTarget.SetHighlight(false);
             }
 
             if (hoverTarget != null)
             {
-                Debug.Log($"[Highlight ON] {hoverTarget.GetDisplayName()}");
                 hoverTarget.SetHighlight(true);
             }
 
