@@ -7594,7 +7594,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetLight: {fileID: 1405263331}
   toggleDuration: 0.5
-  maxIntensity: 1.5
+  maxIntensity: 8.5
 --- !u!212 &734699697
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -7679,7 +7679,7 @@ MonoBehaviour:
   entryStrategies: []
   exitStrategies: []
   highlightLight: {fileID: 250172331}
-  highlightIntensity: 8
+  highlightIntensity: 1.5
 --- !u!4 &734699700
 Transform:
   m_ObjectHideFlags: 0
