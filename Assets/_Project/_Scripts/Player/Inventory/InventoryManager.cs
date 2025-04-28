@@ -7,6 +7,7 @@ public class InventoryManager : MonoBehaviour
     public static InventoryManager Instance { get; private set; }
 
     private HashSet<string> collectedItems = new HashSet<string>();
+    private Dictionary<string, ItemSO> itemDatabase = new Dictionary<string, ItemSO>();
 
     public event Action<string> OnItemAdded;
     public event Action<string> OnItemRemoved;
@@ -19,11 +20,46 @@ public class InventoryManager : MonoBehaviour
             Instance = this;
     }
 
+    public void AddItem(ItemSO item)
+    {
+        if (item == null) return;
+
+        if (collectedItems.Add(item.ItemID))
+        {
+            itemDatabase[item.ItemID] = item;
+            Debug.Log($"[Inventory] Added item: {item.ItemName}");
+            OnItemAdded?.Invoke(item.ItemID);
+        }
+    }
+
+    public void RemoveItem(ItemSO item)
+    {
+        if (item == null) return;
+
+        if (collectedItems.Remove(item.ItemID))
+        {
+            itemDatabase.Remove(item.ItemID);
+            Debug.Log($"[Inventory] Removed item: {item.ItemName}");
+            OnItemRemoved?.Invoke(item.ItemID);
+        }
+    }
+
+    public bool HasItem(ItemSO item)
+    {
+        if (item == null) return false;
+        return collectedItems.Contains(item.ItemID);
+    }
+
+    public bool HasItem(string itemID)
+    {
+        return collectedItems.Contains(itemID);
+    }
+
     public void AddItem(string itemID)
     {
         if (collectedItems.Add(itemID))
         {
-            Debug.Log($"Collected item: {itemID}");
+            Debug.Log($"[Inventory] Added item by ID: {itemID}");
             OnItemAdded?.Invoke(itemID);
         }
     }
@@ -32,21 +68,27 @@ public class InventoryManager : MonoBehaviour
     {
         if (collectedItems.Remove(itemID))
         {
-            Debug.Log($"Removed item: {itemID}");
+            itemDatabase.Remove(itemID);
+            Debug.Log($"[Inventory] Removed item by ID: {itemID}");
             OnItemRemoved?.Invoke(itemID);
         }
     }
 
-    public bool HasItem(string itemID) => collectedItems.Contains(itemID);
-
-    public List<string> GetAllItems()
+    public List<ItemSO> GetAllItems()
     {
-        return new List<string>(collectedItems);
+        List<ItemSO> items = new List<ItemSO>();
+        foreach (var id in collectedItems)
+        {
+            if (itemDatabase.TryGetValue(id, out var item))
+                items.Add(item);
+        }
+        return items;
     }
 
     public void ClearInventory()
     {
         collectedItems.Clear();
-        Debug.Log("Inventory cleared.");
+        itemDatabase.Clear();
+        Debug.Log("[Inventory] Inventory cleared.");
     }
 }

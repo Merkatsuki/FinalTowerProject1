@@ -268,18 +268,17 @@ public class PlayerInteractor : MonoBehaviour
     private void OnInteractPressed(InputAction.CallbackContext context)
     {
         if (InputManager.instance.IsCommandMode)
-            return; // <<<< EARLY EXIT if in Command Mode!
+            return; // no interaction in command mode
 
         if (currentTarget != null && currentTarget.CanBeInteractedWith(player))
         {
-            float distToTarget = Vector2.Distance(transform.position, currentTarget.GetTransform().position);
-            if (distToTarget <= GetCurrentInteractRadius())
-            {
-                currentTarget.OnInteract(player);
-            }
+            currentTarget.OnInteract(player);
+        }
+        else
+        {
+            currentTarget?.OnInteractionComplete(player, false);
         }
     }
-
 
     private IWorldInteractable GetBestInteractable()
     {

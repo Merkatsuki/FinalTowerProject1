@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 public class CompanionInteractWithObjectState : CompanionState
@@ -66,12 +66,13 @@ public class CompanionInteractWithObjectState : CompanionState
     {
         if (target != null)
         {
-            Debug.Log($"[CompanionInteractWithObjectState] Interacting with: {target.GetDisplayName()}");
+            Debug.Log($"[CompanionInteractWithObjectState] Interacting with {target.GetDisplayName()}");
+
             target.OnInteract(companion);
-        }
-        else
-        {
-            Debug.LogWarning("[CompanionInteractWithObjectState] No target to interact with.");
+
+            target.OnInteractionComplete(companion, true);
+
+            companion.Perception.MarkAsHandled(target);
         }
     }
 }
