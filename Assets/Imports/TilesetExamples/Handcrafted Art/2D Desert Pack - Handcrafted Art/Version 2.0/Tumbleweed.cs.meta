@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: cbd8bf6a55fae4744945ade4874e124b
+timeCreated: 1478259946
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 88444
+  packageName: Corgi Engine + Handcrafted Art - 2D Platformer Bundle
+  packageVersion: 9.3
+  assetPath: Assets/CorgiEngineHandcraftedArt/Handcrafted Art/2D Desert Pack - Handcrafted
+    Art/Version 2.0/Tumbleweed.cs
+  uploadId: 719802

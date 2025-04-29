@@ -18,7 +18,7 @@ TagManager:
   - Player
   - Notables
   - Companion
-  - 
+  - NonInteractableWorld
   - 
   - 
   - 
@@ -45,38 +45,35 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: BackgroundFar
+  - name: 1Sky
     uniqueID: 2025209191
     locked: 0
-  - name: BackgroundMid
+  - name: 2BG1
     uniqueID: 3444493229
     locked: 0
-  - name: BackgroundNear
+  - name: 3BG2
     uniqueID: 1739875667
     locked: 0
-  - name: BackgroundObjects
+  - name: 4BGObjects
     uniqueID: 4248995109
     locked: 0
-  - name: GroundFar
+  - name: 5GroundFar
     uniqueID: 2929033565
     locked: 0
-  - name: GroundObjects
+  - name: 6GroundObjects
     uniqueID: 2951357149
     locked: 0
-  - name: Units
+  - name: 7Units
     uniqueID: 323191825
     locked: 0
-  - name: GroundNear
+  - name: 8GroundNear
     uniqueID: 2126702495
     locked: 0
-  - name: ForegroundFar
+  - name: 8FG1
     uniqueID: 255627343
     locked: 0
-  - name: ForegroundMid
+  - name: 8FG2
     uniqueID: 1941640691
-    locked: 0
-  - name: ForegroundNear
-    uniqueID: 4240498007
     locked: 0
   m_RenderingLayers:
   - Default

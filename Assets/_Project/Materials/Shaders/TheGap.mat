@@ -312,8 +312,8 @@ Material:
     - _HologramLineSpeed: 0.1
     - _HologramMinAlpha: 0.63
     - _Hue: 0
-    - _InkSpreadContrast: 2.19
-    - _InkSpreadDistance: 4.03
+    - _InkSpreadContrast: 2.82
+    - _InkSpreadDistance: 4.8
     - _InkSpreadFade: 1
     - _InkSpreadNoiseFactor: 1.32
     - _InkSpreadWidth: 0.05
@@ -579,7 +579,7 @@ Material:
     - _MetalNoiseDistortionSpeed: {r: -0.05, g: -0.05, b: 0, a: 0}
     - _MetalNoiseScale: {r: 0.25, g: 0.25, b: 0, a: 0}
     - _MetalNoiseSpeed: {r: 0.05, g: 0.05, b: 0, a: 0}
-    - _OuterOutlineColor: {r: 6.0535507, g: 6.0535507, b: 6.0535507, a: 1}
+    - _OuterOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _OuterOutlineDistortionIntensity: {r: -0.1, g: 0, b: 0, a: 0}
     - _OuterOutlineNoiseScale: {r: 20, g: 2, b: 0, a: 0}
     - _OuterOutlineNoiseSpeed: {r: 0, g: 0, b: 0, a: 0}
