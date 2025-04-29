@@ -45,5 +45,38 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: BackgroundFar
+    uniqueID: 2025209191
+    locked: 0
+  - name: BackgroundMid
+    uniqueID: 3444493229
+    locked: 0
+  - name: BackgroundNear
+    uniqueID: 1739875667
+    locked: 0
+  - name: BackgroundObjects
+    uniqueID: 4248995109
+    locked: 0
+  - name: GroundFar
+    uniqueID: 2929033565
+    locked: 0
+  - name: GroundObjects
+    uniqueID: 2951357149
+    locked: 0
+  - name: Units
+    uniqueID: 323191825
+    locked: 0
+  - name: GroundNear
+    uniqueID: 2126702495
+    locked: 0
+  - name: ForegroundFar
+    uniqueID: 255627343
+    locked: 0
+  - name: ForegroundMid
+    uniqueID: 1941640691
+    locked: 0
+  - name: ForegroundNear
+    uniqueID: 4240498007
+    locked: 0
   m_RenderingLayers:
   - Default

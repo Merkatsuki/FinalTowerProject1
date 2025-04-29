@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8192374546802551595}
   - component: {fileID: 572067498045154533}
   - component: {fileID: 3460765704582086218}
+  - component: {fileID: 939155521446340612}
   - component: {fileID: 913739940557225182}
   - component: {fileID: 8471439123227566697}
   - component: {fileID: 4759890362197449347}
@@ -31,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 1660727064808573864}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -13.221, y: -0.452, z: 0}
+  m_LocalPosition: {x: -0.72, y: -0.41, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -54,7 +55,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   followDistance: 0.5
-  energyState: {fileID: 0}
+  energyState: {fileID: 939155521446340612}
   robotGlowLight: {fileID: 3819827973827813093}
   chargedGlowIntensity: 50
   energyDuration: 20
@@ -113,6 +114,19 @@ MonoBehaviour:
   thrustParticles: {fileID: 8412883142569916881}
   tiltMultiplier: 15
   tiltSpeed: 7
+--- !u!114 &939155521446340612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1660727064808573864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efc2063bb4eeeb6448fa58fbb1f7033f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentEnergy: 0
 --- !u!95 &913739940557225182
 Animator:
   serializedVersion: 7
@@ -515,6 +529,7 @@ GameObject:
   - component: {fileID: 8904020221847223008}
   - component: {fileID: 6704964835937092173}
   - component: {fileID: 2097604429846398820}
+  - component: {fileID: 127473890159307316}
   - component: {fileID: 3746841731407322859}
   - component: {fileID: 163473098334428705}
   m_Layer: 6
@@ -533,7 +548,7 @@ Transform:
   m_GameObject: {fileID: 5644472936480896273}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.9, y: -1, z: 0.03125005}
+  m_LocalPosition: {x: -6.44, y: -2.76, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -630,7 +645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ff273b6050d4a24e9065f90de6e9539, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  energyState: {fileID: 0}
+  energyState: {fileID: 127473890159307316}
   <AnimIdle>k__BackingField: Idle
   <AnimMove>k__BackingField: Walk
   <AnimSprint>k__BackingField: Run
@@ -745,6 +760,19 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &127473890159307316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5644472936480896273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efc2063bb4eeeb6448fa58fbb1f7033f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentEnergy: 0
 --- !u!50 &3746841731407322859
 Rigidbody2D:
   serializedVersion: 5
