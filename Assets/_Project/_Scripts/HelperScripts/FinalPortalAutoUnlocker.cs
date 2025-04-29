@@ -15,7 +15,7 @@ public class FinalPortalAutoUnlocker : MonoBehaviour
         if (MemoryProgressTracker.Instance != null &&
             MemoryProgressTracker.Instance.AreAllTrackedMemoriesComplete())
         {
-            portalToUnlock.UnlockPortal();
+            //portalToUnlock.UnlockPortal();
         }
     }
 }

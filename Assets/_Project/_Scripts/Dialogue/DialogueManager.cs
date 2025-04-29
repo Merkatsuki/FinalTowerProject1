@@ -87,6 +87,10 @@ public class DialogueManager : MonoBehaviour
     public void StartDialogueSequence(DialogueSequence sequence, System.Action onComplete) { /* wrapper for sequence */ }
     public void ShowOneLiner(string line, System.Action onComplete) { /* wrapper for one-liner */ }
 
+    public bool IsDialoguePlaying()
+    {
+        return dialoguePanel != null && dialoguePanel.activeSelf;
+    }
 
     #endregion
 

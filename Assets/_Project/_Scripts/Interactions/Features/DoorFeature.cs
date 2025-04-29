@@ -117,4 +117,9 @@ public class DoorFeature : MonoBehaviour, IInteractableFeature
     {
         featureEffects = effects ?? new List<EffectStrategySO>();
     }
+
+    public void SetDoorAnimator(Animator animator)
+    {
+        doorAnimator = animator;
+    }
 }

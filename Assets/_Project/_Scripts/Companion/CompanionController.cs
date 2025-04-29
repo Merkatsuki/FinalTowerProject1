@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using System.Collections;
-using System.Collections.Generic;
-using System;
 using Momentum;
 
 public class CompanionController : MonoBehaviour, IPuzzleInteractor

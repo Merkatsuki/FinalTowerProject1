@@ -1,11 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
 using DG.Tweening;
+using UnityEngine.Rendering.Universal;
 
 public class LightToggleFeature : MonoBehaviour, IInteractableFeature
 {
     [Header("Light Settings")]
-    [SerializeField] private UnityEngine.Rendering.Universal.Light2D targetLight;
+    [SerializeField] private Light2D targetLight;
 
     [Header("Simple Toggle Mode")]
     [SerializeField] private bool startOn = true;
@@ -109,5 +110,10 @@ public class LightToggleFeature : MonoBehaviour, IInteractableFeature
     public void SetFeatureEffects(List<EffectStrategySO> effects)
     {
         featureEffects = effects ?? new List<EffectStrategySO>();
+    }
+
+    public void SetToggleLight(Light2D light)
+    {
+        targetLight = light;
     }
 }
