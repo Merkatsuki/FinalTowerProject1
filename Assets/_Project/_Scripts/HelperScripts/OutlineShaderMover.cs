@@ -119,3 +119,4 @@ public class OutlineShaderMover : MonoBehaviour
         // This is here if additional properties need to be batched later
     }
 }
+

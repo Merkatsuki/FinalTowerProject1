@@ -1,68 +1,114 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class DoorFeature : MonoBehaviour, IInteractableFeature
 {
+    [Header("Door Settings")]
     [SerializeField] private Animator doorAnimator;
-    [SerializeField] private float closeDelay = 2.0f;
+    [SerializeField] private string openTriggerName = "Open";
+    [SerializeField] private string closeTriggerName = "Close";
+
+    [Header("Behavior Options")]
+    [SerializeField] private bool toggleDoorOnInteract = false;
+    [SerializeField] private bool autoClose = false;
+    [SerializeField] private float autoCloseDelay = 2f;
+    [SerializeField] private bool startClosed = true;
 
     [Header("Feature Effects")]
     [SerializeField] private List<EffectStrategySO> featureEffects = new();
 
     private bool isOpen = false;
+    private bool operating = false;
 
-    private void Awake()
+    private void Start()
     {
-        if (doorAnimator == null)
+        // Optional: force closed animation on start
+        if (startClosed && doorAnimator != null && !string.IsNullOrEmpty(closeTriggerName))
         {
-            doorAnimator = GetComponent<Animator>();
-            if (doorAnimator == null)
-            {
-                doorAnimator = gameObject.AddComponent<Animator>();
-                Debug.LogWarning("[DoorFeature] No Animator found. Added default Animator component.");
-            }
+            doorAnimator.SetTrigger(closeTriggerName);
+            isOpen = false;
         }
     }
 
     public void OnInteract(IPuzzleInteractor actor)
     {
-        OpenDoor(actor);
+        if (operating) return;
+
+        if (toggleDoorOnInteract)
+        {
+            if (isOpen)
+            {
+                CloseDoor();
+            }
+            else
+            {
+                OpenDoor();
+            }
+        }
+        else
+        {
+            OpenDoor();
+        }
     }
 
-    public void OpenDoor(IPuzzleInteractor actor)
+    private void OpenDoor()
     {
-        if (isOpen) return;
+        operating = true;
 
-        isOpen = true;
-        if (doorAnimator != null)
+        if (doorAnimator != null && !string.IsNullOrEmpty(openTriggerName))
         {
-            doorAnimator.SetTrigger("Open");
-            Invoke(nameof(CloseDoor), closeDelay);
-            Debug.Log("[DoorFeature] Door opened.");
+            doorAnimator.SetTrigger(openTriggerName);
+        }
+        else
+        {
+            Debug.LogWarning("[DoorFeature] No Animator or Open Trigger assigned!");
         }
 
-        RunFeatureEffects(actor);
+        isOpen = true;
+
+        RunFeatureEffects();
+
+        if (autoClose)
+        {
+            StartCoroutine(AutoCloseCoroutine());
+        }
+        else
+        {
+            operating = false;
+        }
     }
 
     private void CloseDoor()
     {
-        if (!isOpen) return;
+        operating = true;
+
+        if (doorAnimator != null && !string.IsNullOrEmpty(closeTriggerName))
+        {
+            doorAnimator.SetTrigger(closeTriggerName);
+        }
+        else
+        {
+            Debug.LogWarning("[DoorFeature] No Animator or Close Trigger assigned!");
+        }
 
         isOpen = false;
-        if (doorAnimator != null)
-        {
-            doorAnimator.SetTrigger("Close");
-            Debug.Log("[DoorFeature] Door closed.");
-        }
+        operating = false;
     }
 
-    private void RunFeatureEffects(IPuzzleInteractor actor)
+    private IEnumerator AutoCloseCoroutine()
+    {
+        yield return new WaitForSeconds(autoCloseDelay);
+        CloseDoor();
+    }
+
+    private void RunFeatureEffects()
     {
         foreach (var effect in featureEffects)
         {
             if (effect != null && TryGetComponent(out IWorldInteractable interactable))
             {
-                effect.ApplyEffect(actor, interactable, InteractionResult.Success);
+                effect.ApplyEffect(null, interactable, InteractionResult.Success);
             }
         }
     }
@@ -71,6 +117,4 @@ public class DoorFeature : MonoBehaviour, IInteractableFeature
     {
         featureEffects = effects ?? new List<EffectStrategySO>();
     }
-
-    public bool IsOpen() => isOpen;
 }

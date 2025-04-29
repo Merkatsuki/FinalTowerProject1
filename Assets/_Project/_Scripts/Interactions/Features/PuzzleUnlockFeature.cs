@@ -4,45 +4,56 @@ using System.Collections.Generic;
 
 public class PuzzleUnlockFeature : MonoBehaviour, IInteractableFeature
 {
-    [Header("Puzzle Unlock Settings")]
-    [SerializeField] private bool isLocked = true;
-    public UnityEvent onUnlocked;
+    [Header("Unlock Targets")]
+    [SerializeField] private List<GameObject> unlockTargets = new(); // Multiple unlockables supported
+
+    [Header("Puzzle Progression")]
+    [SerializeField] private FlagSO unlockFlag; // Optional flag set
+
+    [Header("Unlock Events")]
+    [SerializeField] private UnityEvent onUnlocked; // Optional for designers
 
     [Header("Feature Effects")]
     [SerializeField] private List<EffectStrategySO> featureEffects = new();
 
+    private bool unlocked = false;
+
     public void OnInteract(IPuzzleInteractor actor)
     {
-        AttemptUnlock(actor);
+        if (unlocked) return;
+
+        Unlock();
     }
 
-    public void AttemptUnlock(IPuzzleInteractor actor)
+    private void Unlock()
     {
-        if (isLocked)
-        {
-            Unlock(actor);
-        }
-        else
-        {
-            Debug.Log("[PuzzleUnlockFeature] Already unlocked.");
-        }
-    }
+        unlocked = true;
 
-    public void Unlock(IPuzzleInteractor actor)
-    {
-        isLocked = false;
-        Debug.Log("[PuzzleUnlockFeature] Puzzle unlocked!");
+        foreach (var target in unlockTargets)
+        {
+            if (target != null)
+            {
+                target.SetActive(true);
+            }
+        }
+
+        if (unlockFlag != null)
+        {
+            PuzzleManager.Instance.SetFlag(unlockFlag, true);
+        }
+
         onUnlocked?.Invoke();
-        RunFeatureEffects(actor);
+
+        RunFeatureEffects();
     }
 
-    private void RunFeatureEffects(IPuzzleInteractor actor)
+    private void RunFeatureEffects()
     {
         foreach (var effect in featureEffects)
         {
             if (effect != null && TryGetComponent(out IWorldInteractable interactable))
             {
-                effect.ApplyEffect(actor, interactable, InteractionResult.Success);
+                effect.ApplyEffect(null, interactable, InteractionResult.Success);
             }
         }
     }
@@ -51,6 +62,4 @@ public class PuzzleUnlockFeature : MonoBehaviour, IInteractableFeature
     {
         featureEffects = effects ?? new List<EffectStrategySO>();
     }
-
-    public bool IsUnlocked() => !isLocked;
 }

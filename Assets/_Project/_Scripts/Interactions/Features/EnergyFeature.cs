@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 
 public class EnergyFeature : MonoBehaviour, IInteractableFeature
@@ -7,13 +9,21 @@ public class EnergyFeature : MonoBehaviour, IInteractableFeature
     [Header("Energy Settings")]
     [SerializeField] private bool isCharged = false;
     [SerializeField] private EnergyType energyType = EnergyType.None;
+    [SerializeField] private bool startCharged = true;
+
+    [Header("Light Behavior")]
+    [SerializeField] private Light2D energyLight;
+    [SerializeField] private float maxLightIntensity = 1.5f;
+    [SerializeField] private float chargeDuration = 1.5f;
+    [SerializeField] private float decayDelay = 5f;
+    [SerializeField] private float decayDuration = 2f;
+    [SerializeField] private bool autoDecay = true;
 
     [Header("Feature Effects")]
     [SerializeField] private List<EffectStrategySO> featureEffects = new();
 
-    private Light2D energyLight;
-    private float maxLightIntensity = 1.5f;
-    private float dischargeSpeed = 0.5f;
+    private Tween activeTween;
+    private Coroutine decayCoroutine;
 
     private void Awake()
     {
@@ -29,42 +39,90 @@ public class EnergyFeature : MonoBehaviour, IInteractableFeature
         UpdateEnergyLightColor();
     }
 
-    private void Update()
+    private void Start()
     {
-        if (!isCharged && energyLight != null && energyLight.intensity > 0f)
+        if (energyLight != null)
         {
-            energyLight.intensity = Mathf.Max(0f, energyLight.intensity - dischargeSpeed * Time.deltaTime);
+            isCharged = startCharged;
+            energyLight.intensity = isCharged ? maxLightIntensity : 0f;
+
+            if (isCharged && autoDecay)
+            {
+                decayCoroutine = StartCoroutine(DecayAfterDelay());
+            }
         }
     }
 
     public void OnInteract(IPuzzleInteractor actor)
     {
         Debug.Log($"[EnergyFeature] OnInteract called by: {actor.GetType().Name}");
-        // Future expansion (charge by actor?)
-        RunFeatureEffects(actor);
+
+        if (!isCharged)
+        {
+            Charge(actor);
+        }
+        else
+        {
+            Discharge(actor);
+        }
     }
 
-    public void Charge(EnergyType incomingEnergyType)
+    public void Charge(IPuzzleInteractor actor)
     {
-        if (energyType != EnergyType.None && incomingEnergyType != energyType)
-        {
-            Debug.Log("[EnergyFeature] Incorrect energy type.");
-            return;
-        }
-
         isCharged = true;
+
         if (energyLight != null)
         {
-            energyLight.intensity = maxLightIntensity;
+            if (activeTween != null && activeTween.IsActive())
+                activeTween.Kill();
+
+            activeTween = DOTween.To(
+                () => energyLight.intensity,
+                x => energyLight.intensity = x,
+                maxLightIntensity,
+                chargeDuration
+            );
         }
 
         Debug.Log("[EnergyFeature] Energy charged!");
+
+        RunFeatureEffects(actor);
+
+        if (autoDecay)
+        {
+            if (decayCoroutine != null)
+                StopCoroutine(decayCoroutine);
+
+            decayCoroutine = StartCoroutine(DecayAfterDelay());
+        }
     }
 
-    public void Discharge()
+    public void Discharge(IPuzzleInteractor actor = null)
     {
         isCharged = false;
-        Debug.Log("[EnergyFeature] Energy discharged.");
+
+        if (energyLight != null)
+        {
+            if (activeTween != null && activeTween.IsActive())
+                activeTween.Kill();
+
+            activeTween = DOTween.To(
+                () => energyLight.intensity,
+                x => energyLight.intensity = x,
+                0f,
+                decayDuration
+            );
+        }
+
+        Debug.Log("[EnergyFeature] Energy discharged!");
+
+        RunFeatureEffects(actor);
+    }
+
+    private IEnumerator DecayAfterDelay()
+    {
+        yield return new WaitForSeconds(decayDelay);
+        Discharge();
     }
 
     private void UpdateEnergyLightColor()

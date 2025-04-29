@@ -1,74 +1,158 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
 {
-    [SerializeField] private bool isLocked = true;
-    [SerializeField] private string requiredFlag;
+    [Header("Door Settings")]
+    [SerializeField] private Animator doorAnimator;
+    [SerializeField] private string openTriggerName = "Open";
+    [SerializeField] private string closeTriggerName = "Close";
+    [SerializeField] private string lockedTriggerName = "Locked"; // Optional locked visual
+
+    [Header("Behavior Options")]
+    [SerializeField] private bool toggleDoorOnInteract = false;
+    [SerializeField] private bool autoClose = false;
+    [SerializeField] private float autoCloseDelay = 2f;
+    [SerializeField] private bool startLocked = true;
+
+    [Header("Puzzle Requirement")]
+    [SerializeField] private FlagSO requiredFlag; // Gate to unlock door
 
     [Header("Feature Effects")]
     [SerializeField] private List<EffectStrategySO> featureEffects = new();
 
-    private Animator doorAnimator;
+    private bool isOpen = false;
+    private bool unlocked = false;
+    private bool operating = false;
 
-    private void Awake()
+    private void Start()
     {
-        doorAnimator = GetComponent<Animator>();
-        if (doorAnimator == null)
+        // Initialize starting lock state
+        unlocked = !startLocked;
+
+        if (startLocked && doorAnimator != null && !string.IsNullOrEmpty(lockedTriggerName))
         {
-            doorAnimator = gameObject.AddComponent<Animator>();
-            Debug.LogWarning("[LockedDoorFeature] No Animator found. Added default Animator component.");
+            doorAnimator.SetTrigger(lockedTriggerName);
         }
     }
 
     public void OnInteract(IPuzzleInteractor actor)
     {
-        AttemptUnlock(actor);
-    }
+        if (operating) return;
 
-    public bool CanUnlock()
-    {
-        if (!isLocked)
-            return true;
-
-        if (string.IsNullOrEmpty(requiredFlag))
-            return false;
-
-        return PuzzleManager.Instance != null && PuzzleManager.Instance.IsFlagSet(requiredFlag);
-    }
-
-    public void AttemptUnlock(IPuzzleInteractor actor)
-    {
-        if (CanUnlock())
+        if (!unlocked)
         {
-            Unlock(actor);
+            if (requiredFlag != null && PuzzleManager.Instance.IsFlagSet(requiredFlag))
+            {
+                UnlockDoor();
+            }
+            else
+            {
+                PlayLockedFeedback();
+                return;
+            }
+        }
+
+        if (toggleDoorOnInteract)
+        {
+            if (isOpen)
+            {
+                CloseDoor();
+            }
+            else
+            {
+                OpenDoor();
+            }
         }
         else
         {
-            Debug.Log("[LockedDoorFeature] Unlock conditions not met.");
+            OpenDoor();
         }
     }
 
-    public void Unlock(IPuzzleInteractor actor)
+    private void UnlockDoor()
     {
-        isLocked = false;
-        Debug.Log("[LockedDoorFeature] Door unlocked.");
+        unlocked = true;
+        Debug.Log("[LockedDoorFeature] Door unlocked!");
 
-        if (doorAnimator != null)
+        if (doorAnimator != null && !string.IsNullOrEmpty(openTriggerName))
         {
-            doorAnimator.SetTrigger("Open");
+            doorAnimator.SetTrigger(openTriggerName);
         }
 
-        RunFeatureEffects(actor);
+        RunFeatureEffects();
     }
 
-    private void RunFeatureEffects(IPuzzleInteractor actor)
+    private void PlayLockedFeedback()
+    {
+        if (doorAnimator != null && !string.IsNullOrEmpty(lockedTriggerName))
+        {
+            doorAnimator.SetTrigger(lockedTriggerName);
+        }
+        else
+        {
+            Debug.Log("[LockedDoorFeature] Door is locked.");
+        }
+    }
+
+    private void OpenDoor()
+    {
+        operating = true;
+
+        if (doorAnimator != null && !string.IsNullOrEmpty(openTriggerName))
+        {
+            doorAnimator.SetTrigger(openTriggerName);
+        }
+        else
+        {
+            Debug.LogWarning("[LockedDoorFeature] No Animator or Open Trigger assigned!");
+        }
+
+        isOpen = true;
+
+        RunFeatureEffects();
+
+        if (autoClose)
+        {
+            StartCoroutine(AutoCloseCoroutine());
+        }
+        else
+        {
+            operating = false;
+        }
+    }
+
+    private void CloseDoor()
+    {
+        operating = true;
+
+        if (doorAnimator != null && !string.IsNullOrEmpty(closeTriggerName))
+        {
+            doorAnimator.SetTrigger(closeTriggerName);
+        }
+        else
+        {
+            Debug.LogWarning("[LockedDoorFeature] No Animator or Close Trigger assigned!");
+        }
+
+        isOpen = false;
+        operating = false;
+    }
+
+    private IEnumerator AutoCloseCoroutine()
+    {
+        yield return new WaitForSeconds(autoCloseDelay);
+        CloseDoor();
+    }
+
+    private void RunFeatureEffects()
     {
         foreach (var effect in featureEffects)
         {
             if (effect != null && TryGetComponent(out IWorldInteractable interactable))
             {
-                effect.ApplyEffect(actor, interactable, InteractionResult.Success);
+                effect.ApplyEffect(null, interactable, InteractionResult.Success);
             }
         }
     }
@@ -77,6 +161,4 @@ public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
     {
         featureEffects = effects ?? new List<EffectStrategySO>();
     }
-
-    public bool IsUnlocked() => !isLocked;
 }

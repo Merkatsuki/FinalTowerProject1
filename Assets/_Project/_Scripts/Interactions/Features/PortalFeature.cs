@@ -1,91 +1,95 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using Momentum;
 
 public class PortalFeature : MonoBehaviour, IInteractableFeature
 {
-    [Header("Portal Settings")]
-    [SerializeField] private PortalMode mode = PortalMode.LocalTeleport;
-    [SerializeField] private Transform linkedPortal;
-    [SerializeField] private string sceneToLoad;
-    [SerializeField] private bool isLocked = false;
+    [Header("Teleport Settings")]
+    [SerializeField] private bool teleportToScene = false;
+    [SerializeField] private string targetSceneName;
+    [SerializeField] private Transform localTeleportTarget;
+    [SerializeField] private float teleportDelay = 0f;
 
-    [Header("Portal Meta Settings")]
-    [SerializeField] private string portalID;
-
-    [Header("Feature Effects")]
+    [Header("Visuals & Effects")]
+    [SerializeField] private bool useFadeTransition = true;
+    [SerializeField] private GameObject portalVisualEffectPrefab;
     [SerializeField] private List<EffectStrategySO> featureEffects = new();
+
+    private bool teleporting = false;
+    private Player player;
 
     private void Awake()
     {
-        if (gameObject.tag != "Portal")
+        // Find player at runtime (safe decoupled)
+        player = FindObjectOfType<Player>();
+        if (player == null)
         {
-            gameObject.tag = "Portal";
-        }
-
-        if (transform.Find("PortalMarker") == null)
-        {
-            GameObject marker = new GameObject("PortalMarker");
-            marker.transform.SetParent(transform);
-            marker.transform.localPosition = Vector3.zero;
-            var sr = marker.AddComponent<SpriteRenderer>();
-            sr.sprite = null;
-            sr.sortingOrder = 5;
-            Debug.Log("[PortalFeature] Auto-created PortalMarker child.");
+            Debug.LogWarning("[PortalFeature] No Player found in scene!");
         }
     }
 
     public void OnInteract(IPuzzleInteractor actor)
     {
-        ActivatePortal(actor);
+        if (teleporting) return;
+        teleporting = true;
+
+        if (useFadeTransition && ScreenFader.Instance != null)
+        {
+            ScreenFader.Instance.FadeOut(() =>
+            {
+                StartCoroutine(DoTeleport());
+            });
+        }
+        else
+        {
+            StartCoroutine(DoTeleport());
+        }
     }
 
-    public void ActivatePortal(IPuzzleInteractor actor)
+    private IEnumerator DoTeleport()
     {
-        if (isLocked)
+        if (teleportDelay > 0f)
         {
-            Debug.Log("[PortalFeature] Portal is locked.");
-            return;
+            yield return new WaitForSeconds(teleportDelay);
         }
 
-        switch (mode)
+        if (portalVisualEffectPrefab != null)
         {
-            case PortalMode.LocalTeleport:
-                if (linkedPortal != null)
-                {
-                    Debug.Log("[PortalFeature] Teleporting to linked portal.");
-                    GameObject player = GameObject.FindGameObjectWithTag("Player");
-                    if (player != null)
-                        player.transform.position = linkedPortal.position;
-                }
-                break;
-
-            case PortalMode.SceneTransition:
-                if (!string.IsNullOrEmpty(sceneToLoad))
-                {
-                    Debug.Log($"[PortalFeature] Loading scene: {sceneToLoad}.");
-                    // TODO: Add scene loading logic here
-                }
-                break;
+            Instantiate(portalVisualEffectPrefab, transform.position, Quaternion.identity);
         }
 
-        RunFeatureEffects(actor);
+        if (teleportToScene && !string.IsNullOrEmpty(targetSceneName))
+        {
+            SceneManager.LoadScene(targetSceneName);
+        }
+        else if (localTeleportTarget != null)
+        {
+            if (player != null)
+            {
+                player.transform.position = localTeleportTarget.position;
+            }
+            else
+            {
+                Debug.LogWarning("[PortalFeature] Player reference missing during teleport!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[PortalFeature] No teleport target set!");
+        }
+
+        RunFeatureEffects();
     }
 
-    public void UnlockPortal()
-    {
-        isLocked = false;
-        Debug.Log("[PortalFeature] Portal unlocked.");
-    }
-
-    public bool IsPortalUnlocked() => !isLocked;
-
-    private void RunFeatureEffects(IPuzzleInteractor actor)
+    private void RunFeatureEffects()
     {
         foreach (var effect in featureEffects)
         {
             if (effect != null && TryGetComponent(out IWorldInteractable interactable))
             {
-                effect.ApplyEffect(actor, interactable, InteractionResult.Success);
+                effect.ApplyEffect(null, interactable, InteractionResult.Success);
             }
         }
     }
@@ -94,9 +98,4 @@ public class PortalFeature : MonoBehaviour, IInteractableFeature
     {
         featureEffects = effects ?? new List<EffectStrategySO>();
     }
-}
-public enum PortalMode
-{
-    LocalTeleport,
-    SceneTransition
 }

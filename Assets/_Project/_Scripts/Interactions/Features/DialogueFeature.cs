@@ -4,48 +4,55 @@ using System.Collections.Generic;
 public class DialogueFeature : MonoBehaviour, IInteractableFeature
 {
     [Header("Dialogue Settings")]
-    [SerializeField] private string oneLiner;
+    [SerializeField] private DialogueGraphSO dialogueGraph;
     [SerializeField] private DialogueSequence dialogueSequence;
+    [SerializeField][TextArea(2, 4)] private string oneLiner;
 
     [Header("Feature Effects")]
     [SerializeField] private List<EffectStrategySO> featureEffects = new();
 
+    private bool dialogueStarted = false;
+
     public void OnInteract(IPuzzleInteractor actor)
     {
-        TriggerDialogue(actor);
-    }
+        if (dialogueStarted) return;
+        dialogueStarted = true;
 
-    public void TriggerDialogue(IPuzzleInteractor actor)
-    {
-        if (DialogueManager.Instance == null)
+        if (dialogueGraph != null)
         {
-            Debug.LogWarning("[DialogueFeature] No DialogueManager found.");
-            return;
+            // Start Branching Dialogue
+            DialogueManager.Instance.StartDialogue(dialogueGraph, OnDialogueComplete);
         }
-
-        if (dialogueSequence != null && dialogueSequence.lines != null && dialogueSequence.lines.Count > 0)
+        else if (dialogueSequence != null)
         {
-            DialogueManager.Instance.ShowDialogue(dialogueSequence);
+            // Start Linear Dialogue Sequence
+            DialogueManager.Instance.StartDialogueSequence(dialogueSequence, OnDialogueComplete);
         }
         else if (!string.IsNullOrEmpty(oneLiner))
         {
-            DialogueManager.Instance.ShowMessage(oneLiner);
+            // Start One Liner
+            DialogueManager.Instance.ShowOneLiner(oneLiner, OnDialogueComplete);
         }
         else
         {
-            Debug.LogWarning("[DialogueFeature] No dialogue set.");
+            Debug.LogWarning("[DialogueFeature] No dialogue data assigned!");
+            dialogueStarted = false;
         }
-
-        RunFeatureEffects(actor);
     }
 
-    private void RunFeatureEffects(IPuzzleInteractor actor)
+    private void OnDialogueComplete()
+    {
+        RunFeatureEffects();
+        dialogueStarted = false;
+    }
+
+    private void RunFeatureEffects()
     {
         foreach (var effect in featureEffects)
         {
             if (effect != null && TryGetComponent(out IWorldInteractable interactable))
             {
-                effect.ApplyEffect(actor, interactable, InteractionResult.Success);
+                effect.ApplyEffect(null, interactable, InteractionResult.Success);
             }
         }
     }
@@ -53,10 +60,5 @@ public class DialogueFeature : MonoBehaviour, IInteractableFeature
     public void SetFeatureEffects(List<EffectStrategySO> effects)
     {
         featureEffects = effects ?? new List<EffectStrategySO>();
-    }
-
-    public bool HasDialogue()
-    {
-        return dialogueSequence != null || !string.IsNullOrEmpty(oneLiner);
     }
 }

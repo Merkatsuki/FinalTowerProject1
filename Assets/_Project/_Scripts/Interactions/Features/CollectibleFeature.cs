@@ -1,42 +1,61 @@
-using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Events;
 
 public class CollectibleFeature : MonoBehaviour, IInteractableFeature
 {
-    [Header("Collectible Settings")]
-    [SerializeField] private ParticleSystem collectParticles;
-    [SerializeField] private AudioClip collectSound;
-    [SerializeField] private AudioSource audioSource;
+    [Header("Collection Settings")]
+    [SerializeField] private float selfDestructDelay = 0f;
+    [SerializeField] private bool useDissolveEffect = false;
+    [SerializeField] private DissolveController dissolveController; // Optional !!! Not Tested, Forced, Or Material Made Yet
+    [SerializeField] private bool animateToPlayerOnCollect = false;
+    [SerializeField] private Transform playerTransform; // Set dynamically if needed
+    [SerializeField] private int requiredCollectionStages = 1;
+    private int currentCollectionProgress = 0;
 
-    [Header("Feature Effects")]
+    [Header("Effects")]
     [SerializeField] private List<EffectStrategySO> featureEffects = new();
+
+    [Header("Events")]
+    [SerializeField] private UnityEvent onCollect;
+
+    private bool collected = false;
 
     public void OnInteract(IPuzzleInteractor actor)
     {
-        Collect(actor);
-    }
+        if (collected) return;
 
-    private void Collect(IPuzzleInteractor actor)
-    {
-        PlayCollectEffects();
-        RunFeatureEffects(actor);
-        Destroy(gameObject);
-    }
+        currentCollectionProgress++;
 
-    private void PlayCollectEffects()
-    {
-        if (collectParticles != null)
+        if (currentCollectionProgress < requiredCollectionStages)
         {
-            Instantiate(collectParticles, transform.position, Quaternion.identity);
+            // Could add a partial collection effect here
+            return;
         }
 
-        if (collectSound != null)
+        collected = true;
+
+        // Fire UnityEvent for designers
+        onCollect?.Invoke();
+
+        // Run assigned Feature Effects
+        RunFeatureEffects(actor);
+
+        // Optionally differentiate companion behavior
+        if (actor is CompanionController)
         {
-            if (audioSource == null)
-            {
-                audioSource = gameObject.AddComponent<AudioSource>();
-            }
-            audioSource.PlayOneShot(collectSound);
+            Debug.Log("[CollectibleFeature] Collected by Companion!");
+            // Optionally different behavior here (sound, FX, etc.)
+        }
+
+        if (animateToPlayerOnCollect && playerTransform != null)
+        {
+            StartCoroutine(AnimateToPlayerCoroutine());
+        }
+        else
+        {
+            StartCollectionVisualEffects();
         }
     }
 
@@ -44,22 +63,62 @@ public class CollectibleFeature : MonoBehaviour, IInteractableFeature
     {
         foreach (var effect in featureEffects)
         {
-            if (effect != null)
+            if (effect != null && TryGetComponent(out IWorldInteractable interactable))
             {
-                if (TryGetComponent(out IWorldInteractable interactable))
-                {
-                    effect.ApplyEffect(actor, interactable, InteractionResult.Success);
-                }
-                else
-                {
-                    Debug.LogWarning("[CollectibleFeature] No IWorldInteractable found for effect execution.");
-                }
+                effect.ApplyEffect(actor, interactable, InteractionResult.Success);
             }
         }
     }
 
+    private void StartCollectionVisualEffects()
+    {
+        if (useDissolveEffect && dissolveController != null)
+        {
+            dissolveController.TriggerDissolve(() => StartCoroutine(DelayedDestroy()));
+        }
+        else
+        {
+            StartCoroutine(DelayedDestroy());
+        }
+    }
+
+    private IEnumerator DelayedDestroy()
+    {
+        if (selfDestructDelay > 0f)
+        {
+            yield return new WaitForSeconds(selfDestructDelay);
+        }
+
+        Destroy(gameObject);
+    }
+
+    private IEnumerator AnimateToPlayerCoroutine()
+    {
+        float duration = 0.5f;
+        float elapsed = 0f;
+        Vector3 startPosition = transform.position;
+        Vector3 targetPosition = playerTransform.position;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            transform.position = Vector3.Lerp(startPosition, targetPosition, t);
+            yield return null;
+        }
+
+        StartCollectionVisualEffects();
+    }
+
+    // Setter for FeatureEffects
     public void SetFeatureEffects(List<EffectStrategySO> effects)
     {
         featureEffects = effects ?? new List<EffectStrategySO>();
+    }
+
+    // Optional setter for playerTransform
+    public void SetPlayerTransform(Transform player)
+    {
+        playerTransform = player;
     }
 }

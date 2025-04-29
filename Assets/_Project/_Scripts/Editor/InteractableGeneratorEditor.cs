@@ -264,6 +264,17 @@ public class InteractableGeneratorEditor : EditorWindow
             var feature = go.AddComponent<LightToggleFeature>();
             metadata.AddFeatureTag("LightToggle");
             feature.SetFeatureEffects(lightToggleFeatureEffects);
+
+            // Setup a dedicated Toggleable Light for toggling
+            GameObject toggleLightObj = new GameObject("ToggleableLight");
+            toggleLightObj.transform.SetParent(go.transform);
+            toggleLightObj.transform.localPosition = Vector3.zero;
+
+            var toggleLight2D = toggleLightObj.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+            toggleLight2D.intensity = 0f;
+            toggleLight2D.pointLightOuterRadius = 2.5f;
+
+            feature.SetToggleLight(toggleLight2D);
         }
 
         if (addPuzzleUnlockFeature)
@@ -278,6 +289,17 @@ public class InteractableGeneratorEditor : EditorWindow
             var feature = go.AddComponent<EnergyFeature>();
             metadata.AddFeatureTag("Energy");
             feature.SetFeatureEffects(energyFeatureEffects);
+
+            // Setup a dedicated Energy Light
+            GameObject energyLightObj = new GameObject("EnergyLight");
+            energyLightObj.transform.SetParent(go.transform);
+            energyLightObj.transform.localPosition = Vector3.zero;
+
+            var energyLight2D = energyLightObj.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+            energyLight2D.intensity = 0f;
+            energyLight2D.pointLightOuterRadius = 2.5f;
+
+            feature.SetEnergyLight(energyLight2D);
         }
 
         if (addLockedDoorFeature)
@@ -285,6 +307,14 @@ public class InteractableGeneratorEditor : EditorWindow
             var feature = go.AddComponent<LockedDoorFeature>();
             metadata.AddFeatureTag("LockedDoor");
             feature.SetFeatureEffects(lockedDoorFeatureEffects);
+
+            // Setup Animator
+            Animator animator = go.GetComponent<Animator>();
+            if (animator == null)
+            {
+                animator = go.AddComponent<Animator>();
+            }
+            feature.SetDoorAnimator(animator);
         }
 
         if (addDoorFeature)
@@ -292,6 +322,14 @@ public class InteractableGeneratorEditor : EditorWindow
             var feature = go.AddComponent<DoorFeature>();
             metadata.AddFeatureTag("Door");
             feature.SetFeatureEffects(doorFeatureEffects);
+
+            // Setup Animator
+            Animator animator = go.GetComponent<Animator>();
+            if (animator == null)
+            {
+                animator = go.AddComponent<Animator>();
+            }
+            feature.SetDoorAnimator(animator);
         }
     }
 
