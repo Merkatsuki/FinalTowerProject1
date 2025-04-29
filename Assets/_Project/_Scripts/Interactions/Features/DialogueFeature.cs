@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class DialogueFeature : MonoBehaviour, IInteractableFeature
 {
@@ -6,12 +7,15 @@ public class DialogueFeature : MonoBehaviour, IInteractableFeature
     [SerializeField] private string oneLiner;
     [SerializeField] private DialogueSequence dialogueSequence;
 
+    [Header("Feature Effects")]
+    [SerializeField] private List<EffectStrategySO> featureEffects = new();
+
     public void OnInteract(IPuzzleInteractor actor)
     {
-        TriggerDialogue();
+        TriggerDialogue(actor);
     }
 
-    public void TriggerDialogue()
+    public void TriggerDialogue(IPuzzleInteractor actor)
     {
         if (DialogueManager.Instance == null)
         {
@@ -31,6 +35,24 @@ public class DialogueFeature : MonoBehaviour, IInteractableFeature
         {
             Debug.LogWarning("[DialogueFeature] No dialogue set.");
         }
+
+        RunFeatureEffects(actor);
+    }
+
+    private void RunFeatureEffects(IPuzzleInteractor actor)
+    {
+        foreach (var effect in featureEffects)
+        {
+            if (effect != null && TryGetComponent(out IWorldInteractable interactable))
+            {
+                effect.ApplyEffect(actor, interactable, InteractionResult.Success);
+            }
+        }
+    }
+
+    public void SetFeatureEffects(List<EffectStrategySO> effects)
+    {
+        featureEffects = effects ?? new List<EffectStrategySO>();
     }
 
     public bool HasDialogue()

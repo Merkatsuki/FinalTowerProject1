@@ -12,5 +12,11 @@ public class RequirePuzzleSolvedEntrySO : EntryStrategySO
 
         return PuzzleManager.Instance != null && PuzzleManager.Instance.IsFlagSet(requiredPuzzleFlag);
     }
+
+    public void SetRequiredPuzzleFlag(string flagName)
+    {
+        requiredPuzzleFlag = flagName;
+    }
+
 }
 

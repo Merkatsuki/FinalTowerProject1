@@ -10,4 +10,10 @@ public class ExitAfterPlayerLeavesSO : ExitStrategySO
         GameObject player = GameObject.FindWithTag("Player");
         return Vector2.Distance(player.transform.position, target.GetTransform().position) > radius;
     }
+
+    public void SetExitRadius(float newRadius)
+    {
+        radius = newRadius;
+    }
+
 }

@@ -12,5 +12,10 @@ public class RequireItemHeldEntrySO : EntryStrategySO
 
         return InventoryManager.Instance != null && InventoryManager.Instance.HasItem(requiredItemId);
     }
+    public void SetRequiredItemId(string itemId)
+    {
+        requiredItemId = itemId;
+    }
+
 }
 

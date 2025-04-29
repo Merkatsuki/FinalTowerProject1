@@ -16,4 +16,10 @@ public class ExitAfterTimerThenConditionalSO : ExitStrategySO
     {
         timer = 0f;
     }
+
+    public void SetMinTime(float seconds)
+    {
+        minTime = seconds;
+    }
+
 }

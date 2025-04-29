@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
+[CreateAssetMenu(menuName = "Effects/Batch Effect")]
 public class BatchEffectStrategySO : EffectStrategySO
 {
     [SerializeField] private List<EffectStrategySO> effects = new();

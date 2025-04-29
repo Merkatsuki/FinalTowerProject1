@@ -16,4 +16,9 @@ public class EntryCooldownStrategySO : EntryStrategySO
     {
         lastEntryTime = Time.time;
     }
+
+    public void SetCooldown(float seconds)
+    {
+        cooldownDuration = seconds;
+    }
 }

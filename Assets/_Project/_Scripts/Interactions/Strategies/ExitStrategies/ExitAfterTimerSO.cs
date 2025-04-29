@@ -16,4 +16,10 @@ public class ExitAfterTimerSO : ExitStrategySO
         timer += Time.deltaTime;
         return timer >= waitTime;
     }
+
+    public void SetWaitTime(float seconds)
+    {
+        waitTime = seconds;
+    }
+
 }

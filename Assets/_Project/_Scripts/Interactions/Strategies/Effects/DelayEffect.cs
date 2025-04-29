@@ -11,4 +11,9 @@ public class DelayEffect : EffectStrategySO
         await Task.Delay((int)(delaySeconds * 1000f));
         Debug.Log($"[Effect] Delay of {delaySeconds} seconds completed.");
     }
+
+    public void SetDelay(float seconds)
+    {
+        delaySeconds = seconds;
+    }
 }

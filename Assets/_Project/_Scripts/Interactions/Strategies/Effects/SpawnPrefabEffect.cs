@@ -15,4 +15,14 @@ public class SpawnPrefabEffect : EffectStrategySO
             Debug.Log($"[Effect] Spawned prefab at {spawnPos}");
         }
     }
+
+    public void SetPrefab(GameObject prefab)
+    {
+        prefabToSpawn = prefab;
+    }
+
+    public void SetOffset(Vector2 offset)
+    {
+        spawnOffset = offset;
+    }
 }

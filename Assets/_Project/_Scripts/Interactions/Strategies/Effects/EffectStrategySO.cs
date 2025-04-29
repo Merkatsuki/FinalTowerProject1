@@ -3,7 +3,9 @@ using UnityEngine;
 public abstract class EffectStrategySO : ScriptableObject
 {
     [Header("Smart Execution Settings")]
-    [SerializeField] private bool onlyOnSuccess = true;
+    [SerializeField] protected bool onlyOnSuccess = true;
+
+    public void SetOnlyOnSuccess(bool value) => onlyOnSuccess = value;
 
     public void ApplyEffect(IPuzzleInteractor actor, IWorldInteractable interactable, InteractionResult result)
     {

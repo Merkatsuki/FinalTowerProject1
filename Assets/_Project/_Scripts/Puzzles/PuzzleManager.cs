@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class PuzzleManager : MonoBehaviour
 {
@@ -7,6 +8,17 @@ public class PuzzleManager : MonoBehaviour
 
     private readonly HashSet<string> boolFlags = new();
     private readonly Dictionary<string, int> intFlags = new();
+
+    public List<string> GetAllBoolFlags()
+    {
+        return boolFlags.ToList();
+    }
+
+    public Dictionary<string, int> GetAllIntFlags()
+    {
+        return new Dictionary<string, int>(intFlags);
+    }
+
 
     private void Awake()
     {

@@ -1,9 +1,13 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
 {
     [SerializeField] private bool isLocked = true;
     [SerializeField] private string requiredFlag;
+
+    [Header("Feature Effects")]
+    [SerializeField] private List<EffectStrategySO> featureEffects = new();
 
     private Animator doorAnimator;
 
@@ -13,13 +17,13 @@ public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
         if (doorAnimator == null)
         {
             doorAnimator = gameObject.AddComponent<Animator>();
-            Debug.LogWarning("[LockedDoorFeature] No Animator found. Added default Animator component. Assign a Controller manually!");
+            Debug.LogWarning("[LockedDoorFeature] No Animator found. Added default Animator component.");
         }
     }
 
     public void OnInteract(IPuzzleInteractor actor)
     {
-        AttemptUnlock();
+        AttemptUnlock(actor);
     }
 
     public bool CanUnlock()
@@ -33,11 +37,11 @@ public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
         return PuzzleManager.Instance != null && PuzzleManager.Instance.IsFlagSet(requiredFlag);
     }
 
-    public void AttemptUnlock()
+    public void AttemptUnlock(IPuzzleInteractor actor)
     {
         if (CanUnlock())
         {
-            Unlock();
+            Unlock(actor);
         }
         else
         {
@@ -45,7 +49,7 @@ public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
         }
     }
 
-    public void Unlock()
+    public void Unlock(IPuzzleInteractor actor)
     {
         isLocked = false;
         Debug.Log("[LockedDoorFeature] Door unlocked.");
@@ -54,6 +58,24 @@ public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
         {
             doorAnimator.SetTrigger("Open");
         }
+
+        RunFeatureEffects(actor);
+    }
+
+    private void RunFeatureEffects(IPuzzleInteractor actor)
+    {
+        foreach (var effect in featureEffects)
+        {
+            if (effect != null && TryGetComponent(out IWorldInteractable interactable))
+            {
+                effect.ApplyEffect(actor, interactable, InteractionResult.Success);
+            }
+        }
+    }
+
+    public void SetFeatureEffects(List<EffectStrategySO> effects)
+    {
+        featureEffects = effects ?? new List<EffectStrategySO>();
     }
 
     public bool IsUnlocked() => !isLocked;

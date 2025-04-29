@@ -1,5 +1,5 @@
 // EffectStrategyGeneratorEditor.cs
-// Upgraded Scaffold: Supports Delay, SoundCue, and Batch Effects
+// Expanded Effect Generator (Now Supports PlaySound, Delay, SpawnPrefab)
 
 using UnityEditor;
 using UnityEngine;
@@ -11,20 +11,16 @@ public class EffectStrategyGeneratorEditor : EditorWindow
     private string effectName = "NewEffect";
     private EffectType selectedEffectType = EffectType.GiveItem;
 
-    // Shared parameters
-    private float delay = 0f;
-    private AudioClip soundCue;
-
-    // GiveItem parameters
+    [Header("Specific Parameters")]
     private ItemSO selectedItem;
-    private bool onlyOnSuccess = true;
-
-    // SetFlag parameters
     private FlagSO selectedFlag;
-    private bool flagValue = true;
-
-    // Batch parameters
+    private bool setValue = true;
     private List<EffectStrategySO> batchEffects = new();
+    private AudioClip soundClip;
+    private float soundVolume = 1.0f;
+    private float delaySeconds = 1.0f;
+    private GameObject prefabToSpawn;
+    private Vector2 spawnOffset;
 
     private string savePath = "Assets/_Project/ScriptableObjects/Effects";
 
@@ -42,7 +38,6 @@ public class EffectStrategyGeneratorEditor : EditorWindow
 
         selectedEffectType = (EffectType)EditorGUILayout.EnumPopup("Effect Type", selectedEffectType);
 
-        DrawSharedParameters();
         DrawEffectParameters();
 
         GUILayout.Space(20);
@@ -56,14 +51,6 @@ public class EffectStrategyGeneratorEditor : EditorWindow
         }
     }
 
-    private void DrawSharedParameters()
-    {
-        GUILayout.Space(10);
-        GUILayout.Label("Shared Parameters", EditorStyles.boldLabel);
-        delay = EditorGUILayout.FloatField("Delay (Seconds)", delay);
-        soundCue = (AudioClip)EditorGUILayout.ObjectField("Sound Cue", soundCue, typeof(AudioClip), false);
-    }
-
     private void DrawEffectParameters()
     {
         GUILayout.Space(10);
@@ -73,13 +60,11 @@ public class EffectStrategyGeneratorEditor : EditorWindow
         {
             case EffectType.GiveItem:
                 selectedItem = (ItemSO)EditorGUILayout.ObjectField("Item to Give", selectedItem, typeof(ItemSO), false);
-                onlyOnSuccess = EditorGUILayout.Toggle("Only On Success", onlyOnSuccess);
                 break;
 
             case EffectType.SetFlag:
-                selectedFlag = (FlagSO)EditorGUILayout.ObjectField("Flag", selectedFlag, typeof(FlagSO), false);
-                flagValue = EditorGUILayout.Toggle("Flag Value", flagValue);
-                onlyOnSuccess = EditorGUILayout.Toggle("Only On Success", onlyOnSuccess);
+                selectedFlag = (FlagSO)EditorGUILayout.ObjectField("Flag to Set", selectedFlag, typeof(FlagSO), false);
+                setValue = EditorGUILayout.Toggle("Set Value (true/false)", setValue);
                 break;
 
             case EffectType.Batch:
@@ -96,8 +81,18 @@ public class EffectStrategyGeneratorEditor : EditorWindow
                 }
                 break;
 
-            default:
-                GUILayout.Label("No specific parameters needed.");
+            case EffectType.PlaySound:
+                soundClip = (AudioClip)EditorGUILayout.ObjectField("Sound Clip", soundClip, typeof(AudioClip), false);
+                soundVolume = EditorGUILayout.Slider("Volume", soundVolume, 0f, 1f);
+                break;
+
+            case EffectType.Delay:
+                delaySeconds = EditorGUILayout.FloatField("Delay (seconds)", delaySeconds);
+                break;
+
+            case EffectType.SpawnPrefab:
+                prefabToSpawn = (GameObject)EditorGUILayout.ObjectField("Prefab to Spawn", prefabToSpawn, typeof(GameObject), false);
+                spawnOffset = EditorGUILayout.Vector2Field("Spawn Offset", spawnOffset);
                 break;
         }
     }
@@ -116,36 +111,47 @@ public class EffectStrategyGeneratorEditor : EditorWindow
         switch (selectedEffectType)
         {
             case EffectType.GiveItem:
-                var giveItemEffect = ScriptableObject.CreateInstance<GiveItemEffect>();
-                giveItemEffect.SetItem(selectedItem);
-                giveItemEffect.SetOnlyOnSuccess(onlyOnSuccess);
-                effect = giveItemEffect;
+                var giveItem = ScriptableObject.CreateInstance<GiveItemEffect>();
+                giveItem.SetItem(selectedItem);
+                effect = giveItem;
                 break;
 
             case EffectType.SetFlag:
-                var setFlagEffect = ScriptableObject.CreateInstance<SetFlagEffect>();
-                setFlagEffect.SetFlag(selectedFlag);
-                setFlagEffect.SetFlagValue(flagValue);
-                setFlagEffect.SetOnlyOnSuccess(onlyOnSuccess);
-                effect = setFlagEffect;
+                var setFlag = ScriptableObject.CreateInstance<SetFlagEffect>();
+                setFlag.SetFlag(selectedFlag);
+                setFlag.SetFlagValue(setValue);
+                effect = setFlag;
                 break;
 
             case EffectType.Batch:
-                var batchEffect = ScriptableObject.CreateInstance<BatchEffectStrategySO>();
-                batchEffect.SetEffects(batchEffects);
-                effect = batchEffect;
+                var batch = ScriptableObject.CreateInstance<BatchEffectStrategySO>();
+                batch.SetEffects(batchEffects);
+                effect = batch;
+                break;
+
+            case EffectType.PlaySound:
+                var playSound = ScriptableObject.CreateInstance<PlaySoundEffect>();
+                playSound.SetSoundClip(soundClip);
+                playSound.SetVolume(soundVolume);
+                effect = playSound;
+                break;
+
+            case EffectType.Delay:
+                var delay = ScriptableObject.CreateInstance<DelayEffect>();
+                delay.SetDelay(delaySeconds);
+                effect = delay;
+                break;
+
+            case EffectType.SpawnPrefab:
+                var spawn = ScriptableObject.CreateInstance<SpawnPrefabEffect>();
+                spawn.SetPrefab(prefabToSpawn);
+                spawn.SetOffset(spawnOffset);
+                effect = spawn;
                 break;
         }
 
         if (effect != null)
         {
-            // Set shared parameters if available
-            if (effect is ISharedEffectSettings sharedEffect)
-            {
-                sharedEffect.SetDelay(delay);
-                sharedEffect.SetSoundCue(soundCue);
-            }
-
             AssetDatabase.CreateAsset(effect, assetPath);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -156,9 +162,14 @@ public class EffectStrategyGeneratorEditor : EditorWindow
             Debug.Log("[Generator] Created Effect Strategy: " + effectName);
         }
     }
+
+    private enum EffectType
+    {
+        GiveItem,
+        SetFlag,
+        Batch,
+        PlaySound,
+        Delay,
+        SpawnPrefab
+    }
 }
-
-
-
-
-

@@ -31,4 +31,10 @@ public class SequentialExitStrategySO : ExitStrategySO
     {
         currentIndex = 0;
     }
+
+    public void SetSubStrategies(List<ExitStrategySO> strategies)
+    {
+        steps = strategies;
+    }
+
 }

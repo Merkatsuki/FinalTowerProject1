@@ -4,24 +4,33 @@ using System.Collections.Generic;
 [CreateAssetMenu(menuName = "Strategies/Exit/Composite Exit")]
 public class CompositeExitStrategySO : ExitStrategySO
 {
-    public enum LogicMode { All, Any }
-
-    [SerializeField] private LogicMode mode = LogicMode.All;
-    [SerializeField] private List<ExitStrategySO> strategies;
+    [SerializeField] private LogicMode logicMode = LogicMode.All;
+    [SerializeField] private List<ExitStrategySO> subStrategies;
 
     public override bool ShouldExit(IPuzzleInteractor actor, IWorldInteractable target)
     {
-        if (mode == LogicMode.All)
+        if (logicMode == LogicMode.All)
         {
-            foreach (var strategy in strategies)
+            foreach (var strategy in subStrategies)
                 if (strategy != null && !strategy.ShouldExit(actor, target)) return false;
             return true;
         }
         else // Any
         {
-            foreach (var strategy in strategies)
+            foreach (var strategy in subStrategies)
                 if (strategy != null && strategy.ShouldExit(actor, target)) return true;
             return false;
         }
     }
+
+    public void SetLogicMode(LogicMode mode)
+    {
+        logicMode = mode;
+    }
+
+    public void SetSubStrategies(List<ExitStrategySO> strategies)
+    {
+        subStrategies = strategies;
+    }
+
 }

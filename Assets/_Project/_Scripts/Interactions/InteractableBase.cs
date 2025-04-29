@@ -8,7 +8,6 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
     [Header("Strategy Settings")]
     public List<EntryStrategySO> entryStrategies;
     public List<ExitStrategySO> exitStrategies;
-    public List<EffectStrategySO> effects = new List<EffectStrategySO>();
 
     [Header("Highlight Settings")]
     [SerializeField] private Light2D highlightLight;
@@ -17,8 +16,8 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
     private Coroutine highlightRoutine;
 
     private bool interactionInProgress = false;
-    private IPuzzleInteractor currentActor;  // ✅ Store actor who is interacting
-    private bool interactionSuccess = false; // ✅ Store whether interaction is successful
+    private IPuzzleInteractor currentActor;
+    private bool interactionSuccess = false;
 
     private void Update()
     {
@@ -30,8 +29,7 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
             interactionInProgress = false;
             Debug.Log($"[InteractableBase] Interaction complete. Success: {interactionSuccess}");
 
-            var result = interactionSuccess ? InteractionResult.Success : InteractionResult.Failure;
-            ExecuteEffects(currentActor, result);
+            // 🚫 Effects are now handled by Features individually, NOT here.
         }
     }
 
@@ -54,12 +52,10 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
     {
         Debug.Log($"[InteractableBase] OnInteract triggered by {actor}");
 
-        // ✅ Start tracking this interaction
         currentActor = actor;
         interactionInProgress = true;
-        interactionSuccess = true; // Default to true unless logic later sets false
+        interactionSuccess = true;
 
-        // ✅ Call all features
         foreach (var feature in GetComponents<IInteractableFeature>())
         {
             feature.OnInteract(actor);
@@ -73,7 +69,7 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
         if (interactionInProgress)
         {
             interactionSuccess = interactionSucceeded;
-            // We still wait for AllExitConditionsMet() before effects apply
+            // We still wait for AllExitConditionsMet() before ending interaction
         }
     }
 
@@ -115,24 +111,12 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
 
     public virtual void BroadcastEvent(string eventId)
     {
-        // Future event system integration
+        // Future event system hook.
     }
 
     public void SetHighlightLight(Light2D light)
     {
         highlightLight = light;
-    }
-
-    public void ExecuteEffects(IPuzzleInteractor actor, InteractionResult result)
-    {
-        foreach (var effect in effects)
-        {
-            if (effect != null)
-            {
-                Debug.Log($"[InteractableBase] Executing effect {effect.name} with result: {result}");
-                effect.ApplyEffect(actor, this, result);
-            }
-        }
     }
 
     private bool AllExitConditionsMet()

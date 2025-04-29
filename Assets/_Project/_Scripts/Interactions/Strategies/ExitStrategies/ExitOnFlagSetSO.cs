@@ -12,4 +12,10 @@ public class ExitOnFlagSetSO : ExitStrategySO
 
         return PuzzleManager.Instance != null && PuzzleManager.Instance.IsFlagSet(requiredFlag);
     }
+
+    public void SetRequiredFlag(string flagName)
+    {
+        requiredFlag = flagName;
+    }
+
 }

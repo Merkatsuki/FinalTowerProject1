@@ -1,37 +1,25 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class CollectibleFeature : MonoBehaviour, IInteractableFeature
 {
     [Header("Collectible Settings")]
-    [SerializeField] private string itemId;
     [SerializeField] private ParticleSystem collectParticles;
     [SerializeField] private AudioClip collectSound;
     [SerializeField] private AudioSource audioSource;
 
+    [Header("Feature Effects")]
+    [SerializeField] private List<EffectStrategySO> featureEffects = new();
+
     public void OnInteract(IPuzzleInteractor actor)
     {
-        Collect();
+        Collect(actor);
     }
 
-    private void Collect()
+    private void Collect(IPuzzleInteractor actor)
     {
-        if (string.IsNullOrEmpty(itemId))
-        {
-            Debug.LogWarning("[CollectibleFeature] No Item ID set.");
-            return;
-        }
-
-        if (InventoryManager.Instance != null)
-        {
-            InventoryManager.Instance.AddItem(itemId);
-            Debug.Log($"[CollectibleFeature] Collected item: {itemId}");
-        }
-        else
-        {
-            Debug.LogWarning("[CollectibleFeature] No InventoryManager instance found.");
-        }
-
         PlayCollectEffects();
+        RunFeatureEffects(actor);
         Destroy(gameObject);
     }
 
@@ -50,5 +38,28 @@ public class CollectibleFeature : MonoBehaviour, IInteractableFeature
             }
             audioSource.PlayOneShot(collectSound);
         }
+    }
+
+    private void RunFeatureEffects(IPuzzleInteractor actor)
+    {
+        foreach (var effect in featureEffects)
+        {
+            if (effect != null)
+            {
+                if (TryGetComponent(out IWorldInteractable interactable))
+                {
+                    effect.ApplyEffect(actor, interactable, InteractionResult.Success);
+                }
+                else
+                {
+                    Debug.LogWarning("[CollectibleFeature] No IWorldInteractable found for effect execution.");
+                }
+            }
+        }
+    }
+
+    public void SetFeatureEffects(List<EffectStrategySO> effects)
+    {
+        featureEffects = effects ?? new List<EffectStrategySO>();
     }
 }

@@ -5,11 +5,7 @@ public class GiveItemEffect : EffectStrategySO
 {
     [SerializeField] private ItemSO itemToGive;
 
-    [SerializeField] private bool onlyOnSuccess = true;
-
     public void SetItem(ItemSO item) => itemToGive = item;
-    public void SetOnlyOnSuccess(bool value) => onlyOnSuccess = value;
-
 
     protected override void ApplyEffectInternal(IPuzzleInteractor actor, IWorldInteractable interactable, InteractionResult result)
     {

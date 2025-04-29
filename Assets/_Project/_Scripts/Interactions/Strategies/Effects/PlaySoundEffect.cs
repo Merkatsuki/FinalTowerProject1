@@ -14,4 +14,14 @@ public class PlaySoundEffect : EffectStrategySO
             Debug.Log($"[Effect] Played sound: {sound.name}");
         }
     }
+
+    public void SetSoundClip(AudioClip clip)
+    {
+        sound = clip;
+    }
+
+    public void SetVolume(float vol)
+    {
+        volume = vol;
+    }
 }

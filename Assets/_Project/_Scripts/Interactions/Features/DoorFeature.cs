@@ -1,9 +1,13 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class DoorFeature : MonoBehaviour, IInteractableFeature
 {
     [SerializeField] private Animator doorAnimator;
     [SerializeField] private float closeDelay = 2.0f;
+
+    [Header("Feature Effects")]
+    [SerializeField] private List<EffectStrategySO> featureEffects = new();
 
     private bool isOpen = false;
 
@@ -15,17 +19,17 @@ public class DoorFeature : MonoBehaviour, IInteractableFeature
             if (doorAnimator == null)
             {
                 doorAnimator = gameObject.AddComponent<Animator>();
-                Debug.LogWarning("[DoorFeature] No Animator found. Added default Animator component. Assign a Controller manually!");
+                Debug.LogWarning("[DoorFeature] No Animator found. Added default Animator component.");
             }
         }
     }
 
     public void OnInteract(IPuzzleInteractor actor)
     {
-        OpenDoor();
+        OpenDoor(actor);
     }
 
-    public void OpenDoor()
+    public void OpenDoor(IPuzzleInteractor actor)
     {
         if (isOpen) return;
 
@@ -36,6 +40,8 @@ public class DoorFeature : MonoBehaviour, IInteractableFeature
             Invoke(nameof(CloseDoor), closeDelay);
             Debug.Log("[DoorFeature] Door opened.");
         }
+
+        RunFeatureEffects(actor);
     }
 
     private void CloseDoor()
@@ -48,6 +54,22 @@ public class DoorFeature : MonoBehaviour, IInteractableFeature
             doorAnimator.SetTrigger("Close");
             Debug.Log("[DoorFeature] Door closed.");
         }
+    }
+
+    private void RunFeatureEffects(IPuzzleInteractor actor)
+    {
+        foreach (var effect in featureEffects)
+        {
+            if (effect != null && TryGetComponent(out IWorldInteractable interactable))
+            {
+                effect.ApplyEffect(actor, interactable, InteractionResult.Success);
+            }
+        }
+    }
+
+    public void SetFeatureEffects(List<EffectStrategySO> effects)
+    {
+        featureEffects = effects ?? new List<EffectStrategySO>();
     }
 
     public bool IsOpen() => isOpen;
