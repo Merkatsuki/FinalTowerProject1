@@ -1,158 +1,139 @@
 using UnityEngine;
 using DG.Tweening;
-using Momentum;
 
-public enum MovingPlatformActivationMode
+public enum PlatformMovementMode
+{
+    Continuous,
+    MoveToNext,
+    MoveUntilToggled
+}
+
+public enum PlatformActivationMode
 {
     AlwaysOn,
     OnInteract,
-    ToggleRunState,
-    OnProximity,
-    OnFlag
-}
-
-public enum PlatformState
-{
-    Idle,
-    MovingForward,
-    MovingBackward
+    OnActivated
 }
 
 public class MovingPlatformFeature : MonoBehaviour, IInteractableFeature
 {
-    [Header("Path Settings")]
+    [Header("Platform Movement Settings")]
     [SerializeField] private Transform[] waypoints;
-    [SerializeField] private float moveDuration = 3f;
-    [SerializeField] private float waitTimeAtEnd = 1f;
-    [SerializeField] private bool loop = true;
+    [SerializeField] private float moveDuration = 2f;
+    [SerializeField] private float waitTimeAtWaypoint = 0.5f;
+    [SerializeField] private bool loopWaypoints = true;
 
-    [Header("Activation")]
-    [SerializeField] private MovingPlatformActivationMode activationMode = MovingPlatformActivationMode.AlwaysOn;
-    [SerializeField] private FlagSO requiredFlag;
-    [SerializeField] private float activationProximity = 3f;
+    [Header("Platform Object (What Moves)")]
+    [SerializeField] private Transform platformTransform;
 
-    [Header("Toggle Run State Settings")]
-    [SerializeField] private bool isToggleActive = false; // Used only for ToggleRunState mode
+    [Header("Mode Settings")]
+    [SerializeField] private PlatformMovementMode movementMode = PlatformMovementMode.Continuous;
+    [SerializeField] private PlatformActivationMode activationMode = PlatformActivationMode.AlwaysOn;
+    [SerializeField] private bool isInitiallyLocked = false;
 
-    private Transform playerTransform;
+    private int currentWaypointIndex = 0;
+    private bool isMoving = false;
+    private bool isActive = false;
+    private bool isLocked = false;
     private Tween moveTween;
-    private int currentTargetIndex = 0;
-    private PlatformState platformState = PlatformState.Idle;
-    private bool unlockedByFlag = false;
 
     private void Start()
     {
-        playerTransform = FindFirstObjectByType<Player>()?.transform;
+        isLocked = isInitiallyLocked;
 
-        if (activationMode == MovingPlatformActivationMode.AlwaysOn)
+        if (activationMode == PlatformActivationMode.AlwaysOn && !isLocked)
         {
-            ActivateContinuous();
-        }
-        else if (activationMode == MovingPlatformActivationMode.OnFlag && requiredFlag != null)
-        {
-            if (PuzzleManager.Instance != null && PuzzleManager.Instance.IsFlagSet(requiredFlag))
-            {
-                unlockedByFlag = true;
-                ActivateContinuous();
-            }
+            ActivatePlatform();
         }
     }
 
     private void Update()
     {
-        if (platformState != PlatformState.Idle || moveTween != null) return;
+        if (isMoving || isLocked || waypoints.Length < 2) return;
 
-        if (activationMode == MovingPlatformActivationMode.OnProximity && playerTransform != null)
+        switch (movementMode)
         {
-            float distance = Vector3.Distance(transform.position, playerTransform.position);
-            if (distance <= activationProximity)
-            {
-                MoveToNextWaypoint();
-            }
-        }
-
-        if (activationMode == MovingPlatformActivationMode.ToggleRunState && isToggleActive)
-        {
-            MoveToNextWaypoint();
+            case PlatformMovementMode.Continuous:
+            case PlatformMovementMode.MoveUntilToggled:
+                if (isActive)
+                    MoveToNext();
+                break;
         }
     }
 
     public void OnInteract(IPuzzleInteractor actor)
     {
-        if (activationMode == MovingPlatformActivationMode.OnInteract)
+        if (activationMode != PlatformActivationMode.OnInteract || isLocked) return;
+        HandleActivation();
+    }
+
+    public void TriggerFromExternal(IPuzzleInteractor actor = null)
+    {
+        if (activationMode != PlatformActivationMode.OnActivated || isLocked) return;
+        HandleActivation();
+    }
+
+    private void HandleActivation()
+    {
+        if (isMoving || waypoints.Length < 2) return;
+
+        switch (movementMode)
         {
-            MoveToNextWaypoint();
-        }
-        else if (activationMode == MovingPlatformActivationMode.ToggleRunState)
-        {
-            isToggleActive = !isToggleActive;
+            case PlatformMovementMode.MoveToNext:
+                MoveToNext();
+                break;
+            case PlatformMovementMode.MoveUntilToggled:
+                isActive = !isActive;
+                break;
         }
     }
 
-    public void TriggerFromExternalSource()
+    private void MoveToNext()
     {
-        if (activationMode == MovingPlatformActivationMode.OnInteract)
-        {
-            MoveToNextWaypoint();
-        }
-        else if (activationMode == MovingPlatformActivationMode.ToggleRunState)
-        {
-            isToggleActive = !isToggleActive;
-        }
-    }
+        isMoving = true;
 
-    private void ActivateContinuous()
-    {
-        isToggleActive = true;
-        MoveToNextWaypoint();
-    }
+        int nextIndex = (currentWaypointIndex + 1) % waypoints.Length;
+        Vector3 targetPosition = waypoints[nextIndex].position;
 
-    private void MoveToNextWaypoint()
-    {
-        if (waypoints == null || waypoints.Length < 2) return;
-
-        platformState = PlatformState.MovingForward;
-
-        int nextIndex = (currentTargetIndex + 1) % waypoints.Length;
-        Vector3 nextPosition = waypoints[nextIndex].position;
-
-        moveTween = transform.DOMove(nextPosition, moveDuration)
+        moveTween = platformTransform.DOMove(targetPosition, moveDuration)
             .SetEase(Ease.InOutSine)
             .OnComplete(() =>
             {
-                currentTargetIndex = nextIndex;
-                platformState = PlatformState.Idle;
+                currentWaypointIndex = nextIndex;
+                isMoving = false;
 
-                if ((activationMode == MovingPlatformActivationMode.AlwaysOn || isToggleActive) && (loop || currentTargetIndex != 0))
+                if (!loopWaypoints && currentWaypointIndex == waypoints.Length - 1)
                 {
-                    Invoke(nameof(MoveToNextWaypoint), waitTimeAtEnd);
+                    isActive = false;
+                }
+
+                if (movementMode == PlatformMovementMode.MoveToNext)
+                {
+                    isActive = false;
                 }
             });
     }
 
-    public bool IsMoving() => platformState != PlatformState.Idle;
-    public int GetCurrentIndex() => currentTargetIndex;
-
-    // Optional API for external triggers
-    public void MoveForward()
-    {
-        if (platformState == PlatformState.Idle)
-        {
-            MoveToNextWaypoint();
-        }
-    }
-
-    public void SetToggleActive(bool value)
-    {
-        isToggleActive = value;
-    }
-
     public void UnlockPlatform()
     {
-        if (activationMode == MovingPlatformActivationMode.OnFlag)
+        isLocked = false;
+        if (activationMode == PlatformActivationMode.AlwaysOn)
         {
-            unlockedByFlag = true;
-            ActivateContinuous();
+            ActivatePlatform();
         }
     }
+
+    private void ActivatePlatform()
+    {
+        isActive = true;
+    }
+
+    public void SetWaypoints(Transform[] points) => waypoints = points;
+    public void SetPlatformTransform(Transform platform) => platformTransform = platform;
+
+    // Public accessors
+    public bool IsLocked() => isLocked;
+    public bool IsMoving() => isMoving;
+    public bool IsActive() => isActive;
+    public int GetCurrentWaypointIndex() => currentWaypointIndex;
 }

@@ -19,7 +19,7 @@ public class InteractableGeneratorEditor : EditorWindow
 
     // Save Settings
     private string savePath = "Assets/_Project/Prefabs/Interactables";
-    private bool saveAsPrefab = true;
+    private bool saveAsPrefab = false;
 
     // Foldout States
     private bool showFeaturesFoldout = true;
@@ -36,6 +36,8 @@ public class InteractableGeneratorEditor : EditorWindow
     private bool addEnergyFeature;
     private bool addLockedDoorFeature;
     private bool addDoorFeature;
+    private bool addSwitchFeature;
+    private bool addMovingPlatformFeature;
 
     // Feature Effects Lists
     private List<EffectStrategySO> collectibleFeatureEffects = new();
@@ -46,6 +48,7 @@ public class InteractableGeneratorEditor : EditorWindow
     private List<EffectStrategySO> energyFeatureEffects = new();
     private List<EffectStrategySO> lockedDoorFeatureEffects = new();
     private List<EffectStrategySO> doorFeatureEffects = new();
+    private List<EffectStrategySO> switchFeatureEffects = new();
 
     // Entry / Exit Strategies
     private List<EntryStrategySO> entryStrategies = new();
@@ -149,6 +152,16 @@ public class InteractableGeneratorEditor : EditorWindow
 
         addDoorFeature = EditorGUILayout.ToggleLeft("Add Door Feature", addDoorFeature);
         if (addDoorFeature) DrawEffectList(doorFeatureEffects, "Door Feature Effects");
+
+        addSwitchFeature = EditorGUILayout.ToggleLeft("Add Switch Feature", addSwitchFeature);
+        if (addSwitchFeature) DrawEffectList(switchFeatureEffects, "Switch Feature Effects");
+
+        addMovingPlatformFeature = EditorGUILayout.ToggleLeft("Add Moving Platform Feature", addMovingPlatformFeature);
+        if (addMovingPlatformFeature)
+        {
+            EditorGUILayout.HelpBox("Default waypoints will be created above and below object. Customize later in inspector.", MessageType.Info);
+        }
+
     }
 
     private void DrawEffectList(List<EffectStrategySO> effectsList, string label)
@@ -276,6 +289,64 @@ public class InteractableGeneratorEditor : EditorWindow
 
             feature.SetToggleLight(toggleLight2D);
         }
+
+        if (addSwitchFeature)
+        {
+            var feature = go.AddComponent<SwitchFeature>();
+            metadata.AddFeatureTag("Switch");
+            feature.SetEffectStrategies(switchFeatureEffects);
+        }
+
+        if (addMovingPlatformFeature)
+        {
+            var feature = go.AddComponent<MovingPlatformFeature>();
+            metadata.AddFeatureTag("Platform");
+
+            // Create the visual object that actually moves
+            GameObject platformVisual = new GameObject("PlatformVisual");
+            platformVisual.transform.SetParent(go.transform);
+            platformVisual.transform.localPosition = Vector3.zero;
+
+            // Add sprite renderer
+            var sr = platformVisual.AddComponent<SpriteRenderer>();
+            sr.sprite = sprite;
+
+            // Add trigger collider for interaction
+            var triggerCol = platformVisual.AddComponent<CircleCollider2D>();
+            triggerCol.isTrigger = true;
+
+            // Add physics box collider for riding/collision
+            var boxCol = platformVisual.AddComponent<BoxCollider2D>();
+            boxCol.isTrigger = false;
+
+            // Add highlight light
+            GameObject lightObj = new GameObject("HighlightLight");
+            lightObj.transform.SetParent(platformVisual.transform);
+            lightObj.transform.localPosition = Vector3.zero;
+
+            var light2D = lightObj.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+            light2D.intensity = 0f;
+            light2D.pointLightOuterRadius = 1.5f;
+
+            // Register light and trigger with InteractableBase
+            var interactable = go.GetComponent<InteractableBase>();
+            interactable.SetHighlightLight(light2D);
+            interactable.SetTriggerColliderOverride(triggerCol);
+
+            // Create two default waypoints
+            GameObject wp0 = new GameObject("Waypoint_0");
+            wp0.transform.SetParent(go.transform);
+            wp0.transform.localPosition = Vector3.zero;
+
+            GameObject wp1 = new GameObject("Waypoint_1");
+            wp1.transform.SetParent(go.transform);
+            wp1.transform.localPosition = Vector3.up * 2f;
+
+            feature.SetWaypoints(new Transform[] { wp0.transform, wp1.transform });
+            feature.SetPlatformTransform(platformVisual.transform);
+        }
+
+
 
         if (addPuzzleUnlockFeature)
         {
