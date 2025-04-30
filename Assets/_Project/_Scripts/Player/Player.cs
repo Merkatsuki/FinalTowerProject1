@@ -117,15 +117,17 @@ namespace Momentum
 		private void Update()
 		{
 			StateMachine.CurrentState.LogicUpdate(); // Call the Logic Update of the current state
-
-			OnUpdateEvent?.Invoke(); // Call the OnUpdateEvent
+            OnUpdateEvent?.Invoke(); // Call the OnUpdateEvent
 		}
 
 		private void FixedUpdate() 
 		{
 			StateMachine.CurrentState.PhysicsUpdate(); // Call the Physics Update of the current state
-		}
-		public void debug(RaycastHit2D r) {  Debug.Log(r); }
+        }
+
+
+
+        public void debug(RaycastHit2D r) {  Debug.Log(r); }
 		public void LedgeClimbAnimationFinished() { LedgeClimbState.Climb(); } // Called by animation event to trigger ledge climb after the animation finishes
 
         public GameObject GetInteractorObject() => gameObject;

@@ -21,7 +21,7 @@ namespace Momentum.States
 			base.Enter();
 			
 			Grounded?.Invoke(); // Invoke our event to let subscribers know we are grounded
-		}
+        }
 
 		public override void Exit()
 		{

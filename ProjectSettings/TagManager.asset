@@ -8,6 +8,7 @@ TagManager:
   - PuzzleObject
   - Collectible
   - Portal
+  - MovingPlatform
   layers:
   - Default
   - TransparentFX

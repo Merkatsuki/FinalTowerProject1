@@ -12,7 +12,7 @@ namespace Momentum
 		// public CapsuleCollider2D PBC { get; private set; }
 		public PlayerChecks PChecks { get; private set; }
 
-		private void Awake()
+        private void Awake()
 		{ // Set the references so they aren't null reference
 			PAnimator = GetComponent<Animator>();
 			PChecks = GetComponent<PlayerChecks>();

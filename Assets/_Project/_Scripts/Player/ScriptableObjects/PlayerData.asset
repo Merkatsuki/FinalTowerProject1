@@ -78,7 +78,7 @@ MonoBehaviour:
   LedgeHangOffset: {x: -0.19, y: -1.23}
   CanMoveInAir: 1
   FallGravityMultiplier: 12
-  MaxFallForce: -19.2
+  MaxFallForce: -12.1
   AddForceParallelToSlope: 1
   PreventBouncingOnSlope: 1
   AntiBounceForce: 0.75
