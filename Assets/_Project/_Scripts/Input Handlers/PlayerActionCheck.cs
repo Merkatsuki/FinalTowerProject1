@@ -51,7 +51,7 @@ namespace Momentum
 		
 		public bool Jump(PlayerBaseState state) 
 		{
-			if (state == _player.CrouchIdleState || state == _player.CrouchMoveState)
+            if (state == _player.CrouchIdleState || state == _player.CrouchMoveState)
 			{
 				if (_player.CrouchIdleState.CanUncrouch() && _playerReferences.PData.Jump && _playerReferences.PData.AmountOfJumps == 1 && _player.JumpState.JumpCoolDown <= 0 && _player.JumpState.JumpBuffer > 0 && _player.JumpState.CoyoteTimer > 0 // Jump is enabled and the total jump amount is 1 and cooldown is finished and the jump input has been pressed recently (within JumpBuffer) and we have left the ground within _playerReferences.PData.CoyoteTime seconds ago OR
 					|| _player.CrouchIdleState.CanUncrouch() && _playerReferences.PData.Jump && _playerReferences.PData.AmountOfJumps != 1 && _player.JumpState.JumpsLeft > 0 && _player.JumpState.JumpBuffer > 0) // Jump is enabled and amount of jumps is not 1 and we have jumps left and we just recently pressed the jump

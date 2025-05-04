@@ -34,6 +34,9 @@ MonoBehaviour:
   GroundLayerMask:
     serializedVersion: 2
     m_Bits: 8
+  OneWayPlatformLayerMask:
+    serializedVersion: 2
+    m_Bits: 1024
   WallLayerMask:
     serializedVersion: 2
     m_Bits: 8

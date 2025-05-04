@@ -54,7 +54,8 @@ namespace Momentum
 		
 		[Tooltip("What is considered ground? Used to determine when the player is grounded")]
 		public LayerMask GroundLayerMask;
-		[Tooltip("What is considered a wall? Usually the same as what is considered ground")]
+        public LayerMask OneWayPlatformLayerMask;
+        [Tooltip("What is considered a wall? Usually the same as what is considered ground")]
 		public LayerMask WallLayerMask;
 		[Tooltip("What can our player not exist in? This is used for ray/box casts to determine if the player will end up in solid objects when changing box collider properties or setting transform.position. Will most likely be combination of wall & grounded layer mask")]
 		public LayerMask CantExistIn;
