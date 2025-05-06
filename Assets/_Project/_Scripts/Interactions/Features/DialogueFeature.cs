@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class DialogueFeature : MonoBehaviour, IInteractableFeature
 {
     [Header("Dialogue Settings")]
+    [SerializeField] private DialogueMode mode;
     [SerializeField] private DialogueGraphSO dialogueGraph;
     [SerializeField] private DialogueSequence dialogueSequence;
     [SerializeField][TextArea(2, 4)] private string oneLiner;
@@ -13,30 +14,46 @@ public class DialogueFeature : MonoBehaviour, IInteractableFeature
 
     private bool dialogueStarted = false;
 
+    private void OnValidate()
+    {
+        switch (mode)
+        {
+            case DialogueMode.Graph:
+                dialogueSequence = null;
+                oneLiner = string.Empty;
+                break;
+            case DialogueMode.Sequence:
+                dialogueGraph = null;
+                oneLiner = string.Empty;
+                break;
+            case DialogueMode.OneLiner:
+                dialogueGraph = null;
+                dialogueSequence = null;
+                break;
+        }
+    }
+
     public void OnInteract(IPuzzleInteractor actor)
     {
         if (dialogueStarted) return;
         dialogueStarted = true;
 
-        if (dialogueGraph != null)
+        switch (mode)
         {
-            // Start Branching Dialogue
-            DialogueManager.Instance.StartDialogue(dialogueGraph, OnDialogueComplete);
-        }
-        else if (dialogueSequence != null)
-        {
-            // Start Linear Dialogue Sequence
-            DialogueManager.Instance.StartDialogueSequence(dialogueSequence, OnDialogueComplete);
-        }
-        else if (!string.IsNullOrEmpty(oneLiner))
-        {
-            // Start One Liner
-            DialogueManager.Instance.ShowOneLiner(oneLiner, OnDialogueComplete);
-        }
-        else
-        {
-            Debug.LogWarning("[DialogueFeature] No dialogue data assigned!");
-            dialogueStarted = false;
+            case DialogueMode.Graph:
+                if (dialogueGraph)
+                    DialogueManager.Instance.StartDialogue(dialogueGraph, OnDialogueComplete);
+                break;
+
+            case DialogueMode.Sequence:
+                if (dialogueSequence != null)
+                    DialogueManager.Instance.StartDialogueSequence(dialogueSequence, OnDialogueComplete);
+                break;
+
+            case DialogueMode.OneLiner:
+                if (!string.IsNullOrEmpty(oneLiner))
+                    DialogueManager.Instance.ShowOneLiner(oneLiner, OnDialogueComplete);
+                break;
         }
     }
 

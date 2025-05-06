@@ -4,6 +4,8 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
+public enum DialogueMode { Graph, Sequence, OneLiner }
+
 public class DialogueManager : MonoBehaviour
 {
     [Header("Dialogue UI")]
@@ -84,8 +86,67 @@ public class DialogueManager : MonoBehaviour
         onDialogueComplete?.Invoke();
     }
 
-    public void StartDialogueSequence(DialogueSequence sequence, System.Action onComplete) { /* wrapper for sequence */ }
-    public void ShowOneLiner(string line, System.Action onComplete) { /* wrapper for one-liner */ }
+    public void StartDialogueSequence(DialogueSequence sequence, System.Action onComplete = null)
+    {
+        if (sequence == null || sequence.lines == null || sequence.lines.Count == 0)
+        {
+            Debug.LogWarning("Tried to start an empty dialogue sequence.");
+            return;
+        }
+
+        onDialogueComplete = onComplete;
+
+        // Build a temporary dialogue graph on the fly
+        DialogueGraphSO tempGraph = ScriptableObject.CreateInstance<DialogueGraphSO>();
+        tempGraph.graphName = "Sequence_" + sequence.speaker;
+        tempGraph.startNodeId = "0";
+
+        for (int i = 0; i < sequence.lines.Count; i++)
+        {
+            DialogueNode node = new DialogueNode
+            {
+                id = i.ToString(),
+                speakerName = sequence.speaker,
+                lineText = sequence.lines[i],
+                choices = new List<DialogueChoice>(),
+                autoAdvance = true
+            };
+
+            // Optionally add a dummy choice to auto-advance
+            if (i < sequence.lines.Count - 1)
+            {
+                node.choices.Add(new DialogueChoice
+                {
+                    text = "", // hidden
+                    nextNodeId = (i + 1).ToString()
+                });
+            }
+
+            tempGraph.nodes.Add(node);
+        }
+
+        StartDialogue(tempGraph, onComplete);
+        Destroy(tempGraph);
+    }
+
+    public void ShowOneLiner(string line, System.Action onComplete = null)
+    {
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            Debug.LogWarning("Tried to show empty one-liner.");
+            onComplete?.Invoke();
+            return;
+        }
+
+        DialogueSequence quickSeq = new DialogueSequence
+        {
+            speaker = "", // Or "Narrator"
+            lines = new List<string> { line },
+            pauseAfter = false
+        };
+
+        StartDialogueSequence(quickSeq, onComplete);
+    }
 
     public bool IsDialoguePlaying()
     {
@@ -136,21 +197,32 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
+        // If there are choices, we wait for player input
         if (currentNode.choices != null && currentNode.choices.Count > 0)
         {
-            // Should not auto-advance when choices exist
             return;
         }
 
-        // Move automatically if possible
-        if (!string.IsNullOrEmpty(currentNode.choices?.Count > 0 ? currentNode.choices[0].nextNodeId : ""))
+        // Try to auto-advance if flagged
+        if (currentNode.autoAdvance)
         {
-            // If somehow choices exist but no player input yet
-            return;
+            // Check if a next node ID exists in the first choice
+            if (currentNode.choices != null && currentNode.choices.Count == 1)
+            {
+                string nextId = currentNode.choices[0].nextNodeId;
+
+                if (!string.IsNullOrEmpty(nextId))
+                {
+                    OnChoiceSelected(nextId);
+                    return;
+                }
+            }
         }
 
-        EndDialogue(); // Default to ending for now
+        // If no valid next node, end dialogue
+        EndDialogue();
     }
+
 
     private void OnChoiceSelected(string nextNodeId)
     {
