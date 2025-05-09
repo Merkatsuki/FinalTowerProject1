@@ -44,10 +44,10 @@ public enum ZoneTag
     Any, 
     Hub, 
     Junkyard, 
-    JoyZone,
-    AngerZone, 
-    SadnessZone, 
-    FinalMemory 
+    Elevator,
+    TheTower, 
+    Greenhouse, 
+    TheChip 
 }
 public enum QuipTone 
 { 

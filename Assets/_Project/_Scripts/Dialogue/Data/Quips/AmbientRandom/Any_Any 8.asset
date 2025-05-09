@@ -15,7 +15,7 @@ MonoBehaviour:
   quipText: Today feels like it already happened yesterday.
   triggerType: 9
   emotionTag: 0
-  zoneTag: 0
+  zoneTag: 6
   tone: 6
   weight: 1
   repeatable: 1

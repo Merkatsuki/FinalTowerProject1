@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   quipText: I miss the humming. Not the power. The comfort.
   triggerType: 4
-  emotionTag: 1
+  emotionTag: 0
   zoneTag: 2
   tone: 4
   weight: 1

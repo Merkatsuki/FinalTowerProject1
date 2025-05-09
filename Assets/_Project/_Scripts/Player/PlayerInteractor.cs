@@ -33,6 +33,7 @@ public class PlayerInteractor : MonoBehaviour
     [Header("Command Mode Settings")]
     [SerializeField] private GameObject clickMarkerPrefab;
     [SerializeField] private CanvasGroup commandOverlay;
+    [SerializeField] private CanvasGroup commandOverlayPanel;
     [SerializeField] private float commandModeRadiusBoost = 2f;
     [SerializeField] private float commandModeFacingBonus = 0.2f;
 
@@ -118,9 +119,34 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (!InputManager.instance.IsCommandMode) return;
 
+        if (IsPointerOverBlockingUI()) return;
+
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(InputManager.instance.MousePosition);
         companion.CommandMoveToPoint(mouseWorldPos);
         SpawnClickMarker(mouseWorldPos);
+    }
+
+    private bool IsPointerOverBlockingUI()
+    {
+        var eventSystem = UnityEngine.EventSystems.EventSystem.current;
+        if (eventSystem == null) return false;
+
+        var pointerData = new UnityEngine.EventSystems.PointerEventData(eventSystem)
+        {
+            position = InputManager.instance.MousePosition
+        };
+
+        var results = new List<UnityEngine.EventSystems.RaycastResult>();
+        UnityEngine.EventSystems.EventSystem.current.RaycastAll(pointerData, results);
+
+        foreach (var result in results)
+        {
+            // Add tag or layer filter here if needed
+            if (result.gameObject.CompareTag("BlockInput"))
+                return true;
+        }
+
+        return false;
     }
 
 
@@ -257,12 +283,15 @@ public class PlayerInteractor : MonoBehaviour
 
     private void UpdateCommandOverlay(bool isCommandMode)
     {
+        commandOverlayPanel.DOFade(isCommandMode ? 1f : 0f, 0.3f).SetEase(Ease.OutQuad).SetUpdate(true);
+
+
         commandOverlay.DOFade(isCommandMode ? 1f : 0f, 0.3f)
             .SetEase(Ease.OutQuad)
             .SetUpdate(true);
 
-        commandOverlay.interactable = false;
-        commandOverlay.blocksRaycasts = false;
+        commandOverlay.interactable = isCommandMode;
+        commandOverlay.blocksRaycasts = isCommandMode;
     }
 
     private void OnInteractPressed(InputAction.CallbackContext context)

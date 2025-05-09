@@ -10,6 +10,8 @@ TagManager:
   - Portal
   - MovingPlatform
   - OneWayPlatform
+  - Companion
+  - BlockInput
   layers:
   - Default
   - TransparentFX

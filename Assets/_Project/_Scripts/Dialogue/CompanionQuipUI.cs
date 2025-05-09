@@ -22,6 +22,7 @@ public class CompanionQuipUI : MonoBehaviour
     {
         yield return new WaitForSeconds(displayDuration);
         quipPanel.SetActive(false);
+        QuipManager.Instance?.NotifyQuipEnded();
     }
 
     private bool IsVisibleToCamera()

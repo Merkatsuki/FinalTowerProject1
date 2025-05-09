@@ -15,7 +15,7 @@ MonoBehaviour:
   quipText: Circuits age better than people. We just get nostalgic instead of wrinkled.
   triggerType: 9
   emotionTag: 0
-  zoneTag: 0
+  zoneTag: 1
   tone: 5
   weight: 1
   repeatable: 1

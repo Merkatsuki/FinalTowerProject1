@@ -15,7 +15,7 @@ MonoBehaviour:
   quipText: "If joy had a smell\u2026 it has to be burnt toast."
   triggerType: 9
   emotionTag: 0
-  zoneTag: 0
+  zoneTag: 5
   tone: 6
   weight: 1
   repeatable: 1
