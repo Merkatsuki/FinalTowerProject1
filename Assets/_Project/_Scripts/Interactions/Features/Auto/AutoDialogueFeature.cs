@@ -1,0 +1,66 @@
+// AutoDialogueFeature.cs
+using UnityEngine;
+using System.Collections.Generic;
+
+public class AutoDialogueFeature : AutoTriggerFeature
+{
+    [Header("Dialogue Settings")]
+    [Tooltip("If provided, this will override the inline sequence below")]
+    [SerializeField] private DialogueSequenceSO sequenceAsset;
+    [Tooltip("Optional inline sequence if no asset is used")]
+    [SerializeField] private DialogueSequence inlineSequence = new();
+
+    [Header("One Liner (used if no sequence or SO)")]
+    [SerializeField] private string oneLinerText;
+    [SerializeField] private string oneLinerSpeaker;
+    [SerializeField] private bool oneLinerWaitForInput = true;
+    [SerializeField] private float oneLinerPauseAfter = 0f;
+
+
+    private void OnValidate()
+    {
+        if (sequenceAsset != null)
+        {
+            inlineSequence.lines.Clear();
+            oneLinerText = string.Empty;
+        }
+        else if (inlineSequence.lines.Count > 0)
+        {
+            oneLinerText = string.Empty;
+        }
+    }
+    protected override void ExecuteTrigger()
+    {
+        if (sequenceAsset != null)
+        {
+            DialogueManager.Instance.PlaySequence(sequenceAsset, OnDialogueComplete);
+        }
+        else if (inlineSequence != null && inlineSequence.lines.Count > 0)
+        {
+            DialogueManager.Instance.PlaySequence(inlineSequence, OnDialogueComplete);
+        }
+        else if (!string.IsNullOrEmpty(oneLinerText))
+        {
+            DialogueManager.Instance.PlaySequence(new DialogueSequence
+            {
+                lines = new List<DialogueLine> {
+                    new DialogueLine {
+                        speaker = oneLinerSpeaker,
+                        text = oneLinerText,
+                        waitForInput = oneLinerWaitForInput,
+                        pauseAfter = oneLinerPauseAfter
+                    }
+                }
+            }, OnDialogueComplete);
+        }
+        else
+        {
+            OnDialogueComplete();
+        }
+    }
+
+    private void OnDialogueComplete()
+    {
+        RunFeatureEffects();
+    }
+}

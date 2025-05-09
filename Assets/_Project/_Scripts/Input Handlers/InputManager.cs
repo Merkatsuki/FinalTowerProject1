@@ -8,6 +8,8 @@ namespace Momentum
         public static InputManager instance; // Creates one instance for everyone to use
         private InputMaster _controls; // Reference to the InputMaster script where our controls are stored
 
+        private bool _isDialogueMode = false;
+        
         #region Player Input Map
         // Avalible for the rest of the classes to use (Mainly should be used by PlayerAction as a front end for other classes)
 
@@ -25,6 +27,7 @@ namespace Momentum
         public bool JumpBlocked => _jumpBlocked;
         public bool JumpPressedThisFrame => !_jumpBlocked && _controls.Player.Jump.WasPressedThisFrame();
         public bool JumpHeld => _controls.Player.Jump.inProgress && !_jumpBlocked;
+        public bool IsDialogueMode => _isDialogueMode;
 
         public bool IsPressingDown => WASDInput.y < -0.5f;
         public bool IsSprint { get; private set; }
@@ -70,6 +73,16 @@ namespace Momentum
         private void Update()
         {
             #region Read Input
+            if (_isDialogueMode)
+            {
+                WASDInput = Vector2.zero;
+                IsSprint = false;
+                IsDash = false;
+                IsCrouch = false;
+                IsGrab = false;
+                IsAttack = false;
+                return;
+            }
 
             MousePosition = _controls.Player.PointerPosition.ReadValue<Vector2>();
             WASDInput = _controls.Player.MovementControls.ReadValue<Vector2>();
@@ -121,6 +134,11 @@ namespace Momentum
         public void BlockJumpUntilRelease()
         {
             _jumpBlocked = true;
+        }
+
+        public void SetDialogueMode(bool active)
+        {
+            _isDialogueMode = active;
         }
 
         #endregion

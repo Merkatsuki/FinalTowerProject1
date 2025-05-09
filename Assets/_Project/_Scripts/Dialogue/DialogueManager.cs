@@ -1,246 +1,103 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
-
-public enum DialogueMode { Graph, Sequence, OneLiner }
+using Momentum;
 
 public class DialogueManager : MonoBehaviour
 {
-    [Header("Dialogue UI")]
+    public static DialogueManager Instance { get; private set; }
+
+    [Header("UI References")]
+    [SerializeField] private GameObject dialogueModeIndicator;
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private TMP_Text speakerNameText;
     [SerializeField] private TMP_Text dialogueText;
-    [SerializeField] private Transform choicesContainer;
-    [SerializeField] private GameObject choiceButtonPrefab;
     [SerializeField] private float typingSpeed = 0.02f;
 
-    [Header("Typing Settings")]
-    [SerializeField] private bool useTypewriter = true;
-
-    private DialogueGraphSO currentGraph;
-    private DialogueNode currentNode;
     private bool isTyping = false;
-    private bool awaitingChoice = false;
-    private System.Action onDialogueComplete; // Optional callback when dialogue ends
-
-    private static DialogueManager instance;
-    public static DialogueManager Instance => instance;
+    private bool awaitingInput = false;
+    private System.Action onDialogueComplete;
 
     private void Awake()
     {
-        if (instance != null && instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        instance = this;
+        if (Instance != null && Instance != this) Destroy(gameObject);
+        else Instance = this;
     }
 
-    private void Update()
+    private void Start()
     {
-        if (dialoguePanel.activeSelf && !awaitingChoice && Input.GetKeyDown(KeyCode.Space))
+        if (InputManager.instance != null)
         {
-            if (isTyping)
-            {
-                SkipTyping();
-            }
-            else
-            {
-                AdvanceDialogue();
-            }
+            InputManager.instance.JumpPressed += OnAdvanceInput;
         }
     }
 
-    #region Public API
 
-    public void StartDialogue(DialogueGraphSO graph, System.Action onComplete = null)
+    private void OnAdvanceInput()
     {
-        if (graph == null)
+        if (awaitingInput)
         {
-            Debug.LogWarning("Tried to start dialogue with a null graph.");
-            return;
+            awaitingInput = false;
         }
-
-        onDialogueComplete = onComplete;
-        currentGraph = graph;
-        currentNode = graph.GetNodeById(graph.startNodeId);
-
-        if (currentNode == null)
-        {
-            Debug.LogError("Start Node not found!");
-            return;
-        }
-
-        dialoguePanel.SetActive(true);
-        DisplayNode(currentNode);
     }
 
-    public void EndDialogue()
-    {
-        dialoguePanel.SetActive(false);
-        ClearChoices();
-        currentGraph = null;
-        currentNode = null;
-        onDialogueComplete?.Invoke();
-    }
-
-    public void StartDialogueSequence(DialogueSequence sequence, System.Action onComplete = null)
+    public void PlaySequence(DialogueSequence sequence, System.Action onComplete = null)
     {
         if (sequence == null || sequence.lines == null || sequence.lines.Count == 0)
         {
-            Debug.LogWarning("Tried to start an empty dialogue sequence.");
+            Debug.LogWarning("Empty dialogue sequence.");
             return;
         }
 
         onDialogueComplete = onComplete;
+        dialoguePanel.SetActive(true);
 
-        // Build a temporary dialogue graph on the fly
-        DialogueGraphSO tempGraph = ScriptableObject.CreateInstance<DialogueGraphSO>();
-        tempGraph.graphName = "Sequence_" + sequence.speaker;
-        tempGraph.startNodeId = "0";
-
-        for (int i = 0; i < sequence.lines.Count; i++)
+        // Dialogue Mode auto-detect logic
+        bool shouldBlockInput = sequence.lines.Exists(l => l.waitForInput);
+        if (shouldBlockInput)
         {
-            DialogueNode node = new DialogueNode
-            {
-                id = i.ToString(),
-                speakerName = sequence.speaker,
-                lineText = sequence.lines[i],
-                choices = new List<DialogueChoice>(),
-                autoAdvance = true
-            };
-
-            // Optionally add a dummy choice to auto-advance
-            if (i < sequence.lines.Count - 1)
-            {
-                node.choices.Add(new DialogueChoice
-                {
-                    text = "", // hidden
-                    nextNodeId = (i + 1).ToString()
-                });
-            }
-
-            tempGraph.nodes.Add(node);
+            InputManager.instance?.SetDialogueMode(true);
+            if (dialogueModeIndicator != null)
+                dialogueModeIndicator.SetActive(true);
         }
 
-        StartDialogue(tempGraph, onComplete);
-        Destroy(tempGraph);
+        StartCoroutine(PlaySequenceCoroutine(sequence.lines, shouldBlockInput));
     }
 
-    public void ShowOneLiner(string line, System.Action onComplete = null)
+    public void PlaySequence(DialogueSequenceSO sequenceSO, System.Action onComplete = null)
     {
-        if (string.IsNullOrWhiteSpace(line))
+        if (sequenceSO == null || sequenceSO.lines == null || sequenceSO.lines.Count == 0)
         {
-            Debug.LogWarning("Tried to show empty one-liner.");
-            onComplete?.Invoke();
+            Debug.LogWarning("Empty dialogue asset.");
             return;
         }
 
-        DialogueSequence quickSeq = new DialogueSequence
-        {
-            speaker = "", // Or "Narrator"
-            lines = new List<string> { line },
-            pauseAfter = false
-        };
-
-        StartDialogueSequence(quickSeq, onComplete);
+        DialogueSequence runtime = new DialogueSequence { lines = sequenceSO.lines };
+        PlaySequence(runtime, onComplete);
     }
 
-    public bool IsDialoguePlaying()
+    private IEnumerator PlaySequenceCoroutine(List<DialogueLine> lines, bool blockInput)
     {
-        return dialoguePanel != null && dialoguePanel.activeSelf;
-    }
-
-    #endregion
-
-    #region Node Handling
-
-    private void DisplayNode(DialogueNode node)
-    {
-        ClearChoices();
-
-        if (speakerNameText != null)
+        foreach (var line in lines)
         {
-            speakerNameText.text = node.speakerName;
-        }
+            speakerNameText.text = line.speaker;
+            yield return TypeLine(line.text);
 
-        if (useTypewriter)
-        {
-            StartCoroutine(TypeLine(node.lineText));
-        }
-        else
-        {
-            dialogueText.text = node.lineText;
-        }
-
-        if (node.choices != null && node.choices.Count > 0)
-        {
-            awaitingChoice = true;
-            foreach (var choice in node.choices)
+            if (line.pauseAfter > 0f)
             {
-                CreateChoiceButton(choice);
+                yield return new WaitForSeconds(line.pauseAfter);
             }
-        }
-        else
-        {
-            awaitingChoice = false;
-        }
-    }
 
-    private void AdvanceDialogue()
-    {
-        if (currentNode == null)
-        {
-            EndDialogue();
-            return;
-        }
-
-        // If there are choices, we wait for player input
-        if (currentNode.choices != null && currentNode.choices.Count > 0)
-        {
-            return;
-        }
-
-        // Try to auto-advance if flagged
-        if (currentNode.autoAdvance)
-        {
-            // Check if a next node ID exists in the first choice
-            if (currentNode.choices != null && currentNode.choices.Count == 1)
+            if (line.waitForInput)
             {
-                string nextId = currentNode.choices[0].nextNodeId;
-
-                if (!string.IsNullOrEmpty(nextId))
-                {
-                    OnChoiceSelected(nextId);
-                    return;
-                }
+                awaitingInput = true;
+                yield return new WaitUntil(() => !awaitingInput);
             }
         }
 
-        // If no valid next node, end dialogue
         EndDialogue();
     }
-
-
-    private void OnChoiceSelected(string nextNodeId)
-    {
-        var nextNode = currentGraph.GetNodeById(nextNodeId);
-        if (nextNode == null)
-        {
-            Debug.LogError($"Next node with ID {nextNodeId} not found!");
-            EndDialogue();
-            return;
-        }
-
-        currentNode = nextNode;
-        DisplayNode(currentNode);
-    }
-
-    #endregion
-
-    #region Typing
 
     private IEnumerator TypeLine(string line)
     {
@@ -256,42 +113,19 @@ public class DialogueManager : MonoBehaviour
         isTyping = false;
     }
 
-    private void SkipTyping()
+    public void EndDialogue()
     {
-        StopAllCoroutines();
-        dialogueText.text = currentNode.lineText;
-        isTyping = false;
+        if (dialogueModeIndicator != null)
+            dialogueModeIndicator.SetActive(false);
+        dialoguePanel.SetActive(false);
+        speakerNameText.text = "";
+        dialogueText.text = "";
+        InputManager.instance?.SetDialogueMode(false);
+        onDialogueComplete?.Invoke();
     }
 
-    #endregion
-
-    #region Choice UI
-
-    private void CreateChoiceButton(DialogueChoice choice)
+    public bool IsDialoguePlaying()
     {
-        GameObject buttonObj = Instantiate(choiceButtonPrefab, choicesContainer);
-        TMP_Text buttonText = buttonObj.GetComponentInChildren<TMP_Text>();
-        Button button = buttonObj.GetComponent<Button>();
-
-        if (buttonText != null)
-        {
-            buttonText.text = choice.text;
-        }
-
-        button.onClick.AddListener(() =>
-        {
-            awaitingChoice = false;
-            OnChoiceSelected(choice.nextNodeId);
-        });
+        return dialoguePanel.activeSelf;
     }
-
-    private void ClearChoices()
-    {
-        foreach (Transform child in choicesContainer)
-        {
-            Destroy(child.gameObject);
-        }
-    }
-
-    #endregion
 }

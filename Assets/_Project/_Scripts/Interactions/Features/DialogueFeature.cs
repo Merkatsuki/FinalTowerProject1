@@ -1,13 +1,20 @@
+// DialogueFeature.cs
 using UnityEngine;
 using System.Collections.Generic;
 
 public class DialogueFeature : MonoBehaviour, IInteractableFeature
 {
     [Header("Dialogue Settings")]
-    [SerializeField] private DialogueMode mode;
-    [SerializeField] private DialogueGraphSO dialogueGraph;
-    [SerializeField] private DialogueSequence dialogueSequence;
-    [SerializeField][TextArea(2, 4)] private string oneLiner;
+    [Tooltip("If provided, this will override the inline sequence below")]
+    [SerializeField] private DialogueSequenceSO sequenceAsset;
+    [Tooltip("Optional inline sequence if no asset is used")]
+    [SerializeField] private DialogueSequence inlineSequence = new();
+
+    [Header("One Liner (used if no sequence or SO)")]
+    [SerializeField] private string oneLinerText;
+    [SerializeField] private string oneLinerSpeaker;
+    [SerializeField] private bool oneLinerWaitForInput = true;
+    [SerializeField] private float oneLinerPauseAfter = 0f;
 
     [Header("Feature Effects")]
     [SerializeField] private List<EffectStrategySO> featureEffects = new();
@@ -16,20 +23,14 @@ public class DialogueFeature : MonoBehaviour, IInteractableFeature
 
     private void OnValidate()
     {
-        switch (mode)
+        if (sequenceAsset != null)
         {
-            case DialogueMode.Graph:
-                dialogueSequence = null;
-                oneLiner = string.Empty;
-                break;
-            case DialogueMode.Sequence:
-                dialogueGraph = null;
-                oneLiner = string.Empty;
-                break;
-            case DialogueMode.OneLiner:
-                dialogueGraph = null;
-                dialogueSequence = null;
-                break;
+            inlineSequence.lines.Clear();
+            oneLinerText = string.Empty;
+        }
+        else if (inlineSequence.lines.Count > 0)
+        {
+            oneLinerText = string.Empty;
         }
     }
 
@@ -38,22 +39,31 @@ public class DialogueFeature : MonoBehaviour, IInteractableFeature
         if (dialogueStarted) return;
         dialogueStarted = true;
 
-        switch (mode)
+        if (sequenceAsset != null)
         {
-            case DialogueMode.Graph:
-                if (dialogueGraph)
-                    DialogueManager.Instance.StartDialogue(dialogueGraph, OnDialogueComplete);
-                break;
-
-            case DialogueMode.Sequence:
-                if (dialogueSequence != null)
-                    DialogueManager.Instance.StartDialogueSequence(dialogueSequence, OnDialogueComplete);
-                break;
-
-            case DialogueMode.OneLiner:
-                if (!string.IsNullOrEmpty(oneLiner))
-                    DialogueManager.Instance.ShowOneLiner(oneLiner, OnDialogueComplete);
-                break;
+            DialogueManager.Instance.PlaySequence(sequenceAsset, OnDialogueComplete);
+        }
+        else if (inlineSequence != null && inlineSequence.lines.Count > 0)
+        {
+            DialogueManager.Instance.PlaySequence(inlineSequence, OnDialogueComplete);
+        }
+        else if (!string.IsNullOrEmpty(oneLinerText))
+        {
+            DialogueManager.Instance.PlaySequence(new DialogueSequence
+            {
+                lines = new List<DialogueLine> {
+                    new DialogueLine {
+                        speaker = oneLinerSpeaker,
+                        text = oneLinerText,
+                        waitForInput = oneLinerWaitForInput,
+                        pauseAfter = oneLinerPauseAfter
+                    }
+                }
+            }, OnDialogueComplete);
+        }
+        else
+        {
+            OnDialogueComplete();
         }
     }
 
