@@ -43,7 +43,7 @@ public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
 
         if (!unlocked)
         {
-            if (requiredFlag != null && PuzzleManager.Instance.IsFlagSet(requiredFlag))
+            if (requiredFlag != null && FlagManager.Instance.IsFlagSet(requiredFlag))
             {
                 UnlockDoor();
             }

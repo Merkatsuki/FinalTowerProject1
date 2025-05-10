@@ -13,8 +13,8 @@ public class SetFlagEffect : EffectStrategySO
     {
         if (flag != null)
         {
-            PuzzleManager.Instance?.SetFlag(flag, setValue);
-            Debug.Log($"[Effect] Flag '{flag.flagName}' set to {setValue}.");
+            FlagManager.Instance?.SetBool(flag, setValue);
+            Debug.Log($"[Effect] Flag '{flag.displayName}' set to {setValue}.");
         }
         else
         {

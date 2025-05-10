@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lines:
   - speaker: CB2212
-    text: Text 1
+    text: IUHDOQYWGDOQIUDGQOWIUDHIWQOPUDHQWOIUDGHWQOYDGQWOYDGQWOIUDGWD
     pauseAfter: 1
     waitForInput: 0
   - speaker: CB2212

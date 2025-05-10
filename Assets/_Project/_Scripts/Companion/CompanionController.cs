@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿// CompanionController.cs - Fully updated for Emotion system, cleaned and organized
+using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using System.Collections;
 using Momentum;
@@ -16,30 +17,27 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
     public CompanionIdleState idleState;
     public CompanionMoveToPointState moveToPointState;
 
-    [Header("Status & Energy")]
-    [SerializeField] private EnergyStateComponent energyState;
+    [Header("Emotion & Visuals")]
     [SerializeField] private Light2D robotGlowLight;
     [SerializeField] private float chargedGlowIntensity = 1.2f;
-    [SerializeField] private float energyDuration = 10f;
+    [SerializeField] private float glowFadeDuration = 1f;
     [SerializeField] private CompanionStatusUI statusUI;
 
     [Header("Cooldown & Lock")]
     [SerializeField] private float retargetCooldown = 0.2f;
     private float retargetCooldownTimer = 0f;
-    private Coroutine energyTimerCoroutine;
+    private Coroutine emotionGlowCoroutine;
     private bool interactionLocked = false;
 
-    [Header("Emotion")]
-    [SerializeField] private EmotionType currentEmotion = EmotionType.Neutral;
+    [Header("Emotion State")]
+    [SerializeField] private EmotionTag currentEmotion = EmotionTag.Neutral;
 
     // Interaction targets
     private IWorldInteractable currentTarget;
     private IWorldInteractable playerCommandTarget;
-    
+
     public TargetData CurrentTarget { get; private set; }
     public void SetCurrentTarget(TargetData data) => CurrentTarget = data;
-
-
     public void SetCurrentTarget(IWorldInteractable target) => currentTarget = target;
     public void ClearCurrentTarget() => currentTarget = null;
     public IWorldInteractable GetCurrentTrackedTarget() => currentTarget;
@@ -55,14 +53,25 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
     public CompanionFSM GetFSM() => fsm;
     public CompanionPerception GetPerception() => Perception;
 
-    public EmotionType GetEmotion() => currentEmotion;
-    public void SetEmotion(EmotionType emotion) => currentEmotion = emotion;
+    public EmotionTag GetEmotion() => EmotionSwitcher.Instance?.GetCurrentEmotion() ?? EmotionTag.Neutral;
+    public void SetEmotion(EmotionTag emotion) => currentEmotion = emotion;
+
     public bool WasCommanded(IWorldInteractable target) => playerCommandTarget == target;
     public bool HasPendingPlayerCommand() => playerCommandTarget != null;
     public void ClearPlayerCommand() => playerCommandTarget = null;
 
-    #region Unity Lifecycle
+    public GameObject GetInteractorObject()
+    {
+        return gameObject;
+    }
 
+    public string GetDisplayName()
+    {
+        return "Companion";
+    }
+
+
+    #region Unity Lifecycle
     private void Awake()
     {
         InitializeComponents();
@@ -72,7 +81,6 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
     {
         InputManager.instance.ToggleFollowPressed += ToggleFollowMode;
     }
-
 
     private void Update()
     {
@@ -86,11 +94,9 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
     {
         fsm.FixedTick();
     }
-
     #endregion
 
     #region Initialization
-
     private void InitializeComponents()
     {
         fsm = new CompanionFSM();
@@ -101,11 +107,9 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
         moveToPointState = new CompanionMoveToPointState(this, fsm);
         fsm.Initialize(idleState, statusUI);
     }
-
     #endregion
 
     #region Player Commands
-
     public void CommandMoveToPoint(Vector2 worldPosition)
     {
         SetCurrentTarget(new TargetData(worldPosition));
@@ -115,13 +119,9 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
     public void ToggleFollowMode()
     {
         if (fsm.CurrentStateType == CompanionStateType.Follow)
-        {
             fsm.ChangeState(idleState);
-        }
         else
-        {
             fsm.ChangeState(followState);
-        }
     }
 
     public void IssuePlayerCommand(IWorldInteractable target)
@@ -130,11 +130,9 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
         SetCurrentTarget(new TargetData(target.GetTransform().position, target));
         fsm.ChangeState(new CompanionInvestigateState(this, fsm, target));
     }
-
     #endregion
 
     #region Auto Investigate
-
     public bool TryAutoInvestigate()
     {
         if (!CanInvestigate()) return false;
@@ -148,78 +146,53 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
         }
         return false;
     }
-
     #endregion
 
-    #region Energy Management
-
-    public EnergyType GetEnergyType() => energyState?.GetEnergy() ?? EnergyType.None;
-    public GameObject GetInteractorObject() => gameObject;
-    public string GetDisplayName() => "Companion";
-
-    public void SetEnergyType(EnergyType type)
+    #region Emotion Visual Feedback
+    public void DisplayEmotionCharge(EmotionTag emotion, float duration = 2f)
     {
-        if (energyState != null)
-            energyState.SetEnergy(type);
+        Color color = EmotionColorMap.GetColor(emotion);
 
-        if (energyTimerCoroutine != null)
-            StopCoroutine(energyTimerCoroutine);
-
-        if (type != EnergyType.None)
-            energyTimerCoroutine = StartCoroutine(EnergyDecay());
-    }
-
-    private IEnumerator EnergyDecay()
-    {
-        float from = robotGlowLight.intensity;
-        float elapsed = 0f;
-
-        while (elapsed < energyDuration)
+        if (robotGlowLight != null)
         {
-            robotGlowLight.intensity = Mathf.Lerp(from, 0f, elapsed / energyDuration);
-            elapsed += Time.deltaTime;
-            yield return null;
+            if (emotionGlowCoroutine != null)
+                StopCoroutine(emotionGlowCoroutine);
+
+            emotionGlowCoroutine = StartCoroutine(GlowCoroutine(color, duration));
         }
-
-        ClearEnergy(true);
     }
 
-    public void ClearEnergy(bool skipFade = false)
+    public void ClearEmotionVisual(bool skipFade = false)
     {
-        if (energyState != null)
-            energyState.SetEnergy(EnergyType.None);
-
-        if (robotGlowLight != null && skipFade)
-            robotGlowLight.intensity = 0f;
+        if (robotGlowLight != null)
+        {
+            if (skipFade)
+                robotGlowLight.intensity = 0f;
+            else if (emotionGlowCoroutine != null)
+                StopCoroutine(emotionGlowCoroutine);
+        }
     }
 
-    public Light2D GetRobotLight() => robotGlowLight;
-    public float GetChargedGlowIntensity() => chargedGlowIntensity;
-
-    public IEnumerator ChargeGlow(Color color, float duration)
+    private IEnumerator GlowCoroutine(Color color, float duration)
     {
-        if (robotGlowLight == null) yield break;
-
         float from = robotGlowLight.intensity;
         float elapsed = 0f;
+        robotGlowLight.color = color;
 
         while (elapsed < duration)
         {
-            float t = elapsed / duration;
-            robotGlowLight.intensity = Mathf.Lerp(from, chargedGlowIntensity, t);
-            robotGlowLight.color = color;
+            robotGlowLight.intensity = Mathf.Lerp(from, chargedGlowIntensity, elapsed / duration);
             elapsed += Time.deltaTime;
             yield return null;
         }
 
         robotGlowLight.intensity = chargedGlowIntensity;
-        robotGlowLight.color = color;
+        yield return new WaitForSeconds(duration);
+        robotGlowLight.intensity = 0f;
     }
-
     #endregion
 
     #region Editor Debug
-
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
@@ -246,6 +219,5 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
         }
     }
 #endif
-
     #endregion
 }

@@ -3,19 +3,18 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Strategies/Entry/RequirePuzzleSolvedEntry")]
 public class RequirePuzzleSolvedEntrySO : EntryStrategySO
 {
-    [SerializeField] private string requiredPuzzleFlag;
+    [SerializeField] private FlagSO requiredFlag;
+
 
     public override bool CanEnter(IPuzzleInteractor actor, IWorldInteractable interactable)
     {
-        if (string.IsNullOrEmpty(requiredPuzzleFlag))
-            return true; // If no flag required, allow by default
+        return FlagManager.Instance != null && FlagManager.Instance.IsFlagSet(requiredFlag);
 
-        return PuzzleManager.Instance != null && PuzzleManager.Instance.IsFlagSet(requiredPuzzleFlag);
     }
 
-    public void SetRequiredPuzzleFlag(string flagName)
+    public void SetRequiredPuzzleFlag(FlagSO flag)
     {
-        requiredPuzzleFlag = flagName;
+        requiredFlag = flag;
     }
 
 }
