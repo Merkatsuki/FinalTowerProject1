@@ -3,19 +3,17 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Strategies/Exit/ExitOnFlagSet")]
 public class ExitOnFlagSetSO : ExitStrategySO
 {
-    [SerializeField] private string requiredFlag;
+    [SerializeField] private FlagSO requiredFlag;
 
     public override bool ShouldExit(IPuzzleInteractor actor, IWorldInteractable interactable)
     {
-        if (string.IsNullOrEmpty(requiredFlag))
-            return false;
+        return FlagManager.Instance != null && FlagManager.Instance.IsFlagSet(requiredFlag);
 
-        return PuzzleManager.Instance != null && PuzzleManager.Instance.IsFlagSet(requiredFlag);
     }
 
-    public void SetRequiredFlag(string flagName)
+    public void SetRequiredFlag(FlagSO flag)
     {
-        requiredFlag = flagName;
+        requiredFlag = flag;
     }
 
 }

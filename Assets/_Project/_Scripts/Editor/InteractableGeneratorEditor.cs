@@ -33,7 +33,7 @@ public class InteractableGeneratorEditor : EditorWindow
     private bool addPortalFeature;
     private bool addLightToggleFeature;
     private bool addPuzzleUnlockFeature;
-    private bool addEnergyFeature;
+    private bool addEmotionNodeFeature;
     private bool addLockedDoorFeature;
     private bool addDoorFeature;
     private bool addSwitchFeature;
@@ -144,8 +144,8 @@ public class InteractableGeneratorEditor : EditorWindow
         addPuzzleUnlockFeature = EditorGUILayout.ToggleLeft("Add Puzzle Unlock Feature", addPuzzleUnlockFeature);
         if (addPuzzleUnlockFeature) DrawEffectList(puzzleUnlockFeatureEffects, "Puzzle Unlock Feature Effects");
 
-        addEnergyFeature = EditorGUILayout.ToggleLeft("Add Energy Feature", addEnergyFeature);
-        if (addEnergyFeature) DrawEffectList(energyFeatureEffects, "Energy Feature Effects");
+        addEmotionNodeFeature = EditorGUILayout.ToggleLeft("Add Energy Feature", addEmotionNodeFeature);
+        if (addEmotionNodeFeature) DrawEffectList(energyFeatureEffects, "Energy Feature Effects");
 
         addLockedDoorFeature = EditorGUILayout.ToggleLeft("Add Locked Door Feature", addLockedDoorFeature);
         if (addLockedDoorFeature) DrawEffectList(lockedDoorFeatureEffects, "Locked Door Feature Effects");
@@ -294,7 +294,7 @@ public class InteractableGeneratorEditor : EditorWindow
         {
             var feature = go.AddComponent<SwitchFeature>();
             metadata.AddFeatureTag("Switch");
-            feature.SetEffectStrategies(switchFeatureEffects);
+            feature.SetFeatureEffects(switchFeatureEffects);
         }
 
         if (addMovingPlatformFeature)
@@ -355,22 +355,21 @@ public class InteractableGeneratorEditor : EditorWindow
             feature.SetFeatureEffects(puzzleUnlockFeatureEffects);
         }
 
-        if (addEnergyFeature)
+        if (addEmotionNodeFeature)
         {
-            var feature = go.AddComponent<EnergyFeature>();
-            metadata.AddFeatureTag("Energy");
+            var feature = go.AddComponent<EmotionNodeFeature>();
+            metadata.AddFeatureTag("EmotionNode");
             feature.SetFeatureEffects(energyFeatureEffects);
 
-            // Setup a dedicated Energy Light
-            GameObject energyLightObj = new GameObject("EnergyLight");
-            energyLightObj.transform.SetParent(go.transform);
-            energyLightObj.transform.localPosition = Vector3.zero;
+            GameObject glowObj = new GameObject("EmotionGlowLight");
+            glowObj.transform.SetParent(go.transform);
+            glowObj.transform.localPosition = Vector3.zero;
 
-            var energyLight2D = energyLightObj.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
-            energyLight2D.intensity = 0f;
-            energyLight2D.pointLightOuterRadius = 2.5f;
+            var glowLight = glowObj.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+            glowLight.intensity = 0f;
+            glowLight.pointLightOuterRadius = 2.5f;
 
-            feature.SetEnergyLight(energyLight2D);
+            feature.SetEmotionLight(glowLight);
         }
 
         if (addLockedDoorFeature)

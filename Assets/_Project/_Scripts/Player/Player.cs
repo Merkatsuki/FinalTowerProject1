@@ -8,8 +8,6 @@ namespace Momentum
 {
     public class Player : MonoBehaviour, IPuzzleInteractor
     {
-        [SerializeField] private EnergyStateComponent energyState;
-
         public PlayerStateMachine StateMachine { get; private set; } // Manages all our states
         public PlayerActionCheck CanDoAction { get; private set; } // Checks if we can transition to another state
 
@@ -142,7 +140,6 @@ namespace Momentum
         }
 
         public GameObject GetInteractorObject() => gameObject;
-        public EnergyType GetEnergyType() => energyState?.GetEnergy() ?? EnergyType.None;
         public string GetDisplayName() => "Player";
 
         public void SetVelocityZero()

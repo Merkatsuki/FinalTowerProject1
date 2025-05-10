@@ -1,94 +1,77 @@
-using UnityEngine;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance { get; private set; }
 
-    private HashSet<string> collectedItems = new HashSet<string>();
-    private Dictionary<string, ItemSO> itemDatabase = new Dictionary<string, ItemSO>();
+    private readonly HashSet<string> collectedItems = new();
+    private readonly Dictionary<string, ItemSO> itemDatabase = new();
 
-    public event Action<string> OnItemAdded;
-    public event Action<string> OnItemRemoved;
+    public static event Action<string> OnItemAdded;
+    public static event Action OnInventoryUpdated;
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
+        {
             Destroy(gameObject);
-        else
-            Instance = this;
+            return;
+        }
+        Instance = this;
+    }
+
+    public void RegisterItem(ItemSO item)
+    {
+        if (item == null || string.IsNullOrEmpty(item.ItemID)) return;
+
+        if (!itemDatabase.ContainsKey(item.ItemID))
+            itemDatabase.Add(item.ItemID, item);
     }
 
     public void AddItem(ItemSO item)
     {
-        if (item == null) return;
+        if (item == null || string.IsNullOrEmpty(item.ItemID)) return;
 
-        if (collectedItems.Add(item.ItemID))
-        {
-            itemDatabase[item.ItemID] = item;
-            Debug.Log($"[Inventory] Added item: {item.ItemName}");
-            OnItemAdded?.Invoke(item.ItemID);
-        }
-    }
+        if (collectedItems.Contains(item.ItemID)) return;
 
-    public void RemoveItem(ItemSO item)
-    {
-        if (item == null) return;
+        collectedItems.Add(item.ItemID);
+        RegisterItem(item);
 
-        if (collectedItems.Remove(item.ItemID))
-        {
-            itemDatabase.Remove(item.ItemID);
-            Debug.Log($"[Inventory] Removed item: {item.ItemName}");
-            OnItemRemoved?.Invoke(item.ItemID);
-        }
-    }
-
-    public bool HasItem(ItemSO item)
-    {
-        if (item == null) return false;
-        return collectedItems.Contains(item.ItemID);
-    }
-
-    public bool HasItem(string itemID)
-    {
-        return collectedItems.Contains(itemID);
-    }
-
-    public void AddItem(string itemID)
-    {
-        if (collectedItems.Add(itemID))
-        {
-            Debug.Log($"[Inventory] Added item by ID: {itemID}");
-            OnItemAdded?.Invoke(itemID);
-        }
-    }
-
-    public void RemoveItem(string itemID)
-    {
-        if (collectedItems.Remove(itemID))
-        {
-            itemDatabase.Remove(itemID);
-            Debug.Log($"[Inventory] Removed item by ID: {itemID}");
-            OnItemRemoved?.Invoke(itemID);
-        }
+        OnItemAdded?.Invoke(item.ItemID);
+        OnInventoryUpdated?.Invoke();
     }
 
     public List<ItemSO> GetAllItems()
     {
-        List<ItemSO> items = new List<ItemSO>();
+        List<ItemSO> result = new();
         foreach (var id in collectedItems)
         {
             if (itemDatabase.TryGetValue(id, out var item))
-                items.Add(item);
+                result.Add(item);
         }
-        return items;
+        return result;
     }
 
-    public void ClearInventory()
+    public List<ItemSO> GetQuickItems()
     {
-        collectedItems.Clear();
-        itemDatabase.Clear();
-        Debug.Log("[Inventory] Inventory cleared.");
+        List<ItemSO> result = new();
+        foreach (var id in collectedItems)
+        {
+            if (itemDatabase.TryGetValue(id, out var item) && item.isQuickInventoryItem)
+                result.Add(item);
+        }
+        return result;
+    }
+
+    public bool HasItem(string itemId)
+    {
+        return collectedItems.Contains(itemId);
+    }
+
+    public bool HasItem(ItemSO item)
+    {
+        return item != null && collectedItems.Contains(item.ItemID);
     }
 }

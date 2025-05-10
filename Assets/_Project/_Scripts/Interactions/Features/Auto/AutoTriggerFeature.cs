@@ -12,10 +12,13 @@ public abstract class AutoTriggerFeature : MonoBehaviour
     [SerializeField] protected List<EffectStrategySO> featureEffects = new();
 
     protected bool hasTriggered = false;
+    protected IPuzzleInteractor playerInteractor;
     private Coroutine triggerCoroutine;
 
-    public virtual void OnPlayerEnterZone()
+    public virtual void OnPlayerEnterZone(IPuzzleInteractor interactor)
     {
+        playerInteractor = interactor;
+
         if (triggerCoroutine == null)
             triggerCoroutine = StartCoroutine(TryTriggerAfterDelay());
     }
@@ -50,7 +53,7 @@ public abstract class AutoTriggerFeature : MonoBehaviour
         {
             if (effect != null && TryGetComponent(out IWorldInteractable interactable))
             {
-                effect.ApplyEffect(null, interactable, InteractionResult.Success);
+                effect.ApplyEffect(playerInteractor, interactable, InteractionResult.Success);
             }
         }
     }

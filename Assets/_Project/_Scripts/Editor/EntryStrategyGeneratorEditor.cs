@@ -12,8 +12,8 @@ public class EntryStrategyGeneratorEditor : EditorWindow
     private EntryStrategyType selectedStrategyType = EntryStrategyType.AllowAll;
 
     private string requiredItemId;
-    private string requiredPuzzleFlag;
-    private EnergyType requiredEnergyType;
+    private FlagSO requiredPuzzleFlag;
+    private EmotionTag requiredEmotionTag;
     private float cooldownDuration = 5f;
     private List<EntryStrategySO> compositeStrategies = new();
     private CompositeEntryStrategySO.LogicMode compositeLogicMode = CompositeEntryStrategySO.LogicMode.All;
@@ -59,11 +59,11 @@ public class EntryStrategyGeneratorEditor : EditorWindow
                 break;
 
             case EntryStrategyType.RequirePuzzleSolved:
-                requiredPuzzleFlag = EditorGUILayout.TextField("Required Puzzle Flag", requiredPuzzleFlag);
+                requiredPuzzleFlag = (FlagSO)EditorGUILayout.ObjectField("Required Flag", requiredPuzzleFlag, typeof(FlagSO), false);
                 break;
 
-            case EntryStrategyType.RequireMatchingEnergy:
-                requiredEnergyType = (EnergyType)EditorGUILayout.EnumPopup("Required Energy Type", requiredEnergyType);
+            case EntryStrategyType.RequireMatchingEmotion:
+                requiredEmotionTag = (EmotionTag)EditorGUILayout.EnumPopup("Required Emotion", requiredEmotionTag);
                 break;
 
             case EntryStrategyType.EntryCooldown:
@@ -116,10 +116,10 @@ public class EntryStrategyGeneratorEditor : EditorWindow
                 puzzleStrategy.SetRequiredPuzzleFlag(requiredPuzzleFlag);
                 strategy = puzzleStrategy;
                 break;
-            case EntryStrategyType.RequireMatchingEnergy:
-                var energyStrategy = ScriptableObject.CreateInstance<RequireMatchingEnergyTypeSO>();
-                energyStrategy.SetRequiredEnergyType(requiredEnergyType);
-                strategy = energyStrategy;
+            case EntryStrategyType.RequireMatchingEmotion:
+                var emotionStrategy = ScriptableObject.CreateInstance<RequireMatchingEmotionTypeSO>();
+                emotionStrategy.SetRequiredEmotionType(requiredEmotionTag);
+                strategy = emotionStrategy;
                 break;
             case EntryStrategyType.EntryCooldown:
                 var cooldownStrategy = ScriptableObject.CreateInstance<EntryCooldownStrategySO>();
@@ -153,7 +153,7 @@ public class EntryStrategyGeneratorEditor : EditorWindow
         DenyAll,
         RequireItemHeld,
         RequirePuzzleSolved,
-        RequireMatchingEnergy,
+        RequireMatchingEmotion,
         EntryCooldown,
         Composite
     }

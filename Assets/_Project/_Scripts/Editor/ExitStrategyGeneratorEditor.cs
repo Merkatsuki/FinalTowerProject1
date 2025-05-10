@@ -15,7 +15,7 @@ public class ExitStrategyGeneratorEditor : EditorWindow
     private float timerSeconds = 1f;
     private float radius = 5f;
     private float minTimerSeconds = 1f;
-    private string requiredFlagName = "";
+    private FlagSO requiredFlag;
     private List<ExitStrategySO> subStrategies = new();
     private LogicMode compositeLogicMode = LogicMode.All;
 
@@ -67,7 +67,7 @@ public class ExitStrategyGeneratorEditor : EditorWindow
                 break;
 
             case ExitType.ExitOnFlagSet:
-                requiredFlagName = EditorGUILayout.TextField("Required Flag Name", requiredFlagName);
+                requiredFlag = (FlagSO)EditorGUILayout.ObjectField("Required Flag", requiredFlag, typeof(FlagSO), false);
                 break;
 
             case ExitType.Composite:
@@ -129,14 +129,6 @@ public class ExitStrategyGeneratorEditor : EditorWindow
                 exitStrategy = playerLeavesExit;
                 break;
 
-            case ExitType.ExitAfterCompanionInteracts:
-                exitStrategy = ScriptableObject.CreateInstance<ExitAfterCompanionInteractsSO>();
-                break;
-
-            case ExitType.ExitAfterPlayerCommandedMove:
-                exitStrategy = ScriptableObject.CreateInstance<ExitAfterPlayerCommandedMoveSO>();
-                break;
-
             case ExitType.ExitAfterTimerThenConditional:
                 var timerCondExit = ScriptableObject.CreateInstance<ExitAfterTimerThenConditionalSO>();
                 timerCondExit.SetMinTime(minTimerSeconds);
@@ -149,7 +141,7 @@ public class ExitStrategyGeneratorEditor : EditorWindow
 
             case ExitType.ExitOnFlagSet:
                 var flagExit = ScriptableObject.CreateInstance<ExitOnFlagSetSO>();
-                flagExit.SetRequiredFlag(requiredFlagName);
+                flagExit.SetRequiredFlag(requiredFlag);
                 exitStrategy = flagExit;
                 break;
 

@@ -9,7 +9,7 @@ public class AutoInteractFeature : AutoTriggerFeature
     {
         if (interactableTarget != null && interactableTarget is IInteractableFeature feature)
         {
-            feature.OnInteract(null); // No actor passed; assumes safe to null
+            feature.OnInteract(playerInteractor);
         }
         RunFeatureEffects();
     }

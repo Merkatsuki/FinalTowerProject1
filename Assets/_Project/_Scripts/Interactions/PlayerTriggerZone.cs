@@ -8,12 +8,16 @@ public class PlayerTriggerZone : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            foreach (var feature in GetComponents<AutoTriggerFeature>())
+            if (other.TryGetComponent<IPuzzleInteractor>(out var interactor))
             {
-                feature.OnPlayerEnterZone();
+                foreach (var feature in GetComponents<AutoTriggerFeature>())
+                {
+                    feature.OnPlayerEnterZone(interactor);
+                }
             }
         }
     }
+
 
     private void OnTriggerExit2D(Collider2D other)
     {
@@ -25,4 +29,5 @@ public class PlayerTriggerZone : MonoBehaviour
             }
         }
     }
+
 }
