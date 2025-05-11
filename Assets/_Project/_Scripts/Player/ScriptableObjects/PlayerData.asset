@@ -16,7 +16,7 @@ MonoBehaviour:
   Sprint: 1
   Crouch: 0
   Jump: 1
-  Dash: 1
+  Dash: 0
   LedgeHang: 0
   LedgeClimb: 0
   WallGrab: 0
