@@ -19,6 +19,10 @@ public class CameraController : MonoBehaviour
     [Header("Command Settings")]
     [SerializeField] private CanvasGroup commandOverlay;
 
+    [Header("Damping Settings")]
+    private Vector3 originalDamping;
+
+
     private bool isZoomedForCommand = false;
 
     private Coroutine zoomCoroutine;
@@ -132,5 +136,23 @@ public class CameraController : MonoBehaviour
         commandOverlay.interactable = false;
         commandOverlay.blocksRaycasts = false;
     }
+
+    public void SnapToTargetImmediately()
+    {
+        if (positionComposer != null)
+        {
+            originalDamping = positionComposer.Damping;
+            positionComposer.Damping = Vector3.zero; // Disable all smoothing
+        }
+    }
+
+    public void RestoreCameraDamping()
+    {
+        if (positionComposer != null)
+        {
+            positionComposer.Damping = originalDamping;
+        }
+    }
+
 
 }

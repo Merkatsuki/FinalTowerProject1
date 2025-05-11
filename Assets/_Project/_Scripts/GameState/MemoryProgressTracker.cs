@@ -5,11 +5,10 @@ public class MemoryProgressTracker : MonoBehaviour
 {
     public static MemoryProgressTracker Instance;
 
-    [Header("Tracking")]
-    [SerializeField] private List<string> trackedMemoryScenes = new List<string> { "Memory1", "Memory2", "Memory3" };
-    [SerializeField] private string finalMemoryScene = "MemoryFinal";
+    public enum MemoryZoneID { Joy, Anger, Sadness, FinalMemory }
 
-    private HashSet<string> completedMemories = new HashSet<string>();
+    [SerializeField] private List<MemoryZoneID> trackedZones = new() { MemoryZoneID.Joy, MemoryZoneID.Anger, MemoryZoneID.Sadness };
+    private HashSet<MemoryZoneID> completedZones = new();
 
     private void Awake()
     {
@@ -23,25 +22,24 @@ public class MemoryProgressTracker : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public void MarkMemoryComplete(string sceneName)
+    public void MarkZoneComplete(MemoryZoneID zone)
     {
-        if (!completedMemories.Contains(sceneName))
+        if (!completedZones.Contains(zone))
         {
-            completedMemories.Add(sceneName);
-            Debug.Log($"Memory marked complete: {sceneName}");
+            completedZones.Add(zone);
+            Debug.Log($"Zone marked complete: {zone}");
         }
     }
 
-    public bool IsMemoryComplete(string sceneName) => completedMemories.Contains(sceneName);
+    public bool IsZoneComplete(MemoryZoneID zone) => completedZones.Contains(zone);
 
-    public bool AreAllTrackedMemoriesComplete()
+    public bool AreAllZonesComplete()
     {
-        foreach (var memory in trackedMemoryScenes)
+        foreach (var zone in trackedZones)
         {
-            if (!completedMemories.Contains(memory))
+            if (!completedZones.Contains(zone))
                 return false;
         }
-
         return true;
     }
 }

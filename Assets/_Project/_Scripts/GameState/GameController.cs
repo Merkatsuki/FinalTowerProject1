@@ -6,7 +6,6 @@ public class GameController : MonoBehaviour
 
     [Header("Core Systems")]
     public GameStateManager gameStateManager;
-    public SceneLoader sceneLoader;
     public MemoryProgressTracker memoryProgressTracker;
 
     private void Awake()
@@ -27,9 +26,6 @@ public class GameController : MonoBehaviour
     {
         if (gameStateManager == null)
             gameStateManager = GetComponent<GameStateManager>();
-
-        if (sceneLoader == null)
-            sceneLoader = GetComponent<SceneLoader>();
 
         if (memoryProgressTracker == null)
             memoryProgressTracker = GetComponent<MemoryProgressTracker>();
