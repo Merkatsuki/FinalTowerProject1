@@ -12,12 +12,12 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _ENABLEFULLDISTORTION_ON
   - _ENABLEWIGGLE_ON
   - _SHADERFADING_NONE
   - _SHADERSPACE_UV
   - _TEXTURELAYER1SHEETTOGGLE_ON
   - _TEXTURELAYER2SHEETTOGGLE_ON
+  - _WINDLOCALWIND_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -211,7 +211,7 @@ Material:
     - _EnableFlame: 0
     - _EnableFrozen: 0
     - _EnableFullAlphaDissolve: 0
-    - _EnableFullDistortion: 1.1
+    - _EnableFullDistortion: 0
     - _EnableFullGlowDissolve: 0
     - _EnableGaussianBlur: 0
     - _EnableGlitch: 0
@@ -465,9 +465,9 @@ Material:
     - _UVRotateSpeed: 1
     - _VertexTintFirst: 0
     - _VibrateFade: 1
-    - _VibrateFrequency: 100
-    - _VibrateOffset: 0.04
-    - _VibrateRotation: 4
+    - _VibrateFrequency: 101.01
+    - _VibrateOffset: 0.94
+    - _VibrateRotation: 67.5
     - _WiggleFade: 1
     - _WiggleFixedGroundToggle: 0
     - _WiggleFrequency: 0.5
@@ -476,7 +476,7 @@ Material:
     - _WindFlip: 0
     - _WindHighQualityNoise: 0
     - _WindIsParallax: 0
-    - _WindLocalWind: 0
+    - _WindLocalWind: 1
     - _WindMaxIntensity: 0.4
     - _WindMaxRotation: 2
     - _WindMinIntensity: -0.4
