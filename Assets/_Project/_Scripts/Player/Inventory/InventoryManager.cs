@@ -6,6 +6,8 @@ public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance { get; private set; }
 
+    [SerializeField] private List<ItemSO> debugAddOnStart;
+
     private readonly HashSet<string> collectedItems = new();
     private readonly Dictionary<string, ItemSO> itemDatabase = new();
 
@@ -20,6 +22,14 @@ public class InventoryManager : MonoBehaviour
             return;
         }
         Instance = this;
+    }
+
+    private void Start()
+    {
+        foreach (var item in debugAddOnStart)
+        {
+            AddItem(item);
+        }
     }
 
     public void RegisterItem(ItemSO item)

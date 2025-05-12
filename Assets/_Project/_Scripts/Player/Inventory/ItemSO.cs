@@ -24,7 +24,8 @@ public class ItemSO : ScriptableObject
 
     [Header("Story Page Content")]
     public bool isStoryPage;
-    [TextArea(3, 6)] public string storyText;
+    [TextArea(3, 6)] public string storyLeftPageText;
+    [TextArea(3, 6)] public string storyRightPageText;
     public Sprite storyImage;
     public AudioClip pageAudio;
     public Color backgroundTint;

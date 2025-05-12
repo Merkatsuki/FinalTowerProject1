@@ -1,11 +1,11 @@
 // InventoryItemButton.cs - updated for callback-based interaction
-using Unity.VisualScripting;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class InventoryItemButton : MonoBehaviour
 {
-    [SerializeField] private Text labelText;
+    [SerializeField] private TextMeshProUGUI labelText;
     [SerializeField] private Image iconImage;
     [SerializeField] private Button button;
 

@@ -10,7 +10,6 @@ public class InventoryViewerUI : MonoBehaviour
 
     [Header("Special Item Hooks")]
     [SerializeField] private ItemSO storyBookItem;
-    [SerializeField] private Button loreViewerOpenButton;
 
     private void OnEnable()
     {
@@ -38,14 +37,6 @@ public class InventoryViewerUI : MonoBehaviour
             InventoryItemButton button = btnObj.GetComponent<InventoryItemButton>();
             if (button != null)
                 button.Setup(item, () => OnItemClicked(item));
-
-            // Hook story book to lore viewer open button if applicable
-            if (item == storyBookItem && loreViewerOpenButton != null)
-            {
-                loreViewerOpenButton.gameObject.SetActive(true);
-                loreViewerOpenButton.onClick.RemoveAllListeners();
-                loreViewerOpenButton.onClick.AddListener(OpenLoreViewer);
-            }
         }
     }
 

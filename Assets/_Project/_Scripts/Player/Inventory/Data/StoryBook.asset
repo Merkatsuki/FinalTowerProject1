@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5644535d74ae2214c99281fc36b12f4f, type: 3}
+  m_Name: StoryBook
+  m_EditorClassIdentifier: 
+  ItemID: StoryBook
+  ItemName: Story Book
+  Description: An empty book with some pages missing.
+  category: 1
+  isQuickInventoryItem: 1
+  Icon: {fileID: 21300000, guid: 9adf6f86c152154499c231e7dd56e4da, type: 3}
+  isStoryPage: 0
+  storyText: 
+  storyImage: {fileID: 0}
+  pageAudio: {fileID: 0}
+  backgroundTint: {r: 0, g: 0, b: 0, a: 0}
+  audioClip: {fileID: 0}
+  dialogueOnInspect: {fileID: 0}

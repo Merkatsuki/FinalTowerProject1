@@ -31,7 +31,6 @@ public class StoryPageViewerUI : MonoBehaviour
         }
 
         titleText.text = item.ItemName;
-        bodyText.text = item.storyText;
         storyImage.sprite = item.storyImage;
 
         if (backgroundPanel != null)
