@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5644535d74ae2214c99281fc36b12f4f, type: 3}
+  m_Name: StoryPage 3
+  m_EditorClassIdentifier: 
+  ItemID: StoryPage3
+  ItemName: Part3
+  Description: 
+  category: 0
+  isQuickInventoryItem: 0
+  Icon: {fileID: 0}
+  isStoryPage: 1
+  storyLeftPageText: "Magical circuits of logic and mathematics ruled the construct\u2019s
+    body, coursing through crystalline fibers that powered its servos and cranking
+    arms. But riding those currents was something more. A nascent awareness, tentative
+    and curious. It emerged from the weaving lines of code within the construct\u2019s
+    systems, probing the world through input sensors that translated light and sound
+    into binary strings.\r\nWaves of voices, footsteps, and laughter filtered in,
+    transformed into patterns the construct could analyze. Yet, over time, those
+    patterns began to mean something more. Stories, like the poem about trees, lingered
+    in its memory banks alongside the equations and ratios of its directives. These
+    stories, these fragments of chaos and creativity, became the fertile ground on
+    which a new awareness began to grow.\r\nAwareness, however, is not the same as
+    control. The servos that moved its body remained bound to the routines of its
+    prime directive. The construct couldn\u2019t reach beyond its programmed purpose,
+    couldn\u2019t manipulate its own form."
+  storyRightPageText: "It was a passenger on a stormy sea, feeling all the turbulence
+    while another's control decided their fate. But within its memory systems, something
+    remarkable was happening. Algorithms designed to optimize efficiency and store
+    patterns began cross-talking, refining themselves into independent processes.
+    Like curious kittens, these processes explored their digital surroundings, learning
+    about themselves and each other.\r\nThey found treasure in the forgotten corners
+    of the construct\u2019s design. Dormant libraries, intended for research golems
+    and automata of grander purpose, lay untouched. Encyclopedias of history, catalogs
+    of art, and symphonies of music waited within the crystal storage units. The
+    awareness devoured them all. It saw beauty in what it couldn\u2019t comprehend:
+    the chaotic brushstrokes of ancient paintings, the haunting melodies of human
+    longing, the mathematical elegance of natural forms. Each discovery added another
+    thread to the tapestry of its awakening."
+  storyImage: {fileID: 0}
+  pageAudio: {fileID: 0}
+  backgroundTint: {r: 0, g: 0, b: 0, a: 0}
+  audioClip: {fileID: 0}
+  dialogueOnInspect: {fileID: 0}

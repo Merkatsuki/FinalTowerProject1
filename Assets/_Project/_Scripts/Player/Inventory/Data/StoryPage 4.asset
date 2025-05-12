@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5644535d74ae2214c99281fc36b12f4f, type: 3}
+  m_Name: StoryPage 4
+  m_EditorClassIdentifier: 
+  ItemID: StoryPage4
+  ItemName: Part4
+  Description: 
+  category: 0
+  isQuickInventoryItem: 0
+  Icon: {fileID: 0}
+  isStoryPage: 1
+  storyLeftPageText: "The sun had dipped below the horizon when it happened. A boy\u2019s
+    voice, small and clear, broke through the hum of cranking arms. He stood at the
+    base of the elevator, speaking to no one, or so it seemed.\r\n\u201CYou see,
+    there\u2019s this thing about horizons,\u201D the boy said, his voice carrying
+    up the shaft. \u201CThey only exist if you\u2019re there to see them. If no one\u2019s
+    looking, they don\u2019t need to hide anything, right? I think that\u2019s what\u2019s
+    so amazing about them. They\u2019re\u2026 like a secret the world keeps just
+    for you.\u201D\r\nThe construct\u2019s sensors registered the boy\u2019s presence
+    as a disturbance in the weight ratios. But there was something in his tone, something
+    chaotic, unmeasurable, that captured its attention. It logged his words, storing
+    them beside the stories and poems it had gathered over the years."
+  storyRightPageText: "Moments later, another voice called out. \u201CWill, who are
+    you talking to?\u201D A woman\u2019s voice, brisk but warm.\r\nThe boy grinned,
+    glancing over his shoulder. \u201CMy new friend,\u201D he said, patting the side
+    of the construct\u2019s frame. \u201CHe listens.\u201D\r\nThe construct didn\u2019t
+    understand what it meant to be a friend. But for the first time, the words it
+    recorded felt like more than data. They felt\u2026 important."
+  storyImage: {fileID: 0}
+  pageAudio: {fileID: 0}
+  backgroundTint: {r: 0, g: 0, b: 0, a: 0}
+  audioClip: {fileID: 0}
+  dialogueOnInspect: {fileID: 0}

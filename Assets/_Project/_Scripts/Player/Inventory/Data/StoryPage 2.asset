@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5644535d74ae2214c99281fc36b12f4f, type: 3}
+  m_Name: StoryPage 2
+  m_EditorClassIdentifier: 
+  ItemID: StoryPage2
+  ItemName: Part2
+  Description: 
+  category: 0
+  isQuickInventoryItem: 0
+  Icon: {fileID: 0}
+  isStoryPage: 1
+  storyLeftPageText: "Among the stories it overheard, one stood out. A traveling
+    poet had once recited a piece that captivated even the inert ears of the construct.
+    The words had lingered in its memory, like a faint imprint left behind by wind
+    against stone.\r\n\t \r\n\tThe Struggle Of Trees\r\n\r\n\tRoots carve through
+    stone, unyielding, untamed,\r\n\tTime their sole master, demanding the earth
+    unclaimed.\r\n\tLeaves spiral to the sky, bold in their chase,\r\n\tYearning
+    for the sun\u2019s fleeting touch of grace.\r\n\t\r\n\tWithin their veins, a
+    golden pattern sings,\r\n\tThe oath to order in all nature's things.\r\n\tYet
+    chaos works the loom, with threads unrefined,\r\n\tWeaving a shape where beauty
+    is enshrined.\r\n\t\r\n\tAs storm stills, its fury takes form,\r\n\tEtched in
+    the scars of a life reborn.\r\n\tFrom those marks arise a natural art,\r\n\tA
+    testament to life's unyielding heart."
+  storyRightPageText: "\tFor a tree is no mere thing of the land,\r\n\tIt\u2019s
+    rebellion etched by nature\u2019s hand.\r\n\tA question posed to the void so
+    vast:\r\n\t\"What can you take that I cannot outlast?\"\r\n\t\r\n\tIt is quiet
+    resilience, steadfast and whole,\r\n\tA whisper of strength in the earth\u2019s
+    great soul.\r\n\tThe world\u2019s first answer to chaos profound,\r\n\tA revelation
+    where much wisdom is found.\r\n\r\nThe construct didn\u2019t understand the poem\u2019s
+    meaning, but it resonated in the unlit corners of its awareness. Something about
+    the interplay of order and chaos, of structure born from wildness, seemed important,
+    though it couldn\u2019t say why. It had no words for its thoughts, only the faint
+    echo of an idea struggling to take root."
+  storyImage: {fileID: 0}
+  pageAudio: {fileID: 0}
+  backgroundTint: {r: 0, g: 0, b: 0, a: 0}
+  audioClip: {fileID: 0}
+  dialogueOnInspect: {fileID: 0}

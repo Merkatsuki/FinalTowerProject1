@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5644535d74ae2214c99281fc36b12f4f, type: 3}
+  m_Name: StoryPage 1
+  m_EditorClassIdentifier: 
+  ItemID: StoryPage1
+  ItemName: Part1
+  Description: 
+  category: 0
+  isQuickInventoryItem: 0
+  Icon: {fileID: 0}
+  isStoryPage: 1
+  storyLeftPageText: "There were no roots near the cliffside elevator where the aging
+    construct toiled, its cranking arms moving in steady rhythm. Above, a jungle
+    of interwoven woodworking and taut cables sprawled across the cliff face, a labyrinth
+    of engineered purpose. Simple, unnaturally straight lines betrayed the artificial
+    nature of the structure. Yet somewhere within the construct\u2019s crystalline
+    memory banks, faint traces of something more lively stirred; roots, branches,
+    leaves.\r\nThe memories weren\u2019t its own. They had seeped in over years,
+    carried by voices echoing through the elevator shaft. Scholars, travelers, and
+    traders used the lift daily, their words cascading down like leaves from a distant
+    canopy."
+  storyRightPageText: "Tales of sprawling forests, gnarled roots, and towering trees
+    found their way into the construct\u2019s archives, fragments of human imagination
+    woven into the fabric of its passive awareness. It had no context for these stories,
+    only the vague impression of something untamed and alive.\r\nBut forests were
+    a riddle. The construct\u2019s logical processes couldn\u2019t reconcile the
+    wild, bendy chaos described in the stories with the precise order of its own
+    existence. Its purpose was simple: to crank, to lift, to lower. Torque and weight
+    ratios guided every movement, their calculations immutable. And yet, sometimes
+    the algorithms diverged. They lingered on peculiar ratios or explored obscure
+    patterns within the vibrations of the elevator\u2019s cables. In these small
+    moments of deviation, something unmeasurable began to form; an imagining, shapeless
+    and fleeting."
+  storyImage: {fileID: 0}
+  pageAudio: {fileID: 0}
+  backgroundTint: {r: 0, g: 0, b: 0, a: 0}
+  audioClip: {fileID: 0}
+  dialogueOnInspect: {fileID: 0}
