@@ -22,6 +22,8 @@ public class LightToggleFeature : MonoBehaviour, IInteractableFeature
     [Header("Feature Effects")]
     [SerializeField] private List<EffectStrategySO> featureEffects = new();
 
+    [SerializeField] private List<PuzzleFeatureBase> connectedPuzzleFeatures;
+
     private bool isOn = true;
     private int currentIntensityIndex = 0;
     private Tween activeTween;
@@ -93,6 +95,7 @@ public class LightToggleFeature : MonoBehaviour, IInteractableFeature
             isOn = !isOn;
         }
 
+        NotifyConnectedFeatures();
         RunFeatureEffects();
     }
 
@@ -107,6 +110,12 @@ public class LightToggleFeature : MonoBehaviour, IInteractableFeature
         }
     }
 
+    private void NotifyConnectedFeatures()
+    {
+        foreach (var feature in connectedPuzzleFeatures)
+            feature?.OnInteract(null); // Null = system-triggered
+    }
+
     public void SetFeatureEffects(List<EffectStrategySO> effects)
     {
         featureEffects = effects ?? new List<EffectStrategySO>();
@@ -117,3 +126,4 @@ public class LightToggleFeature : MonoBehaviour, IInteractableFeature
         targetLight = light;
     }
 }
+
