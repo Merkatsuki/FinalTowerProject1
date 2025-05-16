@@ -15,7 +15,7 @@ public enum PlatformActivationMode
     OnActivated
 }
 
-public class MovingPlatformFeature : MonoBehaviour, IInteractableFeature
+public class MovingPlatformFeature : FeatureBase
 {
     [Header("Platform Movement Settings")]
     [SerializeField] private Transform[] waypoints;
@@ -61,7 +61,7 @@ public class MovingPlatformFeature : MonoBehaviour, IInteractableFeature
         }
     }
 
-    public void OnInteract(IPuzzleInteractor actor)
+    public override void OnInteract(IPuzzleInteractor actor)
     {
         if (activationMode != PlatformActivationMode.OnInteract || isLocked) return;
         HandleActivation();

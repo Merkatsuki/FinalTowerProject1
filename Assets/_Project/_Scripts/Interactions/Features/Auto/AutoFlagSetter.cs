@@ -1,7 +1,7 @@
 // AutoFlagSetter.cs
 using UnityEngine;
 
-public class AutoFlagSetter : AutoTriggerFeature
+public class AutoFlagSetter : AutoTriggerFeatureBase
 {
     [SerializeField] private string flagKey;
     [SerializeField] private bool flagValue = true;

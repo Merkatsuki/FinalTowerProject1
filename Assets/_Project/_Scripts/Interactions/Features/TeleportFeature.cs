@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class TeleportFeature : PuzzleFeatureBase
+public class TeleportFeature : FeatureBase
 {
     [Header("Teleport Settings")]
     [SerializeField] private Transform teleportTarget;
@@ -14,8 +14,9 @@ public class TeleportFeature : PuzzleFeatureBase
 
     private bool teleporting = false;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         if (playerTransform == null && GameController.Instance != null)
         {
             playerTransform = GameController.Instance.transform; // Or assign via inspector
@@ -24,14 +25,17 @@ public class TeleportFeature : PuzzleFeatureBase
 
     public override void OnInteract(IPuzzleInteractor actor)
     {
-        if (teleporting || teleportTarget == null || playerTransform == null)
+        if (isSolved) return;
         {
-            Debug.LogWarning("[TeleportFeature] Missing references or already teleporting.");
-            return;
-        }
+            if (teleporting || teleportTarget == null || playerTransform == null)
+            {
+                Debug.LogWarning("[TeleportFeature] Missing references or already teleporting.");
+                return;
+            }
 
-        teleporting = true;
-        StartCoroutine(HandleTeleport());
+            teleporting = true;
+            StartCoroutine(HandleTeleport());
+        }
     }
 
     private IEnumerator HandleTeleport()

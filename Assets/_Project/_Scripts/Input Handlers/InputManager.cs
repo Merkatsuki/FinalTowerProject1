@@ -19,7 +19,6 @@ namespace Momentum
 
         [NonSerialized] public Action JumpPressed; // Public so other classes can subscribe to this. Tagged to not show up in inspector
         [NonSerialized] public Action JumpReleased;
-        [NonSerialized] public Action ToggleFollowPressed;
         public event Action OnMoveCommand;
         public event Action<bool> OnCommandModeChanged;
 
@@ -58,7 +57,6 @@ namespace Momentum
 
             #endregion
 
-            _controls.Player.ToggleFollow.performed += ctx => ToggleFollowPressed?.Invoke();
             _controls.Player.CommandMode.performed += ctx => ToggleCommandMode();
 
             _controls.Player.Jump.performed += ctx =>
@@ -127,6 +125,8 @@ namespace Momentum
 
         private void ToggleCommandMode()
         {
+            var unlockFlag = FlagManager.Instance.CommandModeUnlockedFlag;
+            if (!FlagManager.Instance.IsFlagSet(unlockFlag)) return;
             IsCommandMode = !IsCommandMode;
             OnCommandModeChanged?.Invoke(IsCommandMode);
         }

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Momentum;
 using System;
 using DG.Tweening;
+using static UnityEditor.Experimental.GraphView.GraphView;
+
 
 
 #if UNITY_EDITOR
@@ -43,8 +45,12 @@ public class PlayerInteractor : MonoBehaviour
     private List<IWorldInteractable> nearbyInteractables = new();
     private IWorldInteractable currentTarget;
     private IWorldInteractable lastHoveredTarget;
+    public IWorldInteractable commandHoverTarget;
     private CircleCollider2D triggerCollider;
     private bool wasCommandModeActive = false;
+
+    public CompanionController Companion => companion;
+    public LayerMask InteractableMask => interactableLayerMask;
 
     private void OnEnable()
     {
@@ -93,7 +99,7 @@ public class PlayerInteractor : MonoBehaviour
     {
         UpdateFacingDirection();
         UpdateFocus();
-        UpdateCollider(); 
+        UpdateCollider();
 
     }
 
@@ -149,7 +155,6 @@ public class PlayerInteractor : MonoBehaviour
         return false;
     }
 
-
     private void TryIssueCommandToCompanion()
     {
         Vector3 mouseScreenPos = InputManager.instance.MousePosition;
@@ -160,18 +165,13 @@ public class PlayerInteractor : MonoBehaviour
         if (hit.collider != null)
         {
             var target = hit.collider.GetComponent<IWorldInteractable>();
-            if (target != null && target.CanBeInteractedWith(companion))
+            if (companion.Perception.CanInteractWith(target))
             {
                 companion.IssuePlayerCommand(target);
                 Debug.Log($"[Command] Companion ordered to interact with: {target.GetDisplayName()}");
                 return;
             }
         }
-
-        // If no valid interactable, just move
-        //Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
-        //companion.CommandMoveToPoint(mouseWorldPos);
-        //SpawnClickMarker(mouseWorldPos);
     }
 
     void SpawnClickMarker(Vector2 worldPos)
@@ -264,6 +264,33 @@ public class PlayerInteractor : MonoBehaviour
         return null;
     }
 
+    public void UpdateCommandHover()
+    {
+        var mouseWorld = Camera.main.ScreenToWorldPoint(InputManager.instance.MousePosition);
+        var hit = Physics2D.OverlapPoint(mouseWorld, interactableLayerMask);
+
+        IWorldInteractable newHover = null;
+
+        if (hit != null && hit.TryGetComponent(out IWorldInteractable candidate))
+        {
+            if (companion.Perception.CanInteractWith(candidate))
+            {
+                newHover = candidate;
+            }
+        }
+
+        if (commandHoverTarget != newHover)
+        {
+            if (commandHoverTarget != null)
+                commandHoverTarget.SetHighlight(false);
+
+            if (newHover != null)
+                newHover.SetHighlight(true);
+
+            commandHoverTarget = newHover;
+        }
+    }
+
     private float GetCurrentInteractRadius()
     {
         return interactRadius + (InputManager.instance.IsCommandMode ? commandModeRadiusBoost : 0f);
@@ -276,9 +303,16 @@ public class PlayerInteractor : MonoBehaviour
         SyncColliderRadius();
 
         if (isCommandMode)
-            player.StateMachine.ChangeState(player.CommandState);  // New state!
+        {
+            CompanionCommandManager.Instance?.EnterCommandMode();
+            player.StateMachine.ChangeState(player.CommandState);
+        }
         else
-            player.StateMachine.ChangeState(player.IdleState);     // Return to idle (or resume normal logic)
+        {
+            LoreViewerUI.Instance?.Close();
+            CompanionCommandManager.Instance?.ExitCommandMode();
+            player.StateMachine.ChangeState(player.IdleState);
+        }
     }
 
     private void UpdateCommandOverlay(bool isCommandMode)
@@ -299,14 +333,7 @@ public class PlayerInteractor : MonoBehaviour
         if (InputManager.instance.IsCommandMode)
             return; // no interaction in command mode
 
-        if (currentTarget != null && currentTarget.CanBeInteractedWith(player))
-        {
-            currentTarget.OnInteract(player);
-        }
-        else
-        {
-            currentTarget?.OnInteractionComplete(player, false);
-        }
+        currentTarget?.OnInteract(player);
     }
 
     private IWorldInteractable GetBestInteractable()

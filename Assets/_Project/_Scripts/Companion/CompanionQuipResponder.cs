@@ -42,7 +42,7 @@ public class CompanionQuipResponder : MonoBehaviour
             idleTimer += Time.deltaTime;
             if (idleTimer > idleTimeThreshold)
             {
-                QuipManager.Instance.TryPlayQuip(QuipTriggerType.OnIdle);
+                QuipManager.Instance.TryPlayFilteredQuip(QuipTriggerType.OnIdle, null);
                 idleTimer = -999f; // lockout after firing
             }
         }
@@ -65,7 +65,7 @@ public class CompanionQuipResponder : MonoBehaviour
         {
             if (directionSwitchCount >= directionSpamThreshold)
             {
-                QuipManager.Instance.TryPlayQuip(QuipTriggerType.OnDirectionSpam);
+                QuipManager.Instance.TryPlayFilteredQuip(QuipTriggerType.OnDirectionSpam, null);
             }
             directionSwitchCount = 0;
             directionTimer = 0f;
@@ -76,13 +76,13 @@ public class CompanionQuipResponder : MonoBehaviour
     {
         Debug.Log($"CompanionQuipResponder: Companion zone changed to {newZone}");
         QuipManager.Instance.SetZone(newZone);
-        QuipManager.Instance.TryPlayQuip(QuipTriggerType.OnZoneEnter);
+        QuipManager.Instance.TryPlayFilteredQuip(QuipTriggerType.OnZoneEnter, null);
     }
 
     private void HandleEmotionChanged(EmotionTag newEmotion)
     {
         Debug.Log($"CompanionQuipResponder: Emotion changed to {newEmotion}, firing quip.");
         QuipManager.Instance.SetEmotion(newEmotion);
-        QuipManager.Instance.TryPlayQuip(QuipTriggerType.OnEmotionSwitch);
+        QuipManager.Instance.TryPlayFilteredQuip(QuipTriggerType.OnEmotionSwitch, null);
     }
 }

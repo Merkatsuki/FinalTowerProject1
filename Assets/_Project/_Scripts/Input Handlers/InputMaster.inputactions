@@ -103,15 +103,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
-                },
-                {
-                    "name": "ToggleFollow",
-                    "type": "Button",
-                    "id": "1e9c24d6-acee-46a5-8656-766d376834cb",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -217,7 +208,7 @@
                 {
                     "name": "",
                     "id": "c0edfa34-ddc3-421f-a373-d93ec343eb15",
-                    "path": "<Mouse>/leftButton",
+                    "path": "<Keyboard>/leftShift",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard and Mouse",
@@ -277,17 +268,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "PointerPosition",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "e679bb1f-8f3c-4333-8b19-4201fb330922",
-                    "path": "<Keyboard>/f",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ToggleFollow",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

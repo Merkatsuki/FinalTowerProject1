@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine.Rendering.Universal;
 
-public class LightToggleFeature : MonoBehaviour, IInteractableFeature
+public class LightToggleFeature : FeatureBase
 {
     [Header("Light Settings")]
     [SerializeField] private Light2D targetLight;
@@ -19,10 +19,7 @@ public class LightToggleFeature : MonoBehaviour, IInteractableFeature
     [SerializeField] private List<float> intensityLevels = new();
     [SerializeField] private float dimmerTransitionDuration = 0.5f;
 
-    [Header("Feature Effects")]
-    [SerializeField] private List<EffectStrategySO> featureEffects = new();
-
-    [SerializeField] private List<PuzzleFeatureBase> connectedPuzzleFeatures;
+    [SerializeField] private List<FeatureBase> connectedFeatures;
 
     private bool isOn = true;
     private int currentIntensityIndex = 0;
@@ -50,9 +47,12 @@ public class LightToggleFeature : MonoBehaviour, IInteractableFeature
         }
     }
 
-    public void OnInteract(IPuzzleInteractor actor)
+    public override void OnInteract(IPuzzleInteractor actor)
     {
-        ToggleLight();
+        if (isSolved) return;
+        {
+            ToggleLight();
+        }
     }
 
     private void ToggleLight()
@@ -112,13 +112,8 @@ public class LightToggleFeature : MonoBehaviour, IInteractableFeature
 
     private void NotifyConnectedFeatures()
     {
-        foreach (var feature in connectedPuzzleFeatures)
+        foreach (var feature in connectedFeatures)
             feature?.OnInteract(null); // Null = system-triggered
-    }
-
-    public void SetFeatureEffects(List<EffectStrategySO> effects)
-    {
-        featureEffects = effects ?? new List<EffectStrategySO>();
     }
 
     public void SetToggleLight(Light2D light)
@@ -126,4 +121,5 @@ public class LightToggleFeature : MonoBehaviour, IInteractableFeature
         targetLight = light;
     }
 }
+
 

@@ -17,9 +17,10 @@ MonoBehaviour:
   Description: An empty book with some pages missing.
   category: 1
   isQuickInventoryItem: 1
-  Icon: {fileID: 21300000, guid: 9adf6f86c152154499c231e7dd56e4da, type: 3}
+  Icon: {fileID: -5387562833892707887, guid: 0ebad9d8d9c2bc840af72fed7c236ec5, type: 3}
   isStoryPage: 0
-  storyText: 
+  storyLeftPageText: 
+  storyRightPageText: 
   storyImage: {fileID: 0}
   pageAudio: {fileID: 0}
   backgroundTint: {r: 0, g: 0, b: 0, a: 0}

@@ -1,16 +1,24 @@
 // AutoInteractFeature.cs
 using UnityEngine;
 
-public class AutoInteractFeature : AutoTriggerFeature
+public class AutoInteractFeature : AutoTriggerFeatureBase
 {
-    [SerializeField] private MonoBehaviour interactableTarget;
+    [SerializeField] private InteractableBase interactableTarget;
 
     protected override void ExecuteTrigger()
     {
-        if (interactableTarget != null && interactableTarget is IInteractableFeature feature)
+        Debug.Log($"[AutoInteractFeature] Triggering interaction on {gameObject.name}");
+
+        if (interactableTarget != null)
         {
-            feature.OnInteract(playerInteractor);
+            Debug.Log($"[AutoInteractFeature] Calling OnInteract on target InteractableBase: {gameObject.name}");
+            interactableTarget.OnInteract(Interactor);
         }
+        else
+        {
+            Debug.LogWarning($"[AutoInteractFeature] No valid interactableTarget assigned or not IInteractableFeature.");
+        }
+
         RunFeatureEffects();
     }
 }

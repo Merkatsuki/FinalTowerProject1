@@ -11,6 +11,8 @@ public class FlagManager : MonoBehaviour
     private readonly Dictionary<FlagSO, float> floatFlags = new();
     private readonly Dictionary<FlagSO, string> stringFlags = new();
 
+    public FlagSO CommandModeUnlockedFlag;
+
 
     private void Awake()
     {

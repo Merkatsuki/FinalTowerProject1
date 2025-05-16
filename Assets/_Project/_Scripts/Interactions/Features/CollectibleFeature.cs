@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class CollectibleFeature : MonoBehaviour, IInteractableFeature
+public class CollectibleFeature : FeatureBase
 {
     [Header("Collection Settings")]
     [SerializeField] private ItemSO collectibleItem;
@@ -14,13 +14,12 @@ public class CollectibleFeature : MonoBehaviour, IInteractableFeature
     [Header("Stage Requirements")]
     [SerializeField] private List<FlagSO> requiredCollectionStages = new();
 
-    [Header("Events & Effects")]
+    [Header("Events")]
     [SerializeField] private UnityEvent onCollect;
-    [SerializeField] private List<EffectStrategySO> featureEffects = new();
 
     private bool collected = false;
 
-    public void OnInteract(IPuzzleInteractor actor)
+    public override void OnInteract(IPuzzleInteractor actor)
     {
         if (collected) return;
         if (!CanCollect()) return;
@@ -41,6 +40,7 @@ public class CollectibleFeature : MonoBehaviour, IInteractableFeature
         }
 
         onCollect?.Invoke();
+        Debug.Log($"[Collectible] Attempting collection of: {collectibleItem?.ItemName}, Already Collected: {collected}");
 
         if (disableOnCollect && visualObject != null)
             StartCoroutine(DissolveCollectible());
@@ -72,10 +72,6 @@ public class CollectibleFeature : MonoBehaviour, IInteractableFeature
 
         if (visualObject != null)
             visualObject.SetActive(false);
-    }
-
-    public void SetFeatureEffects(List<EffectStrategySO> effects)
-    {
-        featureEffects = effects ?? new();
+        gameObject.SetActive(false);
     }
 }

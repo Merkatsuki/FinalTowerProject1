@@ -1,8 +1,8 @@
-﻿// Refactored SwitchFeature.cs to inherit from PuzzleFeatureBase
+﻿// Refactored SwitchFeature.cs to inherit from FeatureBase
 using UnityEngine;
 using System.Collections.Generic;
 
-public class SwitchFeature : PuzzleFeatureBase
+public class SwitchFeature : FeatureBase
 {
     [Header("Switch Settings")]
     [SerializeField] private bool toggleable = true;

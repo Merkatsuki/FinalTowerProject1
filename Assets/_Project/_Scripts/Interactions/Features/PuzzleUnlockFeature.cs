@@ -1,9 +1,9 @@
-// Refactored PuzzleUnlockFeature.cs to inherit from PuzzleFeatureBase
+// Refactored PuzzleUnlockFeature.cs to inherit from FeatureBase
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Generic;
 
-public class PuzzleUnlockFeature : PuzzleFeatureBase
+public class PuzzleUnlockFeature : FeatureBase
 {
     [Header("Unlock Targets")]
     [SerializeField] private List<GameObject> unlockTargets = new();

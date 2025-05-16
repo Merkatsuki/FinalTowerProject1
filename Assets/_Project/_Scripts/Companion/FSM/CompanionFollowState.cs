@@ -1,33 +1,41 @@
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class CompanionFollowState : CompanionState
 {
-    public CompanionFollowState(CompanionController companion, CompanionFSM fsm) : base(companion, fsm) { }
+    private NavMeshAgent agent;
+
+    public CompanionFollowState(CompanionController companion, CompanionFSM fsm)
+        : base(companion, fsm)
+    {
+        agent = companion.GetComponent<NavMeshAgent>();
+    }
+
+    public override CompanionStateType StateType => CompanionStateType.Follow;
 
     public override void OnEnter()
     {
-        companion.flightController.allowDefaultFollow = true;
+        if (companion.defaultFollowTarget != null)
+        {
+            agent.SetDestination(companion.defaultFollowTarget.position);
+        }
     }
 
     public override void Tick()
     {
-        if (companion.flightController.defaultFollowTarget == null)
-        {
-            Debug.LogWarning("No defaultFollowTarget set.");
+        if (companion.defaultFollowTarget == null)
             return;
-        }
 
-        float dist = Vector2.Distance(
+        float distance = Vector2.Distance(
             companion.transform.position,
-            companion.flightController.defaultFollowTarget.position
+            companion.defaultFollowTarget.position
         );
 
-        if (dist > companion.followDistance)
+        if (distance > companion.followDistance)
         {
-            companion.flightController.SetTarget(companion.flightController.defaultFollowTarget.position);
+            agent.SetDestination(companion.defaultFollowTarget.position);
         }
-        else
+        else if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
             fsm.ChangeState(companion.idleState);
         }
@@ -35,9 +43,6 @@ public class CompanionFollowState : CompanionState
 
     public override void OnExit()
     {
-        companion.flightController.allowDefaultFollow = false;
-        companion.flightController.ClearTarget();
+        agent.ResetPath();
     }
-
-    public override CompanionStateType StateType => CompanionStateType.Follow;
 }

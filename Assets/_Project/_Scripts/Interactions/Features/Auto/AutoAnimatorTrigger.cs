@@ -1,7 +1,7 @@
 // AutoAnimatorTrigger.cs
 using UnityEngine;
 
-public class AutoAnimatorTrigger : AutoTriggerFeature
+public class AutoAnimatorTrigger : AutoTriggerFeatureBase
 {
     [SerializeField] private Animator animator;
     [SerializeField] private string triggerName;

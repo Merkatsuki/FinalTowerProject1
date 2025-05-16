@@ -1,10 +1,10 @@
-// Refactored EmotionNodeFeature.cs to inherit from PuzzleFeatureBase
+// Refactored EmotionNodeFeature.cs to inherit from FeatureBase
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using DG.Tweening;
 using System.Collections;
 
-public class EmotionNodeFeature : PuzzleFeatureBase
+public class EmotionNodeFeature : FeatureBase
 {
     [Header("Emotion Settings")]
     [SerializeField] private EmotionTag requiredEmotion = EmotionTag.Neutral;

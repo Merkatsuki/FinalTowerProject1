@@ -1,9 +1,9 @@
-// Refactored PuzzlePanelFeature.cs to inherit from PuzzleFeatureBase
+// Refactored PuzzlePanelFeature.cs to inherit from FeatureBase
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PuzzlePanelFeature : PuzzleFeatureBase
+public class PuzzlePanelFeature : FeatureBase
 {
     [Header("Panel Settings")]
     [SerializeField] private GameObject panelUIPrefab;

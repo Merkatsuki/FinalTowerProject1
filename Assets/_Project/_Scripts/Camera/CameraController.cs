@@ -8,6 +8,8 @@ public class CameraController : MonoBehaviour
     [SerializeField] private CinemachineCamera playerVirtualCamera;
     [SerializeField] private CinemachineCamera companionVirtualCamera;
 
+    [Header("Parallax")]
+    [SerializeField] private ParallaxController parallaxController;
 
     [Header("Zoom Settings")]
     [SerializeField] private float defaultZoom = 5.5f;
@@ -22,6 +24,7 @@ public class CameraController : MonoBehaviour
     [Header("Damping Settings")]
     private Vector3 originalDamping;
 
+    private Transform lastFollowTarget;
 
     private bool isZoomedForCommand = false;
 
@@ -49,10 +52,27 @@ public class CameraController : MonoBehaviour
             Debug.LogWarning("CameraController: Perlin component is missing.");
     }
 
+    private void LateUpdate()
+    {
+        if (parallaxController != null)
+        {
+            Transform follow = playerVirtualCamera.Follow;
+            if (follow != null && follow != lastFollowTarget)
+            {
+                parallaxController.Initialize(follow);
+                lastFollowTarget = follow;
+            }
+        }
+    }
+
+
     public void FollowTarget(Transform target)
     {
         playerVirtualCamera.Follow = target;
         playerVirtualCamera.LookAt = target;
+
+        if (parallaxController != null)
+            parallaxController.Initialize(target.transform);
     }
 
     public void FocusOn(Transform target, float blendTime = 1f)

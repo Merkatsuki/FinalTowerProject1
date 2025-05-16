@@ -124,8 +124,8 @@ public class ExitStrategyGeneratorEditor : EditorWindow
                 break;
 
             case ExitType.ExitAfterPlayerLeaves:
-                var playerLeavesExit = ScriptableObject.CreateInstance<ExitAfterPlayerLeavesSO>();
-                playerLeavesExit.SetExitRadius(radius);
+                var playerLeavesExit = ScriptableObject.CreateInstance<ExitAfterActorLeavesSO>();
+                //playerLeavesExit.SetExitRadius(radius);
                 exitStrategy = playerLeavesExit;
                 break;
 
@@ -141,7 +141,7 @@ public class ExitStrategyGeneratorEditor : EditorWindow
 
             case ExitType.ExitOnFlagSet:
                 var flagExit = ScriptableObject.CreateInstance<ExitOnFlagSetSO>();
-                flagExit.SetRequiredFlag(requiredFlag);
+                //flagExit.SetRequiredFlag(requiredFlag);
                 exitStrategy = flagExit;
                 break;
 

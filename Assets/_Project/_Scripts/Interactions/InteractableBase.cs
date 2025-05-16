@@ -3,37 +3,60 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
+public enum InteractionMode
+{
+    Immediate,
+    Sequenced
+}
+
+[System.Serializable]
+public class InteractionSequenceBlock
+{
+    public float delayTimeBefore = 0f;
+    public List<EffectStrategySO> effects;
+    public List<FeatureBase> features;
+}
+
 public class InteractableBase : MonoBehaviour, IWorldInteractable
 {
-    [Header("Optional: Override Collider for Trigger Checks")]
-    [SerializeField] private Collider2D triggerColliderOverride;
+    [Header("Interaction Setup")]
+    [SerializeField] private bool isBlocking = true;
+    [SerializeField] private InteractionMode interactionMode = InteractionMode.Immediate;
+    [SerializeField] private List<EntryStrategySO> entryStrategies = new();
+    [SerializeField] private List<ExitStrategySO> exitStrategies = new();
 
-    [Header("Strategy Settings")]
-    public List<EntryStrategySO> entryStrategies;
-    public List<ExitStrategySO> exitStrategies;
+    [Header("Effects and Features")]
+    [SerializeField] private List<EffectStrategySO> effects = new();
+    [SerializeField] private List<FeatureBase> features = new();
 
     [Header("Highlight Settings")]
     [SerializeField] private Light2D highlightLight;
     [SerializeField] private float highlightIntensity = 2.0f;
 
     private Coroutine highlightRoutine;
-    private bool interactionInProgress = false;
-    private IPuzzleInteractor currentActor;
-    private bool interactionSuccess = false;
+
+    [Header("Optional Sequenced Blocks")]
+    [SerializeField] private List<InteractionSequenceBlock> sequenceBlocks = new();
+
+    private int currentBlockIndex = 0;
+    private bool sequenceActive = false;
+    private bool blockStarted = false;
+
+    private IPuzzleInteractor currentInteractor;
+    private bool isInteracting = false;
+    private bool hasDocked = false;
+
 
     #region Unity Update
 
     private void Update()
     {
-        if (!interactionInProgress)
-            return;
+        if (!isInteracting || interactionMode != InteractionMode.Immediate || !isBlocking) return;
 
-        if (AllExitConditionsMet())
+        if (AreAllExitStrategiesSatisfied())
         {
-            interactionInProgress = false;
-            Debug.Log($"[InteractableBase] Interaction complete. Success: {interactionSuccess}");
-
-            OnInteractionComplete(currentActor, interactionSuccess);
+            Debug.Log($"[InteractableBase] Exiting immediate interaction on {name}");
+            OnInteractionComplete(currentInteractor, true);
         }
     }
 
@@ -45,50 +68,98 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
 
     public virtual Transform GetTransform() => transform;
 
-    public virtual bool CanBeInteractedWith(IPuzzleInteractor actor)
+    public bool CanBeInteractedWith(IPuzzleInteractor interactor)
     {
-        foreach (var strategy in entryStrategies)
+        if (isInteracting) return false;
+        foreach (var entry in entryStrategies)
         {
-            if (strategy != null && !strategy.CanEnter(actor, this))
-                return false;
+            if (!entry.CanEnter(interactor, this)) return false;
         }
-
         return true;
     }
 
-    public virtual void OnInteract(IPuzzleInteractor actor)
+    public void OnInteract(IPuzzleInteractor interactor)
     {
-        Debug.Log($"[InteractableBase] OnInteract triggered by {actor}");
+        if (!CanBeInteractedWith(interactor)) return;
 
-        currentActor = actor;
-        interactionInProgress = true;
-        interactionSuccess = true;
+        currentInteractor = interactor;
+        isInteracting = true;
 
-        foreach (var feature in GetComponents<IInteractableFeature>())
+        Debug.Log($"[InteractableBase] {name} was interacted with by {interactor}");
+
+        if (interactionMode == InteractionMode.Immediate)
         {
-            feature.OnInteract(actor);
+            foreach (var effect in effects)
+                effect?.ApplyEffect(interactor, this, InteractionResult.Success);
+
+            foreach (var feature in features)
+                feature?.OnInteract(interactor);
+
+            if (!isBlocking)
+                isInteracting = false;
         }
+        else
+        {
+            StartCoroutine(RunSequence());
+        }
+    }
+
+    private IEnumerator RunSequence()
+    {
+        sequenceActive = true;
+        currentBlockIndex = 0;
+
+        while (currentBlockIndex < sequenceBlocks.Count)
+        {
+            var block = sequenceBlocks[currentBlockIndex];
+            Debug.Log($"[InteractableBase] Executing sequence block {currentBlockIndex} on {name}");
+
+            if (block.delayTimeBefore > 0f)
+            {
+                Debug.Log($"[InteractableBase] Waiting {block.delayTimeBefore} seconds before executing block {currentBlockIndex}.");
+                yield return new WaitForSeconds(block.delayTimeBefore);
+            }
+
+            foreach (var effect in block.effects)
+            {
+                effect?.ApplyEffect(currentInteractor, this, InteractionResult.Success);
+            }
+
+            foreach (var feature in block.features)
+                feature?.OnInteract(currentInteractor);
+
+            bool waiting = true;
+            while (waiting)
+            {
+                waiting = false;
+                foreach (var feature in block.features)
+                {
+                    if (feature != null && !feature.IsComplete)
+                    {
+                        waiting = true;
+                        break;
+                    }
+                }
+                yield return null;
+            }
+
+            currentBlockIndex++;
+        }
+
+        Debug.Log($"[InteractableBase] Sequence complete on {name}");
+
+        OnInteractionComplete(currentInteractor, true);
     }
 
     public virtual void OnInteractionComplete(IPuzzleInteractor actor, bool interactionSucceeded)
     {
-        Debug.Log($"[InteractableBase] OnInteractionComplete called manually. Success: {interactionSucceeded}");
+        Debug.Log($"[InteractableBase] Interaction completed on {name}. Success: {interactionSucceeded}");
 
-        if (interactionInProgress)
-        {
-            interactionSuccess = interactionSucceeded;
-            // Final exit resolution occurs in Update via AllExitConditionsMet
-        }
-
-        foreach (var strategy in exitStrategies)
-        {
-            if (strategy != null)
-            {
-                strategy.OnExit(actor, this);
-            }
-        }
-
-        currentActor = null;
+        isInteracting = false;
+        sequenceActive = false;
+        blockStarted = false;
+        currentBlockIndex = 0;
+        hasDocked = false;
     }
 
     public virtual List<ExitStrategySO> GetExitStrategies() => exitStrategies;
@@ -96,29 +167,14 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
     #endregion
 
     #region Exit Evaluation
-
-    private bool AllExitConditionsMet()
+    private bool AreAllExitStrategiesSatisfied()
     {
-        if (currentActor == null)
-            return false;
-
-        foreach (var strategy in exitStrategies)
+        foreach (var exit in exitStrategies)
         {
-            if (strategy != null && strategy.ShouldExit(currentActor, this))
-                return true;
+            if (!exit.ShouldExit(currentInteractor, this))
+                return false;
         }
-
-        return false;
-    }
-
-    public bool ShouldExit(IPuzzleInteractor actor)
-    {
-        foreach (var strategy in exitStrategies)
-        {
-            if (strategy != null && strategy.ShouldExit(actor, this))
-                return true;
-        }
-        return false;
+        return true;
     }
 
     #endregion
@@ -156,22 +212,17 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
     }
 
     #endregion
-
-    #region Collider Override Accessors
-
-    public void SetTriggerColliderOverride(Collider2D col)
-    {
-        triggerColliderOverride = col;
-    }
-
-    public Collider2D GetTriggerCollider()
-    {
-        return triggerColliderOverride;
-    }
-
-    #endregion
-
+    
     #region Hooks
+
+    public virtual Vector3 GetDockPosition()
+    {
+        DockPointFeature dock = GetComponent<DockPointFeature>();
+        return dock != null ? dock.GetDockPosition() : transform.position;
+    }
+
+    public void MarkDocked() => hasDocked = true;
+    public bool HasDocked() => hasDocked;
 
     public virtual void BroadcastEvent(string eventId)
     {

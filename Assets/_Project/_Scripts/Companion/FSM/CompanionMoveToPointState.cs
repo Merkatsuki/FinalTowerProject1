@@ -1,12 +1,17 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 
 public class CompanionMoveToPointState : CompanionState
 {
     private Vector2 _targetPosition;
     private float _arrivalThreshold = 0.15f;
     private bool _arrived;
+    private NavMeshAgent agent;
 
-    public CompanionMoveToPointState(CompanionController companion, CompanionFSM fsm) : base(companion, fsm) { }
+    public CompanionMoveToPointState(CompanionController companion, CompanionFSM fsm) : base(companion, fsm)
+    {
+        agent = companion.GetComponent<NavMeshAgent>();
+    }
 
     public override CompanionStateType StateType => CompanionStateType.MoveToPoint;
 
@@ -14,29 +19,25 @@ public class CompanionMoveToPointState : CompanionState
     {
         var target = companion.CurrentTarget;
         _targetPosition = target.Position;
-
         _arrived = false;
-        companion.flightController.SetTarget(_targetPosition);
+
+        agent.SetDestination(_targetPosition);
     }
 
     public override void Tick()
     {
-        base.Tick();
-        float dist = Vector2.Distance(companion.transform.position, _targetPosition);
+        if (_arrived || agent.pathPending)
+            return;
 
-        if (!_arrived && dist < _arrivalThreshold)
+        if (agent.remainingDistance <= _arrivalThreshold)
         {
             _arrived = true;
-            companion.fsm.ChangeState(companion.idleState);
+            fsm.ChangeState(companion.idleState);
         }
     }
 
     public override void OnExit()
     {
-        companion.flightController.allowDefaultFollow = false;
-
-        companion.flightController.ClearTarget();
+        agent.ResetPath();
     }
 }
-
-

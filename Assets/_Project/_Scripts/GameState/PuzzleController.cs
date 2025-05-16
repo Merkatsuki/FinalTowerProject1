@@ -7,20 +7,21 @@ public class PuzzleController : MonoBehaviour
 
     [SerializeField] private List<MonoBehaviour> puzzleComponents = new();
     [SerializeField] private bool autoSolveWhenAllReported = true;
+    [SerializeField] private List<FlagSO> flagsToSetOnSolve;
 
-    private HashSet<IPuzzleComponent> activatedComponents = new();
+    private HashSet<FeatureBase> activatedComponents = new();
     private PuzzleState currentState = PuzzleState.NotStarted;
 
     private void Awake()
     {
         foreach (var comp in puzzleComponents)
         {
-            if (comp is IPuzzleComponent pComp)
-                pComp.RegisterToPuzzle(this);
+            if (comp is FeatureBase feature)
+                feature.RegisterToPuzzle(this);
         }
     }
 
-    public void ReportComponentSuccess(IPuzzleComponent comp)
+    public void ReportComponentSuccess(FeatureBase comp)
     {
         if (currentState == PuzzleState.Solved || currentState == PuzzleState.Failed)
             return;
@@ -38,8 +39,12 @@ public class PuzzleController : MonoBehaviour
         currentState = PuzzleState.Solved;
 
         Debug.Log("[PuzzleController] Puzzle Solved.");
-        QuipManager.Instance.TryPlayQuip(QuipTriggerType.OnPuzzleSolve);
-        // Trigger any puzzle-complete effects, flags, etc.
+        QuipManager.Instance.TryPlayFilteredQuip(QuipTriggerType.OnPuzzleSolve, null);
+        foreach (var flag in flagsToSetOnSolve)
+        {
+            if (flag != null)
+                FlagManager.Instance?.SetBool(flag, true);
+        }
     }
 
     public void FailPuzzle()
@@ -48,7 +53,7 @@ public class PuzzleController : MonoBehaviour
         currentState = PuzzleState.Failed;
 
         Debug.Log("[PuzzleController] Puzzle Failed.");
-        QuipManager.Instance.TryPlayQuip(QuipTriggerType.OnPuzzleFail);
+        QuipManager.Instance.TryPlayFilteredQuip(QuipTriggerType.OnPuzzleFail, null);
     }
 
     public void ResetPuzzle()
@@ -57,8 +62,8 @@ public class PuzzleController : MonoBehaviour
         activatedComponents.Clear();
 
         foreach (var comp in puzzleComponents)
-            if (comp is IPuzzleComponent pComp)
-                pComp.ResetPuzzleComponent();
+            if (comp is FeatureBase feature)
+                feature.ResetPuzzleComponent();
     }
 
     public PuzzleState GetCurrentState() => currentState;

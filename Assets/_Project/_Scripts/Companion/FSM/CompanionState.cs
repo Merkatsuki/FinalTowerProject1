@@ -24,6 +24,8 @@ public enum CompanionStateType
     Investigate,
     InteractWithObject,
     Glitch,
-    MoveToPoint
+    MoveToPoint,
+    Docking,
+    WaitHere,
+    Hub
 }
-

@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class DoorFeature : MonoBehaviour, IInteractableFeature
+public class DoorFeature : FeatureBase
 {
     [Header("Door Settings")]
     [SerializeField] private Animator doorAnimator;
@@ -14,9 +14,6 @@ public class DoorFeature : MonoBehaviour, IInteractableFeature
     [SerializeField] private bool autoClose = false;
     [SerializeField] private float autoCloseDelay = 2f;
     [SerializeField] private bool startClosed = true;
-
-    [Header("Feature Effects")]
-    [SerializeField] private List<EffectStrategySO> featureEffects = new();
 
     private bool isOpen = false;
     private bool operating = false;
@@ -31,7 +28,7 @@ public class DoorFeature : MonoBehaviour, IInteractableFeature
         }
     }
 
-    public void OnInteract(IPuzzleInteractor actor)
+    public override void OnInteract(IPuzzleInteractor actor)
     {
         if (operating) return;
 
@@ -111,11 +108,6 @@ public class DoorFeature : MonoBehaviour, IInteractableFeature
                 effect.ApplyEffect(null, interactable, InteractionResult.Success);
             }
         }
-    }
-
-    public void SetFeatureEffects(List<EffectStrategySO> effects)
-    {
-        featureEffects = effects ?? new List<EffectStrategySO>();
     }
 
     public void SetDoorAnimator(Animator animator)

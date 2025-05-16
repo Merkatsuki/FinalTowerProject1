@@ -26,7 +26,7 @@ public class CompanionGlitchState : CompanionState
 
     public override void OnExit()
     {
-        companion.flightController.allowDefaultFollow = false;
+       
     }
 
     public override CompanionStateType StateType => CompanionStateType.Glitch;

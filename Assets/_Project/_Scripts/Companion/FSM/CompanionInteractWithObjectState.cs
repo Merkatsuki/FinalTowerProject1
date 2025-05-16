@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 using System.Collections.Generic;
 
 public class CompanionInteractWithObjectState : CompanionState
@@ -6,21 +7,25 @@ public class CompanionInteractWithObjectState : CompanionState
     private IWorldInteractable target;
     private float waitTimer = 0f;
     private float maxWaitTime = 5f;
+    private NavMeshAgent agent;
 
     public CompanionInteractWithObjectState(CompanionController companion, CompanionFSM fsm, IWorldInteractable target)
         : base(companion, fsm)
     {
         this.target = target;
+        this.agent = companion.GetComponent<NavMeshAgent>();
     }
 
     public override CompanionStateType StateType => CompanionStateType.InteractWithObject;
 
     public override void OnEnter()
     {
+        agent.ResetPath();
+
         if (target == null || !target.CanBeInteractedWith(companion))
         {
             Debug.LogWarning("[InteractWithObject] Invalid or blocked target.");
-            fsm.ChangeState(companion.idleState);
+            fsm.ResumeDefault(companion);
             return;
         }
 
@@ -32,7 +37,6 @@ public class CompanionInteractWithObjectState : CompanionState
             strategy?.OnEnter(companion, target);
         }
 
-        Debug.Log($"[CompanionInteractWithObjectState] Entered. Target: {target?.GetDisplayName()}");
         InteractWithTarget();
     }
 
@@ -45,21 +49,21 @@ public class CompanionInteractWithObjectState : CompanionState
             if (strategy != null && strategy.ShouldExit(companion, target))
             {
                 Debug.Log("[InteractWithObject] Exit condition met.");
-                fsm.ChangeState(companion.idleState);
+                fsm.ResumeDefault(companion);
                 return;
             }
         }
 
         if (waitTimer >= maxWaitTime)
         {
-            Debug.LogWarning("[InteractWithObject] Timeout. Returning to Idle.");
-            fsm.ChangeState(companion.idleState);
+            Debug.LogWarning("[InteractWithObject] Timeout. Returning to default.");
+            fsm.ResumeDefault(companion);
         }
     }
 
     public override void OnExit()
     {
-        companion.flightController.allowDefaultFollow = false;
+        agent.ResetPath();
     }
 
     private void InteractWithTarget()
@@ -69,7 +73,6 @@ public class CompanionInteractWithObjectState : CompanionState
             Debug.Log($"[CompanionInteractWithObjectState] Interacting with {target.GetDisplayName()}");
 
             target.OnInteract(companion);
-
             target.OnInteractionComplete(companion, true);
 
             companion.Perception.MarkAsHandled(target);

@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class AutoDialogueFeature : AutoTriggerFeature
+public class AutoDialogueFeature : AutoTriggerFeatureBase
 {
     [Header("Dialogue Settings")]
     [Tooltip("If provided, this will override the inline sequence below")]

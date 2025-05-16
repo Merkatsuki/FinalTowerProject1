@@ -29,6 +29,13 @@ public enum QuipTriggerType
     OnInteractableApproach, 
     OnMemoryFragmentPickup, 
     OnStoryPagePickup,
+    OnCommandStart,
+    OnCommandEnd,
+    OnCommandMove,
+    OnCommandInteract,
+    OnWaitHere,
+    OnFollowResume,
+    OnEmotionMismatch,
     AmbientRandom 
 }
 public enum EmotionTag 

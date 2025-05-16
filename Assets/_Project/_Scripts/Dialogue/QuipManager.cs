@@ -1,4 +1,4 @@
-// Patched QuipManager.cs with quip suppression and cooldown timer support
+// Refactored QuipManager.cs for modular trigger support
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -43,18 +43,31 @@ public class QuipManager : MonoBehaviour
         }
     }
 
-    public void TryPlayQuip(QuipTriggerType trigger)
+    // Public entry points by trigger type
+    public void TryPlayCommandStartQuip(CompanionController context) => TryPlayFilteredQuip(QuipTriggerType.OnCommandStart, context);
+    public void TryPlayCommandEndQuip(CompanionController context) => TryPlayFilteredQuip(QuipTriggerType.OnCommandEnd, context);
+    public void TryPlayCommandMoveQuip(CompanionController context) => TryPlayFilteredQuip(QuipTriggerType.OnCommandMove, context);
+    public void TryPlayCommandInteractQuip(CompanionController context) => TryPlayFilteredQuip(QuipTriggerType.OnCommandInteract, context);
+    public void TryPlayWaitHereQuip(CompanionController context) => TryPlayFilteredQuip(QuipTriggerType.OnWaitHere, context);
+    public void TryPlayFollowResumeQuip(CompanionController context) => TryPlayFilteredQuip(QuipTriggerType.OnFollowResume, context);
+    public void TryPlayEmotionMismatchQuip(IWorldInteractable target)
+    {
+        Debug.Log("[Quip] Emotion mismatch on: " + target?.GetDisplayName());
+        TryPlayFilteredQuip(QuipTriggerType.OnEmotionMismatch, null);
+    }
+
+    public void TryPlayFilteredQuip(QuipTriggerType trigger, CompanionController context)
     {
         if (DialogueManager.Instance.IsDialoguePlaying()) return;
+        if (quipInProgress || quipCooldownTimer < globalQuipCooldown) return;
 
-        bool isEmotionSwitch = trigger == QuipTriggerType.OnEmotionSwitch;
-        if (!isEmotionSwitch && (quipInProgress || quipCooldownTimer < globalQuipCooldown)) return;
-
+        EmotionTag emotion = context?.GetEmotion() ?? currentEmotion;
+        ZoneTag zone = currentZone;
 
         var candidates = allQuips.Where(q =>
             q.triggerType == trigger &&
-            (q.emotionTag == EmotionTag.Any || q.emotionTag == currentEmotion) &&
-            (q.zoneTag == ZoneTag.Any || q.zoneTag == currentZone) &&
+            (q.emotionTag == EmotionTag.Any || q.emotionTag == emotion) &&
+            (q.zoneTag == ZoneTag.Any || q.zoneTag == zone) &&
             HasRemainingUses(q) &&
             IsEligibleFromHistory(q)
         ).ToList();
@@ -62,9 +75,8 @@ public class QuipManager : MonoBehaviour
         if (candidates.Count == 0) return;
 
         RobotQuip selected = PickWeightedQuip(candidates);
-        if (selected == null) return;
-
-        PlayQuip(selected);
+        if (selected != null)
+            PlayQuip(selected);
     }
 
     public void TryPlayAmbientQuip()
@@ -83,11 +95,22 @@ public class QuipManager : MonoBehaviour
         if (ambientQuips.Count == 0) return;
 
         RobotQuip selected = PickWeightedQuip(ambientQuips);
-        if (selected == null) return;
-
-        PlayQuip(selected);
+        if (selected != null)
+            PlayQuip(selected);
     }
 
+    public void PlayDirectQuip(string line)
+    {
+        if (DialogueManager.Instance.IsDialoguePlaying()) return;
+        if (quipInProgress || quipCooldownTimer < globalQuipCooldown) return;
+
+        if (companionQuipUI != null)
+        {
+            quipInProgress = true;
+            companionQuipUI.ShowQuip(line);
+            quipCooldownTimer = 0f;
+        }
+    }
     private void PlayQuip(RobotQuip selected)
     {
         if (companionQuipUI != null)

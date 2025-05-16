@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class DialogueFeature : MonoBehaviour, IInteractableFeature
+public class DialogueFeature : FeatureBase
 {
     [Header("Dialogue Settings")]
     [Tooltip("If provided, this will override the inline sequence below")]
@@ -15,9 +15,6 @@ public class DialogueFeature : MonoBehaviour, IInteractableFeature
     [SerializeField] private string oneLinerSpeaker;
     [SerializeField] private bool oneLinerWaitForInput = true;
     [SerializeField] private float oneLinerPauseAfter = 0f;
-
-    [Header("Feature Effects")]
-    [SerializeField] private List<EffectStrategySO> featureEffects = new();
 
     private bool dialogueStarted = false;
 
@@ -34,7 +31,7 @@ public class DialogueFeature : MonoBehaviour, IInteractableFeature
         }
     }
 
-    public void OnInteract(IPuzzleInteractor actor)
+    public override void OnInteract(IPuzzleInteractor actor)
     {
         if (dialogueStarted) return;
         dialogueStarted = true;
@@ -82,10 +79,5 @@ public class DialogueFeature : MonoBehaviour, IInteractableFeature
                 effect.ApplyEffect(null, interactable, InteractionResult.Success);
             }
         }
-    }
-
-    public void SetFeatureEffects(List<EffectStrategySO> effects)
-    {
-        featureEffects = effects ?? new List<EffectStrategySO>();
     }
 }

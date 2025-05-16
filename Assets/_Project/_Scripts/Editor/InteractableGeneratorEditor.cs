@@ -227,8 +227,8 @@ public class InteractableGeneratorEditor : EditorWindow
         }
 
         var interactable = go.AddComponent<InteractableBase>();
-        interactable.entryStrategies = new List<EntryStrategySO>(entryStrategies);
-        interactable.exitStrategies = new List<ExitStrategySO>(exitStrategies);
+        //interactable.entryStrategies = new List<EntryStrategySO>(entryStrategies);
+        //interactable.exitStrategies = new List<ExitStrategySO>(exitStrategies);
 
         var metadata = go.AddComponent<FeatureMetadata>();
 
@@ -331,7 +331,7 @@ public class InteractableGeneratorEditor : EditorWindow
             // Register light and trigger with InteractableBase
             var interactable = go.GetComponent<InteractableBase>();
             interactable.SetHighlightLight(light2D);
-            interactable.SetTriggerColliderOverride(triggerCol);
+            //interactable.SetTriggerColliderOverride(triggerCol);
 
             // Create two default waypoints
             GameObject wp0 = new GameObject("Waypoint_0");

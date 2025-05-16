@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
+public class LockedDoorFeature : FeatureBase
 {
     [Header("Door Settings")]
     [SerializeField] private Animator doorAnimator;
@@ -17,10 +17,7 @@ public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
     [SerializeField] private bool startLocked = true;
 
     [Header("Puzzle Requirement")]
-    [SerializeField] private FlagSO requiredFlag; // Gate to unlock door
-
-    [Header("Feature Effects")]
-    [SerializeField] private List<EffectStrategySO> featureEffects = new();
+    [SerializeField] private FlagSO requiredFlag; 
 
     private bool isOpen = false;
     private bool unlocked = false;
@@ -37,7 +34,7 @@ public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
         }
     }
 
-    public void OnInteract(IPuzzleInteractor actor)
+    public override void OnInteract(IPuzzleInteractor actor)
     {
         if (operating) return;
 
@@ -155,11 +152,6 @@ public class LockedDoorFeature : MonoBehaviour, IInteractableFeature
                 effect.ApplyEffect(null, interactable, InteractionResult.Success);
             }
         }
-    }
-
-    public void SetFeatureEffects(List<EffectStrategySO> effects)
-    {
-        featureEffects = effects ?? new List<EffectStrategySO>();
     }
 
     public void SetDoorAnimator(Animator animator)

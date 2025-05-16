@@ -1,7 +1,7 @@
 // AutoSFXFeature.cs
 using UnityEngine;
 
-public class AutoSFXFeature : AutoTriggerFeature
+public class AutoSFXFeature : AutoTriggerFeatureBase
 {
     [SerializeField] private AudioClip sound;
     [SerializeField] private AudioSource audioSource;

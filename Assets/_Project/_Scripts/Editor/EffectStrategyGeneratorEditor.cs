@@ -18,7 +18,6 @@ public class EffectStrategyGeneratorEditor : EditorWindow
     private List<EffectStrategySO> batchEffects = new();
     private AudioClip soundClip;
     private float soundVolume = 1.0f;
-    private float delaySeconds = 1.0f;
     private GameObject prefabToSpawn;
     private Vector2 spawnOffset;
 
@@ -86,10 +85,6 @@ public class EffectStrategyGeneratorEditor : EditorWindow
                 soundVolume = EditorGUILayout.Slider("Volume", soundVolume, 0f, 1f);
                 break;
 
-            case EffectType.Delay:
-                delaySeconds = EditorGUILayout.FloatField("Delay (seconds)", delaySeconds);
-                break;
-
             case EffectType.SpawnPrefab:
                 prefabToSpawn = (GameObject)EditorGUILayout.ObjectField("Prefab to Spawn", prefabToSpawn, typeof(GameObject), false);
                 spawnOffset = EditorGUILayout.Vector2Field("Spawn Offset", spawnOffset);
@@ -136,12 +131,6 @@ public class EffectStrategyGeneratorEditor : EditorWindow
                 effect = playSound;
                 break;
 
-            case EffectType.Delay:
-                var delay = ScriptableObject.CreateInstance<DelayEffect>();
-                delay.SetDelay(delaySeconds);
-                effect = delay;
-                break;
-
             case EffectType.SpawnPrefab:
                 var spawn = ScriptableObject.CreateInstance<SpawnPrefabEffect>();
                 spawn.SetPrefab(prefabToSpawn);
@@ -169,7 +158,6 @@ public class EffectStrategyGeneratorEditor : EditorWindow
         SetFlag,
         Batch,
         PlaySound,
-        Delay,
         SpawnPrefab
     }
 }

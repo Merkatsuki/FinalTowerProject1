@@ -1,7 +1,7 @@
 // AutoVFXTrigger.cs
 using UnityEngine;
 
-public class AutoVFXTrigger : AutoTriggerFeature
+public class AutoVFXTrigger : AutoTriggerFeatureBase
 {
     [SerializeField] private GameObject vfxPrefab;
     [SerializeField] private Transform spawnPoint;

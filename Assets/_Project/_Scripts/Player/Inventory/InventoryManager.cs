@@ -42,6 +42,8 @@ public class InventoryManager : MonoBehaviour
 
     public void AddItem(ItemSO item)
     {
+        Debug.Log($"[InventoryManager] Adding item: {item.ItemName} (ID: {item.ItemID})");
+
         if (item == null || string.IsNullOrEmpty(item.ItemID)) return;
 
         if (collectedItems.Contains(item.ItemID)) return;
@@ -84,4 +86,25 @@ public class InventoryManager : MonoBehaviour
     {
         return item != null && collectedItems.Contains(item.ItemID);
     }
+
+
+    [ContextMenu("Print Collected Inventory Items")]
+    public void DebugPrintInventory()
+    {
+        Debug.Log("[InventoryManager] --- INVENTORY DEBUG START ---");
+        foreach (var id in collectedItems)
+        {
+            if (itemDatabase.TryGetValue(id, out var item))
+            {
+                Debug.Log($"Collected Item: {item.ItemName} (ID: {item.ItemID}, Category: {item.category})");
+            }
+            else
+            {
+                Debug.LogWarning($"Collected item ID '{id}' has no matching ItemSO in database!");
+            }
+        }
+        Debug.Log("[InventoryManager] --- INVENTORY DEBUG END ---");
+    }
+
+
 }
