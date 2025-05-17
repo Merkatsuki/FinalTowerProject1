@@ -1,0 +1,318 @@
+fileFormatVersion: 2
+guid: 8e55bb89b2110ba42bbddfcd13891322
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5388074597060828102
+    second: GroundBrown_Fixed_0
+  - first:
+      213: -4325613104079545561
+    second: GroundBrown_Fixed_1
+  - first:
+      213: -7803451851783618385
+    second: GroundBrown_Fixed_2
+  - first:
+      213: -4656973452561659671
+    second: GroundBrown_Fixed_3
+  - first:
+      213: -5207764112772952076
+    second: GroundBrown_Fixed_4
+  - first:
+      213: 5907477646897026749
+    second: GroundBrown_Fixed_5
+  - first:
+      213: 6069293972421005026
+    second: GroundBrown_Fixed_6
+  - first:
+      213: -6671193614618489393
+    second: GroundBrown_Fixed_7
+  - first:
+      213: -7015511828247609750
+    second: GroundBrown_Fixed_8
+  - first:
+      213: -2538934031247393847
+    second: GroundBrown_Fixed_9
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 99
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: GroundBrown_Fixed_11
+      rect:
+        serializedVersion: 2
+        x: 489
+        y: 884
+        width: 99
+        height: 297
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape:
+      - - {x: -36.5, y: -148.5}
+        - {x: 38.5, y: -148.5}
+        - {x: 38.5, y: 148.5}
+        - {x: -36.5, y: 148.5}
+      tessellationDetail: 0
+      bones: []
+      spriteID: c8a1d1c9a5cb5a944b8631808f22c466
+      internalID: 245755402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GroundBrown_Fixed_48
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 692
+        width: 297
+        height: 99
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape:
+      - - {x: -148.5, y: -40.5}
+        - {x: 148.5, y: -40.5}
+        - {x: 148.5, y: 35.5}
+        - {x: -148.5, y: 35.5}
+      tessellationDetail: 0
+      bones: []
+      spriteID: b260e98256378cf4b89df60f33030e27
+      internalID: -1794814842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GroundBrown_Fixed_52
+      rect:
+        serializedVersion: 2
+        x: 490
+        y: 695
+        width: 99
+        height: 99
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape:
+      - - {x: -36.5, y: -29.5}
+        - {x: 37.5, y: -29.5}
+        - {x: 37.5, y: 38.5}
+        - {x: -36.5, y: 38.5}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 98b3478a03b0c3d4baa90ebf7c9579ba
+      internalID: 888665445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 15801fad5fcd2a04197fc4e17905a427
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      GroundBrownCustom_0: -129363772
+      GroundBrown_Fixed_0: 260756828
+      GroundBrown_Fixed_1: -532140026
+      GroundBrown_Fixed_10: 1842471974
+      GroundBrown_Fixed_11: 245755402
+      GroundBrown_Fixed_12: 2023711621
+      GroundBrown_Fixed_13: -1009209428
+      GroundBrown_Fixed_14: -660297550
+      GroundBrown_Fixed_15: -2132856119
+      GroundBrown_Fixed_16: 1540039623
+      GroundBrown_Fixed_17: 860845174
+      GroundBrown_Fixed_18: -231804787
+      GroundBrown_Fixed_19: -1938786497
+      GroundBrown_Fixed_2: -124414681
+      GroundBrown_Fixed_20: 754026492
+      GroundBrown_Fixed_21: -1444382775
+      GroundBrown_Fixed_22: 482457807
+      GroundBrown_Fixed_23: 717024580
+      GroundBrown_Fixed_24: -1855202791
+      GroundBrown_Fixed_25: 1715699843
+      GroundBrown_Fixed_26: 781270030
+      GroundBrown_Fixed_27: 1512446548
+      GroundBrown_Fixed_28: 744386217
+      GroundBrown_Fixed_29: 394951417
+      GroundBrown_Fixed_3: 902241610
+      GroundBrown_Fixed_30: -385664158
+      GroundBrown_Fixed_31: -862515142
+      GroundBrown_Fixed_32: 1976389394
+      GroundBrown_Fixed_33: -242597220
+      GroundBrown_Fixed_34: 1531976256
+      GroundBrown_Fixed_35: -1795194163
+      GroundBrown_Fixed_36: 1511824145
+      GroundBrown_Fixed_37: -759372411
+      GroundBrown_Fixed_38: 884159181
+      GroundBrown_Fixed_39: 1963452717
+      GroundBrown_Fixed_4: 1926324013
+      GroundBrown_Fixed_40: -876838997
+      GroundBrown_Fixed_41: 1112337916
+      GroundBrown_Fixed_42: -792708776
+      GroundBrown_Fixed_43: 1097571023
+      GroundBrown_Fixed_44: -31492652
+      GroundBrown_Fixed_45: 717684434
+      GroundBrown_Fixed_46: -1524305598
+      GroundBrown_Fixed_47: 741815622
+      GroundBrown_Fixed_48: -1794814842
+      GroundBrown_Fixed_49: -2100623372
+      GroundBrown_Fixed_5: -2062483215
+      GroundBrown_Fixed_50: -819199429
+      GroundBrown_Fixed_51: -1507670457
+      GroundBrown_Fixed_52: 888665445
+      GroundBrown_Fixed_53: -514867036
+      GroundBrown_Fixed_54: -46578432
+      GroundBrown_Fixed_55: -1943889379
+      GroundBrown_Fixed_56: 1045492248
+      GroundBrown_Fixed_57: 1212402091
+      GroundBrown_Fixed_58: -1108247361
+      GroundBrown_Fixed_59: -2145000916
+      GroundBrown_Fixed_6: -1337508047
+      GroundBrown_Fixed_60: 225775194
+      GroundBrown_Fixed_61: -2051749842
+      GroundBrown_Fixed_62: 931004725
+      GroundBrown_Fixed_63: 494265772
+      GroundBrown_Fixed_64: -348340697
+      GroundBrown_Fixed_65: -1580409715
+      GroundBrown_Fixed_66: 1640541248
+      GroundBrown_Fixed_67: 1628538468
+      GroundBrown_Fixed_68: -1408974507
+      GroundBrown_Fixed_69: -1507334948
+      GroundBrown_Fixed_7: -17368459
+      GroundBrown_Fixed_70: 1233770581
+      GroundBrown_Fixed_71: -716130837
+      GroundBrown_Fixed_72: 1360265801
+      GroundBrown_Fixed_73: -350432018
+      GroundBrown_Fixed_74: 1215888559
+      GroundBrown_Fixed_75: 254010131
+      GroundBrown_Fixed_76: 632674013
+      GroundBrown_Fixed_77: 1489389189
+      GroundBrown_Fixed_78: -1087253928
+      GroundBrown_Fixed_79: -1770384335
+      GroundBrown_Fixed_8: 1627252081
+      GroundBrown_Fixed_80: 832047282
+      GroundBrown_Fixed_81: 613131145
+      GroundBrown_Fixed_82: -1385135307
+      GroundBrown_Fixed_83: 528380859
+      GroundBrown_Fixed_84: 1058648150
+      GroundBrown_Fixed_85: -1048195183
+      GroundBrown_Fixed_86: 906381428
+      GroundBrown_Fixed_87: 2026338309
+      GroundBrown_Fixed_88: 977027281
+      GroundBrown_Fixed_89: 1525098710
+      GroundBrown_Fixed_9: -1994111959
+      GroundBrown_Fixed_90: -1287266527
+      GroundBrown_Fixed_91: -1742825699
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

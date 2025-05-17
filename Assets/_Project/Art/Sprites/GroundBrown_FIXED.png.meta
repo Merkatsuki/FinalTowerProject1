@@ -252,7 +252,7 @@ TextureImporter:
       name: GroundBrown_Fixed_14
       rect:
         serializedVersion: 2
-        x: 784
+        x: 783
         y: 1085
         width: 99
         height: 99
@@ -371,7 +371,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 685
-        y: 986
+        y: 987
         width: 99
         height: 99
       alignment: 0
@@ -392,8 +392,8 @@ TextureImporter:
       name: GroundBrown_Fixed_25
       rect:
         serializedVersion: 2
-        x: 784
-        y: 986
+        x: 785
+        y: 987
         width: 99
         height: 99
       alignment: 0
