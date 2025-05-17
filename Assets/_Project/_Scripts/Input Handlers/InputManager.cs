@@ -18,6 +18,7 @@ namespace Momentum
         public Vector2 MousePosition { get; private set; }
 
         [NonSerialized] public Action JumpPressed; // Public so other classes can subscribe to this. Tagged to not show up in inspector
+        [NonSerialized] public Action JumpPressedDialogue; // Public so other classes can subscribe to this. Tagged to not show up in inspector
         [NonSerialized] public Action JumpReleased;
         public event Action OnMoveCommand;
         public event Action<bool> OnCommandModeChanged;
@@ -63,7 +64,7 @@ namespace Momentum
             {
                 if (!_jumpBlocked)
                 {
-                    JumpPressed?.Invoke();
+                    JumpPressedDialogue?.Invoke();
                 }
             };
         }

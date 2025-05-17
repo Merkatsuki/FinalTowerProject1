@@ -29,7 +29,7 @@ public class DialogueManager : MonoBehaviour
     {
         if (InputManager.instance != null)
         {
-            InputManager.instance.JumpPressed += OnAdvanceInput;
+            InputManager.instance.JumpPressedDialogue += OnAdvanceInput;
         }
     }
 
