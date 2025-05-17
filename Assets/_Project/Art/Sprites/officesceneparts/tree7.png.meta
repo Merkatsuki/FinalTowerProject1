@@ -103,12 +103,12 @@ TextureImporter:
       name: tree7_0
       rect:
         serializedVersion: 2
-        x: 1030
+        x: 1022
         y: 143
-        width: 603
-        height: 791
+        width: 617
+        height: 858
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 3d42c991a99dc54488f58cc55929ea2a
     internalID: 0
     vertices: []
     indices: 
@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      tree7_0: -8330333014425642959
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

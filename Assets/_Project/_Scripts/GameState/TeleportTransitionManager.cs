@@ -1,6 +1,8 @@
 ﻿using DG.Tweening;
+using Momentum;
 using System.Collections;
 using UnityEngine;
+using static Momentum.PlayerChecks;
 
 public class TeleportTransitionManager : MonoBehaviour, IGameStateListener
 {
@@ -42,22 +44,34 @@ public class TeleportTransitionManager : MonoBehaviour, IGameStateListener
         // Optional: fade out HUD, disable UI inputs, etc.
     }
 
-    public void TeleportTo(Vector3 targetPos, EmotionType emotion)
+    public void TeleportTo(Vector3 position, EmotionType emotion, bool faceRight, SadnessPuzzleRoom roomToActivate)
     {
-        StartCoroutine(TeleportRoutine(targetPos, emotion));
+        StartCoroutine(TeleportRoutine(position, emotion, faceRight, roomToActivate));
+    }
+    public void TeleportTo(Vector3 position, EmotionType emotion, bool faceRight)
+    {
+        StartCoroutine(TeleportRoutine(position, emotion, faceRight));
     }
 
-    private IEnumerator TeleportRoutine(Vector3 targetPos, EmotionType emotion)
+    private IEnumerator TeleportRoutine(Vector3 targetPos, EmotionType emotion, bool faceRight, SadnessPuzzleRoom targetRoom)
     {
         GameStateManager.Instance.SetState(GameState.Loading);
 
         yield return Fade(1f); // Fade to black
+
+        SadnessPuzzleRoomManager.Instance.EnterRoom(targetRoom);
 
         // Snap camera to player instantly
         cameraController.SnapToTargetImmediately();
 
         yield return new WaitForSeconds(0.1f);
         playerTransform.position = targetPos;
+
+        if (playerTransform.TryGetComponent(out PlayerChecks checks))
+        {
+            checks.SetFacing(faceRight ? Facing.Right : Facing.Left);
+        }
+
         ApplyEmotionVFX(emotion);
 
         yield return new WaitForSeconds(0.2f);
@@ -70,6 +84,34 @@ public class TeleportTransitionManager : MonoBehaviour, IGameStateListener
         GameStateManager.Instance.SetState(GameState.Gameplay);
     }
 
+    private IEnumerator TeleportRoutine(Vector3 targetPos, EmotionType emotion, bool faceRight)
+    {
+        GameStateManager.Instance.SetState(GameState.Loading);
+
+        yield return Fade(1f); // Fade to black
+
+        // Snap camera to player instantly
+        cameraController.SnapToTargetImmediately();
+
+        yield return new WaitForSeconds(0.1f);
+        playerTransform.position = targetPos;
+
+        if (playerTransform.TryGetComponent(out PlayerChecks checks))
+        {
+            checks.SetFacing(faceRight ? Facing.Right : Facing.Left);
+        }
+
+        ApplyEmotionVFX(emotion);
+
+        yield return new WaitForSeconds(0.2f);
+
+        yield return Fade(0f); // Fade in
+
+        // Restore smooth camera motion
+        cameraController.RestoreCameraDamping();
+
+        GameStateManager.Instance.SetState(GameState.Gameplay);
+    }
 
     private IEnumerator Fade(float targetAlpha)
     {

@@ -9,7 +9,7 @@ public class ZoneTeleportTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            TeleportTransitionManager.Instance.TeleportTo(targetLocation.position, transitionEmotion);
+            TeleportTransitionManager.Instance.TeleportTo(targetLocation.position, transitionEmotion, true);
         }
     }
 }

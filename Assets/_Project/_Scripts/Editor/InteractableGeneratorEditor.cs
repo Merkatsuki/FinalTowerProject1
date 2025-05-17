@@ -265,13 +265,6 @@ public class InteractableGeneratorEditor : EditorWindow
             feature.SetFeatureEffects(dialogueFeatureEffects);
         }
 
-        if (addPortalFeature)
-        {
-            var feature = go.AddComponent<PortalFeature>();
-            metadata.AddFeatureTag("Portal");
-            feature.SetFeatureEffects(portalFeatureEffects);
-        }
-
         if (addLightToggleFeature)
         {
             var feature = go.AddComponent<LightToggleFeature>();
