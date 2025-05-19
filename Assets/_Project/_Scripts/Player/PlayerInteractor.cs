@@ -14,6 +14,7 @@ using UnityEditor;
 
 public class PlayerInteractor : MonoBehaviour
 {
+    public bool PuzzleModeOn;
     [SerializeField] private CompanionController companion;
     [SerializeField] private CameraController cameraController;
     [SerializeField] private Player player;
@@ -103,6 +104,8 @@ public class PlayerInteractor : MonoBehaviour
 
     }
 
+    public void EnterPuzzle() => PuzzleModeOn = true;
+    public void ExitPuzzle() => PuzzleModeOn = false;
 
     private void UpdateCollider()
     {
@@ -124,7 +127,7 @@ public class PlayerInteractor : MonoBehaviour
     private void HandleLeftClick(InputAction.CallbackContext context)
     {
         if (!InputManager.instance.IsCommandMode) return;
-
+        if(PuzzleModeOn) return; // Disable left click in puzzle mode
         if (IsPointerOverBlockingUI()) return;
 
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(InputManager.instance.MousePosition);

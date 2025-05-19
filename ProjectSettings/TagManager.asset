@@ -79,6 +79,9 @@ TagManager:
   - name: 8FG2
     uniqueID: 1941640691
     locked: 0
+  - name: UIFRONT
+    uniqueID: 154093817
+    locked: 0
   m_RenderingLayers:
   - Default
   - Player

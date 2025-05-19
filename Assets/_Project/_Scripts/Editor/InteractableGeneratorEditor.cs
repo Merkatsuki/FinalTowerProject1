@@ -280,7 +280,7 @@ public class InteractableGeneratorEditor : EditorWindow
             toggleLight2D.intensity = 0f;
             toggleLight2D.pointLightOuterRadius = 2.5f;
 
-            feature.SetToggleLight(toggleLight2D);
+            //feature.SetToggleLight(toggleLight2D);
         }
 
         if (addSwitchFeature)

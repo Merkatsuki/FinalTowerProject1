@@ -5,7 +5,7 @@ public class RequiresPlayerCommandSO : EntryStrategySO
 {
     public override bool CanEnter(IPuzzleInteractor actor, IWorldInteractable target)
     {
-        return actor is CompanionController companion && companion.WasCommanded(target);
+        return actor is CompanionController companion;
     }
 }
 

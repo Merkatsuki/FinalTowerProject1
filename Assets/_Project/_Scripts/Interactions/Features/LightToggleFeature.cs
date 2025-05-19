@@ -6,10 +6,9 @@ using UnityEngine.Rendering.Universal;
 public class LightToggleFeature : FeatureBase
 {
     [Header("Light Settings")]
-    [SerializeField] private Light2D targetLight;
+    [SerializeField] private List<Light2D> targetLights = new();
 
     [Header("Simple Toggle Mode")]
-    [SerializeField] private bool startOn = true;
     [SerializeField] private float onIntensity = 1f;
     [SerializeField] private float offIntensity = 0f;
     [SerializeField] private float transitionDuration = 0.5f;
@@ -21,82 +20,108 @@ public class LightToggleFeature : FeatureBase
 
     [SerializeField] private List<FeatureBase> connectedFeatures;
 
-    private bool isOn = true;
+    private bool isOn = false;
     private int currentIntensityIndex = 0;
-    private Tween activeTween;
+    private List<Tween> activeTweens = new();
 
     private void Start()
     {
-        if (targetLight == null)
+        if (targetLights == null || targetLights.Count == 0)
         {
-            Debug.LogWarning("[LightToggleFeature] No Light2D assigned!");
+            Debug.LogWarning("[LightToggleFeature] No Light2D targets assigned!");
             return;
         }
 
-        isOn = startOn;
-
         if (useMultipleIntensityLevels && intensityLevels.Count > 0)
         {
-            // Start at first intensity level
-            targetLight.intensity = intensityLevels[0];
             currentIntensityIndex = 0;
+            foreach (var light in targetLights)
+            {
+                if (light != null)
+                    light.intensity = intensityLevels[0];
+            }
         }
         else
         {
-            targetLight.intensity = startOn ? onIntensity : offIntensity;
+            foreach (var light in targetLights)
+            {
+                if (light != null)
+                    light.intensity = offIntensity;
+            }
         }
     }
 
     public override void OnInteract(IPuzzleInteractor actor)
     {
-        if (isSolved) return;
-        {
-            ToggleLight();
-        }
+        ToggleLight();
+    }
+
+    public void SetPowered(bool powered)
+    {
+        Debug.Log($"[LightToggleFeature] Set powered state: {powered} this feature is set to {isOn} ");
+        if (powered == isOn) return; // Already in desired state
+
+        Debug.Log($"[LightToggleFeature] Toggling light to: {powered}");
+        ToggleLight(); // Flip to match desired state
     }
 
     private void ToggleLight()
     {
-        if (targetLight == null)
+        if (targetLights == null || targetLights.Count == 0)
         {
-            Debug.LogWarning("[LightToggleFeature] No Light2D to toggle.");
+            Debug.LogWarning("[LightToggleFeature] No Light2D targets to toggle.");
             return;
         }
 
-        if (activeTween != null && activeTween.IsActive())
-        {
-            activeTween.Kill();
-        }
+        KillActiveTweens();
 
         if (useMultipleIntensityLevels && intensityLevels.Count > 0)
         {
             currentIntensityIndex = (currentIntensityIndex + 1) % intensityLevels.Count;
             float nextIntensity = intensityLevels[currentIntensityIndex];
 
-            activeTween = DOTween.To(
-                () => targetLight.intensity,
-                x => targetLight.intensity = x,
-                nextIntensity,
-                dimmerTransitionDuration
-            );
+            foreach (var light in targetLights)
+            {
+                if (light == null) continue;
+
+                activeTweens.Add(DOTween.To(
+                    () => light.intensity,
+                    x => light.intensity = x,
+                    nextIntensity,
+                    dimmerTransitionDuration
+                ));
+            }
         }
         else
         {
-            float startIntensity = targetLight.intensity;
             float targetIntensity = isOn ? offIntensity : onIntensity;
 
-            activeTween = DOTween.To(
-                () => targetLight.intensity,
-                x => targetLight.intensity = x,
-                targetIntensity,
-                transitionDuration
-            );
+            foreach (var light in targetLights)
+            {
+                if (light == null) continue;
+
+                activeTweens.Add(DOTween.To(
+                    () => light.intensity,
+                    x => light.intensity = x,
+                    targetIntensity,
+                    transitionDuration
+                ));
+            }
 
             isOn = !isOn;
         }
 
         NotifyConnectedFeatures();
         RunFeatureEffects();
+    }
+
+    private void KillActiveTweens()
+    {
+        foreach (var tween in activeTweens)
+        {
+            if (tween != null && tween.IsActive()) tween.Kill();
+        }
+        activeTweens.Clear();
     }
 
     private void RunFeatureEffects()
@@ -113,13 +138,18 @@ public class LightToggleFeature : FeatureBase
     private void NotifyConnectedFeatures()
     {
         foreach (var feature in connectedFeatures)
-            feature?.OnInteract(null); // Null = system-triggered
+            feature?.OnInteract(ReferenceManager.Instance.Player); // Null = system-triggered
     }
 
-    public void SetToggleLight(Light2D light)
+    public void SetTargetLights(List<Light2D> lights)
     {
-        targetLight = light;
+        targetLights = lights;
+    }
+
+    public void AddTargetLight(Light2D light)
+    {
+        if (!targetLights.Contains(light))
+            targetLights.Add(light);
     }
 }
-
 
