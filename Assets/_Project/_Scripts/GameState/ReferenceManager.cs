@@ -12,6 +12,7 @@ public class ReferenceManager : MonoBehaviour
     public GameObject DialogueUI;
     public InventoryManager Inventory;
     public FlagManager FlagManager;
+    public CameraController Camera;
 
     private void Awake()
     {

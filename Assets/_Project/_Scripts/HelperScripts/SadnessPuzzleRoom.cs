@@ -8,37 +8,48 @@ public class SadnessPuzzleRoom : MonoBehaviour
     [SerializeField] private TeleportFeature[] attachedTeleportFeatures;
     [SerializeField] private FrameImageCycleFeature frameCycler;
     [SerializeField] private PhraseDisplay phraseDisplay;
-    [SerializeField] private GameObject vineObject;
+    [SerializeField] private FloatingWordReactiveEffect floatingWordEffect;
 
     [Header("Puzzle Target")]
     [SerializeField] private string correctPhrase;
     [SerializeField] private int correctImageIndex;
 
-    private bool isSolved;
-
+    public bool IsSolved() => IsCorrectPairing();
     public string GetAssignedPhrase() => correctPhrase;
     public int GetCurrentImageIndex() => frameCycler.GetCurrentIndex();
 
     private void Start()
     {
-        vineObject.SetActive(false);
-        phraseDisplay.DisplayText(correctPhrase); // Show text on entry
+        phraseDisplay.DisplayText(correctPhrase);
+
+        // Set a random starting index that avoids the correct one
+        int total = frameCycler.GetTotalImageCount();
+        int startIndex = Random.Range(0, total);
+
+        if (startIndex == correctImageIndex && total > 1)
+            startIndex = (startIndex + 1) % total;
+
+        frameCycler.SetImageIndex(startIndex);
+
+        ValidateImageAgainstPhrase(); // Apply word effect status
     }
+
 
     public void CheckPuzzleState()
     {
-        if (isSolved)
-            return;
-
         if (IsCorrectPairing())
         {
-            isSolved = true;
-            vineObject.SetActive(true);
-            Debug.Log($"[SadnessPuzzleRoom] Room {name} solved with correct pairing.");
+            Debug.Log($"[SadnessPuzzleRoom] Room {name} currently matches correct pairing.");
         }
 
         SadnessPuzzleRoomManager.Instance.CheckGlobalPuzzleState();
+    }
 
+
+    public void ValidateImageAgainstPhrase()
+    {
+        bool correct = IsCorrectPairing();
+        floatingWordEffect?.SetActiveEffect(correct);
     }
 
     private bool IsCorrectPairing()
@@ -80,6 +91,5 @@ public class SadnessPuzzleRoom : MonoBehaviour
         // Re-show current image, phrase, vine, etc. if needed
         Debug.Log($"[SadnessPuzzleRoom] Refreshing visual state for room: {name}");
     }
-
-    public bool IsSolved() => isSolved;
 }
+

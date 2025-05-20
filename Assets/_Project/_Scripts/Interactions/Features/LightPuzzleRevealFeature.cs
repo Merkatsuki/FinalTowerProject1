@@ -6,6 +6,7 @@ public class LightPuzzleRevealFeature : FeatureBase
 {
     [Header("Linked Systems")]
     [SerializeField] private ElevatorPlatformFeature elevator;
+    [SerializeField] private Transform puzzleCameraTarget;
 
     [Header("Puzzle Canvas Fade Settings")]
     [SerializeField] private CanvasGroup puzzleRevealCanvas;
@@ -41,6 +42,22 @@ public class LightPuzzleRevealFeature : FeatureBase
             Debug.Log($"[LightPuzzleReveal] Puzzle {(isRevealed ? "revealed, elevator locked" : "hidden, elevator unlocked")}.");
         }
 
+        if (isRevealed)
+        {
+            CameraController cam = ReferenceManager.Instance.Camera;
+            if (puzzleCameraTarget != null)
+            {
+                cam.FollowActiveCameraTarget(puzzleCameraTarget);
+                cam.SetZoom(8f, 0.5f); // Optional: tighter zoom
+            }
+        }
+        else
+        {
+            CameraController cam = ReferenceManager.Instance.Camera;
+            cam.FollowActiveCameraTarget(ReferenceManager.Instance.Companion.transform); // return to player view
+            cam.SetZoom(12f, 0.5f);
+        }
+        
         ToggleCanvas(isRevealed);
         RunFeatureEffects(actor); // Chain to light toggle etc.
     }

@@ -26,13 +26,12 @@ public class CameraController : MonoBehaviour
 
     private Transform lastFollowTarget;
 
-    private bool isZoomedForCommand = false;
-
     private Coroutine zoomCoroutine;
-    private Coroutine shakeCoroutine;
 
     private CinemachinePositionComposer positionComposer;
     private CinemachineBasicMultiChannelPerlin noise;
+
+    public float DefaultZoom => defaultZoom;
 
     private void Awake()
     {
@@ -65,23 +64,6 @@ public class CameraController : MonoBehaviour
         }
     }
 
-
-    public void FollowTarget(Transform target)
-    {
-        playerVirtualCamera.Follow = target;
-        playerVirtualCamera.LookAt = target;
-
-        if (parallaxController != null)
-            parallaxController.Initialize(target.transform);
-    }
-
-    public void FocusOn(Transform target, float blendTime = 1f)
-    {
-        playerVirtualCamera.Follow = target;
-        if (positionComposer != null)
-            positionComposer.Damping.x = blendTime;
-    }
-
     public void SetZoom(float newZoom, float duration)
     {
         if (zoomCoroutine != null)
@@ -106,39 +88,28 @@ public class CameraController : MonoBehaviour
         playerVirtualCamera.Lens.OrthographicSize = targetZoom;
     }
 
-    public void ShakeCamera(float intensity = 1f, float duration = 0.5f)
+    public void FollowActiveCameraTarget(Transform target)
     {
-        if (shakeCoroutine != null)
-            StopCoroutine(shakeCoroutine);
+        CinemachineCamera activeCam = IsInCommandMode() ? companionVirtualCamera : playerVirtualCamera;
 
-        shakeCoroutine = StartCoroutine(DoCameraShake(intensity, duration));
+        if (activeCam == null)
+        {
+            Debug.LogWarning("[CameraController] No active virtual camera found.");
+            return;
+        }
+
+        activeCam.Follow = target;
+        activeCam.LookAt = target;
+
+        if (parallaxController != null)
+            parallaxController.Initialize(target);
+
+        Debug.Log($"[CameraController] Active camera now following: {target.name}");
     }
 
-    private IEnumerator DoCameraShake(float intensity, float duration)
+    private bool IsInCommandMode()
     {
-        if (noise != null)
-        {
-            noise.AmplitudeGain = intensity;
-            noise.FrequencyGain = shakeFrequency;
-
-            yield return new WaitForSeconds(duration);
-
-            noise.AmplitudeGain = 0f;
-        }
-    }
-
-    public void SetConfinerBounds(Collider2D bounds)
-    {
-        var confiner = playerVirtualCamera.GetComponent<CinemachineConfiner2D>();
-        if (confiner != null)
-        {
-            confiner.BoundingShape2D = bounds;
-            confiner.InvalidateBoundingShapeCache();
-        }
-        else
-        {
-            Debug.LogWarning("CameraController: Confiner2D component is missing.");
-        }
+        return companionVirtualCamera != null && companionVirtualCamera.Priority > playerVirtualCamera.Priority;
     }
 
     public void SetCameraMode(bool isCommandMode)

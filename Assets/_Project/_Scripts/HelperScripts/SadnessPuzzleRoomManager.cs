@@ -6,15 +6,23 @@ public class SadnessPuzzleRoomManager : MonoBehaviour
 {
     public static SadnessPuzzleRoomManager Instance { get; private set; }
 
-    private static readonly string[] finalMessageSequence = { "I", "Give", "You", "This", "Tree", "To", "Remember"};
+    private static readonly string[] finalMessageSequence = { "I", "Give", "You", "This", "Tree", "To", "Remember" };
 
     [SerializeField] private SadnessPuzzleRoom currentRoom;
 
     [Header("All Rooms")]
     [SerializeField] private List<SadnessPuzzleRoom> allRooms;
 
-    [Header("Final Room Unlock")]
+    [Header("Final Object Unlock")]
     [SerializeField] private GameObject finalUnlockObject;
+
+    [Header("Camera Override Settings")]
+    [SerializeField] private CameraController cameraController;
+    [SerializeField] private Transform playerFollowTarget;
+    [SerializeField] private Transform cameraFocusPoint;
+    [SerializeField] private float cameraZoomOverride = 4.5f;
+    [SerializeField] private float zoomDuration = .2f;
+    [SerializeField] private bool useCameraOverride = true;
 
     private bool puzzleCompleted = false;
 
@@ -38,6 +46,22 @@ public class SadnessPuzzleRoomManager : MonoBehaviour
             currentRoom.gameObject.SetActive(true);
             currentRoom.RefreshState(); // Optional: reapply frame/phrase visuals
             Debug.Log($"[SadnessPuzzleRoomManager] Entered room: {currentRoom.name}");
+        }
+
+        if (cameraFocusPoint != null)
+        {
+            cameraController.FollowActiveCameraTarget(cameraFocusPoint);
+            cameraController.SetZoom(cameraZoomOverride, zoomDuration);
+        }
+    }
+
+    public void ExitPuzzleZone()
+    {
+        if (playerFollowTarget != null)
+        {
+            cameraController.FollowActiveCameraTarget(playerFollowTarget);
+            cameraController.SetZoom(cameraController.DefaultZoom, zoomDuration);
+            Debug.Log("[SadnessPuzzleRoomManager] Exiting Sadness zone, camera restored.");
         }
     }
 
