@@ -8,7 +8,7 @@ public class CompanionWindEffect : MonoBehaviour
 
     void Awake()
     {
-        agent = GetComponent<CompanionController>()?.Agent;
+        agent = GetComponent<NavMeshAgent>();
         if (agent == null)
             Debug.LogError("CompanionWindEffect: Could not find NavMeshAgent on Companion.");
     }

@@ -114,6 +114,7 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
         fsm.FixedTick();
         if (VisualController != null && Agent != null)
             VisualController.UpdateVisuals(Agent.velocity);
+        ApplyWindZones();
     }
 
     #endregion
@@ -242,6 +243,34 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
     }
 
     #endregion
+
+
+    private void ApplyWindZones()
+    {
+        Vector2 totalWindForce = Vector2.zero;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 0.2f);
+        foreach (var col in hits)
+        {
+            WindZone2D wind = col.GetComponent<WindZone2D>();
+            if (wind != null && wind.IsActive())
+            {
+                totalWindForce += wind.GetWindForce();
+            }
+        }
+
+        if (totalWindForce != Vector2.zero)
+        {
+            Agent.nextPosition += (Vector3)(totalWindForce * Time.fixedDeltaTime);
+
+            // Optional stop logic for strong gusts
+            Agent.isStopped = totalWindForce.magnitude > Agent.speed * 2f;
+        }
+        else
+        {
+            Agent.isStopped = false;
+        }
+    }
 }
 
 [Serializable]

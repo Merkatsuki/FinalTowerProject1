@@ -8,7 +8,7 @@ public class PlayerWindEffect : MonoBehaviour
 
     void Awake()
     {
-        rb = GetComponent<PlayerReferences>()?.PRB;
+        rb = GetComponent<Rigidbody2D>();
         if (rb == null)
             Debug.LogError("PlayerWindEffect: Could not find Rigidbody2D via PlayerReferences.");
     }
@@ -22,6 +22,8 @@ public class PlayerWindEffect : MonoBehaviour
             if (wind != null && wind.IsActive())
             {
                 rb.AddForce(wind.GetWindForce(), ForceMode2D.Force);
+                Debug.Log($"AddForce: {wind.GetWindForce()} | Rigidbody velocity: {rb.linearVelocity}");
+
             }
         }
     }
