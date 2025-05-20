@@ -5,6 +5,7 @@ using System.Collections;
 using Momentum;
 using UnityEngine.AI;
 using System;
+using Unity.VisualScripting;
 
 public class CompanionController : MonoBehaviour, IPuzzleInteractor
 {
@@ -32,6 +33,7 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
 
     [Header("Zones")]
     [SerializeField] private Transform hubSpawnPosition;
+    [SerializeField] private Transform greenhousePuzzleSpawnPosition;
 
     #endregion
 
@@ -168,28 +170,37 @@ public class CompanionController : MonoBehaviour, IPuzzleInteractor
 
     private void HandleZoneChange(ZoneTag zone)
     {
-        if (zone == ZoneTag.Hub && hubSpawnPosition != null)
+        if (zone == ZoneTag.GreenhouseMemory)
         {
-            Debug.Log("[CompanionController] Player entered Hub — switching to HubState.");
-            fsm.ChangeState(new CompanionHubState(this, fsm, hubSpawnPosition.position));
+            Agent.enabled = false;
+            transform.position = greenhousePuzzleSpawnPosition.position;
+            transform.rotation = Quaternion.identity;
+            Agent.enabled = true;
+            Agent.isStopped = false;
+            fsm.ChangeState(new CompanionFollowState(this, fsm));
+
         }
-        else if (ZoneManager.Instance.GetPlayerZone() != ZoneTag.Hub && fsm.CurrentStateType == CompanionStateType.Hub)
+        else if (zone == ZoneTag.Hub)
         {
-            // Exiting the hub → return to follow state and reposition
-            Debug.Log("[CompanionController] Player left Hub — teleporting companion to follow target.");
-
-            // 1. Teleport near follow target
-            if (defaultFollowTarget != null)
+            if (hubSpawnPosition != null)
             {
-                Agent.enabled = false;
-                transform.position = defaultFollowTarget.position;
-                transform.rotation = Quaternion.identity;
-                Agent.enabled = true;
-                Agent.isStopped = false;
+                fsm.ChangeState(new CompanionHubState(this, fsm, hubSpawnPosition.position));
             }
+            else if (ZoneManager.Instance.GetPlayerZone() != ZoneTag.Hub && fsm.CurrentStateType == CompanionStateType.Hub)
+            {
+                // 1. Teleport near follow target
+                if (defaultFollowTarget != null)
+                {
+                    Agent.enabled = false;
+                    transform.position = defaultFollowTarget.position;
+                    transform.rotation = Quaternion.identity;
+                    Agent.enabled = true;
+                    Agent.isStopped = false;
+                }
 
-            // 2. Resume follow
-            fsm.ChangeState(followState);
+                // 2. Resume follow
+                fsm.ChangeState(followState);
+            }
         }
     }
 

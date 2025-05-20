@@ -1,5 +1,4 @@
-﻿// Refactored SwitchFeature.cs to inherit from FeatureBase
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 public class SwitchFeature : FeatureBase
@@ -8,14 +7,21 @@ public class SwitchFeature : FeatureBase
     [SerializeField] private bool toggleable = true;
     [SerializeField] private bool startOn = false;
     [SerializeField] private bool oneTimeUse = false;
-    [SerializeField] private Animator switchAnimator;
-    [SerializeField] private string toggleParameter = "On";
+
+    [Header("Visuals")]
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Sprite spriteOn;
+    [SerializeField] private Sprite spriteOff;
+
+    [Header("Wind Zone Actions")]
+    [SerializeField] private List<WindZoneAction> windZoneActions = new(); // 👈 new struct list
 
     private bool isActivated;
     private bool permanentlyUsed;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         isActivated = startOn;
         UpdateVisual();
     }
@@ -27,20 +33,42 @@ public class SwitchFeature : FeatureBase
 
         isActivated = toggleable ? !isActivated : true;
 
-        RunFeatureEffects(actor);
-
-        if (oneTimeUse) permanentlyUsed = true;
-
         UpdateVisual();
         isSolved = true;
         NotifyPuzzleInteractionSuccess();
+
+        if (oneTimeUse) permanentlyUsed = true;
+
+        foreach (var entry in windZoneActions)
+        {
+            if (entry.windZone == null) continue;
+
+            switch (entry.action)
+            {
+                case WindZoneAction.ActionType.Toggle:
+                    Debug.Log($"[SwitchFeature] Toggling WindZone2D: {entry.windZone.name}");
+                    entry.windZone.ToggleActive();
+                    entry.windZone.PulseLight();
+                    break;
+
+                case WindZoneAction.ActionType.Rotate90:
+                    Vector2 current = entry.windZone.windDirection;
+                    entry.windZone.windDirection = new Vector2(-current.y, current.x);
+                    entry.windZone.ApplyRotationVisual();
+                    if (entry.windZone.useDirectionalParticles)
+                        entry.windZone.UpdateActiveParticleSystem();
+                    entry.windZone.PulseLight();
+                    Debug.Log($"[SwitchFeature] Rotated WindZone2D: {entry.windZone.name}");
+                    break;
+            }
+        }
     }
 
     private void UpdateVisual()
     {
-        if (switchAnimator != null && !string.IsNullOrEmpty(toggleParameter))
+        if (spriteRenderer != null)
         {
-            switchAnimator.SetBool(toggleParameter, isActivated);
+            spriteRenderer.sprite = isActivated ? spriteOn : spriteOff;
         }
     }
 

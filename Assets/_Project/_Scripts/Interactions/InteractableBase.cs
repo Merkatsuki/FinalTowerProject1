@@ -85,8 +85,6 @@ public class InteractableBase : MonoBehaviour, IWorldInteractable
         currentInteractor = interactor;
         isInteracting = true;
 
-        Debug.Log($"[InteractableBase] {name} was interacted with by {interactor}");
-
         if (interactionMode == InteractionMode.Immediate)
         {
             foreach (var effect in effects)

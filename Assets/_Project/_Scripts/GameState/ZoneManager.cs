@@ -10,6 +10,7 @@ public class ZoneManager : MonoBehaviour
 
     public event Action<ZoneTag> OnPlayerZoneChanged;
     public event Action<ZoneTag> OnCompanionZoneChanged;
+    public event Action<ZoneTag> OnAngerZoneExited;
 
     private ZoneTag currentPlayerZone = ZoneTag.Any;
     private ZoneTag currentCompanionZone = ZoneTag.Any;
@@ -28,11 +29,10 @@ public class ZoneManager : MonoBehaviour
         if (actorTag == "Player" && currentPlayerZone == zone) return;
         if (actorTag == "Companion" && currentCompanionZone == zone) return;
 
-        Debug.Log($"ZoneManager: {actorTag} entered {zone}");
+        bool wasInAngerZone = currentPlayerZone == ZoneTag.TheTower;
 
         if (!CanTriggerZone(actorTag, zone))
         {
-            Debug.Log($"ZoneManager: Skipping trigger for {actorTag} in {zone} (cooldown active)");
             return;
         }
 
@@ -41,13 +41,14 @@ public class ZoneManager : MonoBehaviour
         if (actorTag == "Player")
         {
             currentPlayerZone = zone;
-            Debug.Log($"ZoneManager: Player zone updated to {zone}");
             OnPlayerZoneChanged?.Invoke(zone);
+
+            if (wasInAngerZone && zone != ZoneTag.TheTower)
+                OnAngerZoneExited?.Invoke(zone);
         }
         else if (actorTag == "Companion")
         {
             currentCompanionZone = zone;
-            Debug.Log($"ZoneManager: Companion zone updated to {zone}");
             OnCompanionZoneChanged?.Invoke(zone);
         }
     }
@@ -70,7 +71,6 @@ public class ZoneManager : MonoBehaviour
             zoneCooldowns[actorTag] = new Dictionary<ZoneTag, float>();
 
         zoneCooldowns[actorTag][zone] = Time.time + zoneTriggerCooldown;
-        Debug.Log($"ZoneManager: Cooldown set for {actorTag} in {zone} until {zoneCooldowns[actorTag][zone]:F2}");
     }
 
     public ZoneTag GetPlayerZone() => currentPlayerZone;

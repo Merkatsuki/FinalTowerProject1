@@ -26,7 +26,6 @@ public class CompanionHubState : CompanionState
         agent.enabled = true;  // <- re-enable after teleporting
         agent.isStopped = true;
 
-        Debug.Log("[CompanionHubState] Companion teleported to hub at: " + hubPosition);
         companion.LockInteraction();
     }
 

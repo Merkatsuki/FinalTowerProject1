@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class DoorFeature : FeatureBase
 {
@@ -14,6 +15,16 @@ public class DoorFeature : FeatureBase
     [SerializeField] private bool autoClose = false;
     [SerializeField] private float autoCloseDelay = 2f;
     [SerializeField] private bool startClosed = true;
+
+    [Header("Linked Doors")]
+    [SerializeField] private List<DoorFeature> linkedDoors = new();
+
+    [Header("DoTween Door Movement")]
+    [SerializeField] private Transform doorTransform;
+    [SerializeField] private Vector3 openPosition;
+    [SerializeField] private Vector3 closedPosition;
+    [SerializeField] private float moveDuration = 0.4f;
+    [SerializeField] private Ease moveEase = Ease.OutCubic;
 
     private bool isOpen = false;
     private bool operating = false;
@@ -49,49 +60,48 @@ public class DoorFeature : FeatureBase
         }
     }
 
+    public void OpenDoorExternally()
+    {
+        if (!isOpen)
+        {
+            OpenDoor();
+        }
+    }
     private void OpenDoor()
     {
         operating = true;
-
-        if (doorAnimator != null && !string.IsNullOrEmpty(openTriggerName))
-        {
-            doorAnimator.SetTrigger(openTriggerName);
-        }
-        else
-        {
-            Debug.LogWarning("[DoorFeature] No Animator or Open Trigger assigned!");
-        }
-
         isOpen = true;
+
+        if (doorTransform != null)
+        {
+            doorTransform.DOKill(); // Cancel any running tween
+            doorTransform.DOMove(openPosition, moveDuration)
+                .SetEase(moveEase)
+                .OnComplete(() => operating = false);
+        }
 
         RunFeatureEffects();
 
         if (autoClose)
-        {
             StartCoroutine(AutoCloseCoroutine());
-        }
         else
-        {
             operating = false;
-        }
     }
 
     private void CloseDoor()
     {
         operating = true;
-
-        if (doorAnimator != null && !string.IsNullOrEmpty(closeTriggerName))
-        {
-            doorAnimator.SetTrigger(closeTriggerName);
-        }
-        else
-        {
-            Debug.LogWarning("[DoorFeature] No Animator or Close Trigger assigned!");
-        }
-
         isOpen = false;
-        operating = false;
+
+        if (doorTransform != null)
+        {
+            doorTransform.DOKill();
+            doorTransform.DOMove(closedPosition, moveDuration)
+                .SetEase(moveEase)
+                .OnComplete(() => operating = false);
+        }
     }
+
 
     private IEnumerator AutoCloseCoroutine()
     {

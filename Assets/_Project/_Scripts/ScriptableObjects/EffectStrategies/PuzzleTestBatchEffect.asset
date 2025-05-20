@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 047b7057452a9d94d97b19df12fe4a27, type: 3}
+  m_Name: PuzzleTestBatchEffect
+  m_EditorClassIdentifier: 
+  onlyOnSuccess: 1
+  effects:
+  - {fileID: 11400000, guid: d6a9d91de97c9c743a3928da67cc9a45, type: 2}
+  - {fileID: 11400000, guid: c73f733d2b2457142a0c66d2d588958b, type: 2}
+  - {fileID: 11400000, guid: 643109a231275d146995d7754fe8282f, type: 2}

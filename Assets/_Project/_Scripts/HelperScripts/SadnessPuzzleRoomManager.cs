@@ -44,8 +44,7 @@ public class SadnessPuzzleRoomManager : MonoBehaviour
         if (currentRoom != null)
         {
             currentRoom.gameObject.SetActive(true);
-            currentRoom.RefreshState(); // Optional: reapply frame/phrase visuals
-            Debug.Log($"[SadnessPuzzleRoomManager] Entered room: {currentRoom.name}");
+            currentRoom.RefreshState();
         }
 
         if (cameraFocusPoint != null)
@@ -61,7 +60,6 @@ public class SadnessPuzzleRoomManager : MonoBehaviour
         {
             cameraController.FollowActiveCameraTarget(playerFollowTarget);
             cameraController.SetZoom(cameraController.DefaultZoom, zoomDuration);
-            Debug.Log("[SadnessPuzzleRoomManager] Exiting Sadness zone, camera restored.");
         }
     }
 
@@ -80,13 +78,11 @@ public class SadnessPuzzleRoomManager : MonoBehaviour
             int expectedIndex = System.Array.IndexOf(finalMessageSequence, phrase);
             if (expectedIndex == -1)
             {
-                Debug.LogWarning($"[SadnessPuzzleManager] Unexpected phrase '{phrase}' in room {room.name}");
                 return;
             }
 
             if (imageIndex != expectedIndex)
             {
-                Debug.Log($"[SadnessPuzzleManager] Room {room.name}: phrase '{phrase}' is set to index {imageIndex} — needs {expectedIndex}");
                 return; // early exit if any are wrong
             }
         }

@@ -114,6 +114,13 @@ public class CameraController : MonoBehaviour
 
     public void SetCameraMode(bool isCommandMode)
     {
+        // Block camera switch if we're in the Anger zone
+        if (ZoneManager.Instance.GetPlayerZone() == ZoneTag.TheTower)
+        {
+            Debug.Log("[CameraController] Anger zone active — skipping camera mode switch.");
+            return;
+        }
+
         if (playerVirtualCamera != null && companionVirtualCamera != null)
         {
             playerVirtualCamera.Priority = isCommandMode ? 0 : 10;

@@ -8,6 +8,10 @@ public class ZoneCameraTrigger : MonoBehaviour
     [SerializeField] private float zoomDuration = 0.75f;
     [SerializeField] private bool triggerOnce = true;
 
+    [Header("Companion Teleport (Optional)")]
+    [SerializeField] private CompanionController companion;
+    [SerializeField] private Transform companionTeleportTarget;
+
     private bool triggered = false;
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -19,7 +23,6 @@ public class ZoneCameraTrigger : MonoBehaviour
         cameraController.SetZoom(zoom, zoomDuration);
 
         triggered = true;
-        Debug.Log("[ZoneCameraTrigger] Sadness Zone camera override activated.");
     }
 }
 

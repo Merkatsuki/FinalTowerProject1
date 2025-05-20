@@ -27,18 +27,20 @@ public class CompanionCommandManager : MonoBehaviour
     public void EnterCommandMode()
     {
         QuipManager.Instance?.TryPlayCommandStartQuip(companion);
-        Debug.Log("[CommandManager] Entered Command Mode");
     }
 
     public void ExitCommandMode()
     {
         QuipManager.Instance?.TryPlayCommandEndQuip(companion);
+
+        bool isInAngerZone = ZoneManager.Instance.GetCompanionZone() == ZoneTag.TheTower;
+
         if (isWaitHereToggled)
         {
             QuipManager.Instance?.TryPlayWaitHereQuip(companion);
             companion.CommandWaitHere();
         }
-        else
+        else if (!isInAngerZone)
         {
             QuipManager.Instance?.TryPlayFollowResumeQuip(companion);
             companion.fsm.ChangeState(companion.followState);
@@ -48,7 +50,6 @@ public class CompanionCommandManager : MonoBehaviour
     public void ToggleWaitHereMode(bool active)
     {
         isWaitHereToggled = active;
-        Debug.Log("[CommandManager] Wait Here mode set to: " + isWaitHereToggled);
     }
 
     public void IssueMoveToPoint(Vector2 worldPosition)

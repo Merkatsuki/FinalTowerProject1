@@ -19,3 +19,4 @@ public abstract class EffectStrategySO : ScriptableObject
 
     protected abstract void ApplyEffectInternal(IPuzzleInteractor actor, IWorldInteractable interactable, InteractionResult result);
 }
+

@@ -39,7 +39,6 @@ public class SadnessPuzzleRoom : MonoBehaviour
     {
         if (IsCorrectPairing())
         {
-            Debug.Log($"[SadnessPuzzleRoom] Room {name} currently matches correct pairing.");
         }
 
         SadnessPuzzleRoomManager.Instance.CheckGlobalPuzzleState();
@@ -61,35 +60,20 @@ public class SadnessPuzzleRoom : MonoBehaviour
     public PortalLink GetLink(PortalSide fromSide)
     {
         var link = portalLinks.FirstOrDefault(p => p.sourceSide == fromSide);
-        if (link == null)
-        {
-            Debug.LogWarning($"[PortalLink] No PortalLink found for side {fromSide} in room {name}");
-        }
-        else
-        {
-            Debug.Log($"[PortalLink] From {name}.{fromSide} → {link.targetRoom.name}.{link.targetSide}");
-        }
+        
         return link;
     }
 
     public TeleportFeature GetFeatureForSide(PortalSide side)
     {
         var feature = attachedTeleportFeatures.FirstOrDefault(f => f.GetSide() == side);
-        if (feature == null)
-        {
-            Debug.LogWarning($"[TeleportFeature] Could not find feature for {side} in {name}");
-        }
-        else
-        {
-            Debug.Log($"[TeleportFeature] Found destination feature in {name}.{side}");
-        }
+        
         return feature;
     }
 
     public void RefreshState()
     {
         // Re-show current image, phrase, vine, etc. if needed
-        Debug.Log($"[SadnessPuzzleRoom] Refreshing visual state for room: {name}");
     }
 }
 

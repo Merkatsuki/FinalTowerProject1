@@ -54,6 +54,7 @@ public enum ZoneTag
     Elevator,
     TheTower, 
     Greenhouse, 
+    GreenhouseMemory, 
     TheChip 
 }
 public enum QuipTone 

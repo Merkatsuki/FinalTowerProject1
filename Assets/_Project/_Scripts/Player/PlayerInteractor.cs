@@ -81,6 +81,8 @@ public class PlayerInteractor : MonoBehaviour
         SyncColliderRadius();
 
         InputManager.instance.OnCommandModeChanged += HandleCommandModeChanged;
+        ZoneManager.Instance.OnAngerZoneExited += HandleAngerZoneExit;
+
     }
 
     private void SyncColliderRadius()
@@ -329,6 +331,26 @@ public class PlayerInteractor : MonoBehaviour
 
         commandOverlay.interactable = isCommandMode;
         commandOverlay.blocksRaycasts = isCommandMode;
+    }
+
+    public void EnterAngerPuzzleMode(Transform cameraTarget)
+    {
+        PuzzleModeOn = true;
+        cameraController?.FollowActiveCameraTarget(cameraTarget);
+        GameStateManager.Instance.SetState(GameState.PuzzleInteraction);
+    }
+
+    private void HandleAngerZoneExit(ZoneTag newZone)
+    {
+        ExitPuzzle();
+        GameStateManager.Instance.SetState(GameState.Gameplay);
+
+        // Teleport companion to follow target
+        Transform followTarget = companion.defaultFollowTarget;
+        if (followTarget != null)
+        {
+            companion.Agent.Warp(followTarget.position);
+        }
     }
 
     private void OnInteractPressed(InputAction.CallbackContext context)

@@ -220,7 +220,7 @@ Material:
     - _EnableHue: 0
     - _EnableInkSpread: 0
     - _EnableInnerOutline: 0
-    - _EnableMetal: 1.1
+    - _EnableMetal: 1
     - _EnableNegative: 0
     - _EnableOuterOutline: 0
     - _EnablePingPongGlow: 0
@@ -562,9 +562,9 @@ Material:
     - _MetalHighlightColor: {r: 6.1509433, g: 7.8803554, b: 8, a: 1}
     - _MetalNoiseDistortion: {r: 0.5, g: 0.5, b: 0, a: 0}
     - _MetalNoiseDistortionScale: {r: 0.2, g: 0.2, b: 0, a: 0}
-    - _MetalNoiseDistortionSpeed: {r: -0.05, g: -0.05, b: 0, a: 0}
-    - _MetalNoiseScale: {r: 7.91, g: 0.5, b: 0, a: 0}
-    - _MetalNoiseSpeed: {r: -0.01, g: 0.05, b: 0, a: 0}
+    - _MetalNoiseDistortionSpeed: {r: 0, g: 0, b: 0, a: 0}
+    - _MetalNoiseScale: {r: 0.1, g: 1.85, b: 0, a: 0}
+    - _MetalNoiseSpeed: {r: 0, g: 0, b: 0, a: 0}
     - _OuterOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _OuterOutlineDistortionIntensity: {r: 0.01, g: 0.01, b: 0, a: 0}
     - _OuterOutlineNoiseScale: {r: 4, g: 4, b: 0, a: 0}

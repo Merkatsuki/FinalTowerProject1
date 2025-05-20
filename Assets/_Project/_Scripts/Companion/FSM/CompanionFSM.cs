@@ -20,7 +20,6 @@ public class CompanionFSM
 
     public void ChangeState(CompanionState newState)
     {
-        Debug.Log($"(CompanionFSM) Transition: {currentState?.StateType} → {newState.StateType}");
         currentState?.OnExit();
         currentState = newState;
         currentState.OnEnter();

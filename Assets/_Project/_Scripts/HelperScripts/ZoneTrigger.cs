@@ -10,7 +10,6 @@ public class ZoneTrigger : MonoBehaviour
 
         if (other.CompareTag("Player") || other.CompareTag("Companion"))
         {
-            Debug.Log($"ZoneTrigger: {other.tag} entered zone: {zone}");
             ZoneManager.Instance.NotifyZoneEntered(other.tag, zone);
         }
     }
